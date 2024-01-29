@@ -1,0 +1,200 @@
+<?php
+namespace Models\Entities;
+
+use Doctrine\ORM\Mapping as ORM;
+use \DateTime;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="comment")
+ */
+class Comment
+{
+    public function __construct()
+    {
+        $this->createDate = new DateTime();
+        $this->isActive = true;
+    }
+    
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(type="bigint", options={"unsigned":true})
+     */
+    private $id;
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @ORM\Column(type="datetime", columnDefinition="DATETIME(6) DEFAULT NOW()", nullable=false)
+     */
+    private $createDate;
+
+    public function getCreateDate()
+    {
+        return $this->createDate;
+    }
+
+    public function setCreateDate(DateTime $createDate)
+    {
+        $this->createDate = $createDate;
+    }
+
+    /**
+     * @ORM\Column(type="datetime", columnDefinition="DATETIME(6) DEFAULT NULL", nullable=true)
+     */
+    private $modifyDate;
+
+    public function getModifyDate()
+    {
+        return $this->modifyDate;
+    }
+    
+    public function setModifyDate(?DateTime $modifyDate)
+    {
+        $this->modifyDate = $modifyDate;
+    }
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private $content;
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+    
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+    
+
+    /**
+     * @ORM\Column(type="boolean", options={"default":1})
+     */
+    private $isActive;
+
+    public function getIsActive()
+    {
+        return $this->isActive;
+    }
+    
+    public function setIsActive($isActive)
+    {
+        $this->isActive = $isActive;
+    }
+    
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $publicScope;
+
+    public function getPublicScope()
+    {
+        return $this->publicScope;
+    }
+    
+    public function setPublicScope($publicScope)
+    {
+        $this->publicScope = $publicScope;
+    }
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $depth;
+
+    public function getDepth()
+    {
+        return $this->depth;
+    }
+    
+    public function setDepth($depth)
+    {
+        $this->depth = $depth;
+    }
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private $commentFilePath;
+
+    public function getCommentFilePath()
+    {
+        return $this->commentFilePath;
+    }
+    
+    public function setCommentFilePath($commentFilePath)
+    {
+        $this->commentFilePath = $commentFilePath;
+    }
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=false)
+     */
+    private $commentFileName;
+
+    public function getCommentFileName()
+    {
+        return $this->commentFileName;
+    }
+    
+    public function setCommentFileName($commentFileName)
+    {
+        $this->commentFileName = $commentFileName;
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Member")
+     * @ORM\JoinColumn(name="member_id", referencedColumnName="id")
+     */
+    private $member;
+
+    public function getMember()
+    {
+        return $this->member;
+    }
+    
+    public function setMember(?Member $member)
+    {
+        $this->member = $member;
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Article")
+     * @ORM\JoinColumn(name="article_id", referencedColumnName="id")
+     */
+    private $article;
+
+    public function getArticle()
+    {
+        return $this->article;
+    }
+    
+    public function setArticle(?Article $article)
+    {
+        $this->article = $article;
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Comment")
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     */
+    private $parent;
+
+    public function getParent()
+    {
+        return $this->parent;
+    }
+    
+    public function setParent(?Comment $parent)
+    {
+        $this->parent = $parent;
+    }
+}
