@@ -17,6 +17,11 @@ class Article
      */
     private $id;
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     /**
      * @ORM\Column(type="datetime", columnDefinition="DATETIME(6) DEFAULT NOW()", nullable=false)
      */
@@ -45,6 +50,22 @@ class Article
     public function setModifyDate($modifyDate)
     {
         $this->modifyDate = $modifyDate;
+    }
+
+    /**
+     * @ORM\Column(type="string", length=16, nullable=false)
+     */
+    private $ip;
+
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    public function setIp($ip)
+    {
+        $ip =  $_SERVER['REMOTE_ADDR'];
+        $this->ip = $ip;
     }
 
     /**

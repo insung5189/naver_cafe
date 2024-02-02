@@ -313,3 +313,7 @@ switch (ENVIRONMENT)
  * And away we go...
  */
 require_once BASEPATH.'core/CodeIgniter.php';
+
+
+// index.php 또는 config.php 등 초기화 스크립트에 추가
+date_default_timezone_set('Asia/Seoul');

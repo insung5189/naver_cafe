@@ -1,4 +1,5 @@
 <?php
+// /cli-config.php
 require_once "application/config/doctrine.php";
 
 use Doctrine\ORM\Tools\Console\ConsoleRunner;

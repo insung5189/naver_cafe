@@ -14,8 +14,15 @@
 		"php": ">=5.3.7",
 		"doctrine/orm": "^2.17",
 		"doctrine/cache": "^1.11",
-		"doctrine/annotations": "^1.0"
+		"doctrine/annotations": "^1.0",
+		"doctrine/dbal": "^3.8"
 	},
+	"autoload": {
+        "psr-4": {
+            "Models\\Entities\\": "application/models/Entities/",
+			"App\\": "application/"
+        }
+    },
 	"suggest": {
 		"paragonie/random_compat": "Provides better randomness in PHP 5.x"
 	},

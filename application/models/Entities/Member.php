@@ -84,8 +84,6 @@ class Member
         if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/', $password)) {
             throw new \InvalidArgumentException("비밀번호는 영문, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
         }
-        $this->password = $password;
-
         // 비밀번호 해싱
         $this->password = password_hash($password, PASSWORD_BCRYPT);
     }
@@ -136,7 +134,7 @@ class Member
     }
 
     /**
-     * @ORM\Column(type="datetime", columnDefinition="DATETIME(6) DEFAULT NULL", nullable=true)
+     * @ORM\Column(type="date", nullable=true)
      */
     private $birth;
 
@@ -147,6 +145,11 @@ class Member
 
     public function setBirth($birth)
     {
+        // 만약 입력된 값이 문자열이면 DateTime 객체로 변환
+        if (is_string($birth)) {
+            $birth = new \DateTime($birth);
+        }
+    
         $this->birth = $birth;
     }
 
@@ -241,7 +244,7 @@ class Member
     }
 
     /**
-     * @ORM\Column(type="boolean", options={"default":true})
+     * @ORM\Column(type="boolean", nullable=false, options={"default":true})
      */
     private $isActive;
 
@@ -252,11 +255,12 @@ class Member
 
     public function setIsActive($isActive)
     {
+        $this->$isActive = true;
         $this->isActive = $isActive;
     }
 
     /**
-     * @ORM\Column(type="boolean", nullable=true, options={"default":false})
+     * @ORM\Column(type="boolean", nullable=false, options={"default":false})
      */
     private $blacklist;
 
@@ -350,7 +354,7 @@ class Member
     }
 
     /**
-     * @ORM\Column(type="text", nullable=false)
+     * @ORM\Column(type="text", nullable=true)
      */
     private $introduce;
 

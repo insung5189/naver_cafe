@@ -3,26 +3,25 @@
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
-// APPPATH 상수가 이미 정의되었는지 확인
 if (!defined('APPPATH')) {
-    // 상수가 정의되지 않았다면, index.php의 로직을 참고하여 정의
-    $application_folder = $_SERVER['DOCUMENT_ROOT']; // 실제 애플리케이션 폴더 경로로 설정
-    define('APPPATH', realpath($application_folder) . DIRECTORY_SEPARATOR);
+    define('APPPATH', realpath(__DIR__ . '/../') . '/');
 }
 
-require_once APPPATH . 'vendor/autoload.php';
+ require_once APPPATH . '../vendor/autoload.php'; // 보통 vendor 폴더는 프로젝트 루트디렉토리에 있는 경우를 고려하여 application폴더 바깥의 vendor 폴더를 참조
 
 $isDevMode = true;
-$entitiesPath = array(APPPATH . 'application/models/Entities');
+$entitiesPath = array(APPPATH . 'models/Entities');
 $config = Setup::createAnnotationMetadataConfiguration($entitiesPath, $isDevMode, null, null, false);
 $config->setAutoGenerateProxyClasses(true);
 
 // 데이터베이스 설정
 $conn = array(
-    'driver' => 'pdo_mysql',
+    'driver' => 'pdo_mysql', 
     'user' => 'root',
     'password' => '',
     'dbname' => 'cafe',
 );
 
 $entityManager = EntityManager::create($conn, $config);
+
+$GLOBALS['entityManager'] = $entityManager;
