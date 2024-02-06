@@ -1,86 +1,144 @@
 $(document).ready(function() {
+    // 중복확인 상태 변수
     var isEmailDuplicateChecked = false;
     var isNicknameDuplicateChecked = false;
 
-    $('#duplicateEmail').click(function() {
-        duplicateEmail();
-    });
+    // 이름, 성 유니코드 정규검사식
+    const nameRegex = /^[A-Za-z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u1E00-\u1EFF\u2C00-\u2C7F\u2D00-\u2D2F\u3000-\u303F\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE30-\uFE4F-'\s]+$/;
 
-    $('#duplicateNickname').click(function() {
-        duplicateNickname();
-    });
-
-
-
-    function duplicateEmail() {
-        const userName = $('#userName').val();
-        $.ajax({
-            url: '/member/signupcontroller/checkEmail',
-            type: 'POST',
-            dataType: 'json',
-            data: { userName: userName },
-            success: function(response) {
-                if (response.isDuplicate) {
-                    $('#email-duplication-check-message').text('❌ 이미 사용 중인 이메일입니다.').css('color', 'red');
-                    isEmailDuplicateChecked = false;
-                } else {
-                    $('#email-duplication-check-message').text('✔️ 사용 가능한 이메일입니다.').css('color', 'green');
-                    isEmailDuplicateChecked = true;
-                }
-            },
-            error: function() {
-                alert('이메일 중복 확인 중 오류가 발생했습니다.');
-            }
-        });
-    }
-    
-    function duplicateNickname() {
-        const nickName = $('#nickName').val();
-        $.ajax({
-            url: '/member/signupcontroller/checkNickname',
-            type: 'POST',
-            dataType: 'json',
-            data: { nickName: nickName },
-            success: function(response) {
-                if (response.isDuplicate) {
-                    $('#nickname-duplication-check-message').text('❌ 이미 사용 중인 닉네임입니다.').css('color', 'red');
-                    isNicknameDuplicateChecked = false; // 중복된 닉네임, 중복 확인 필요
-                } else {
-                    $('#nickname-duplication-check-message').text('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
-                    isNicknameDuplicateChecked = true; // 중복 확인 완료
-                }
-            },
-            error: function() {
-                alert('닉네임 중복 확인 중 오류가 발생했습니다.');
-            }
-        });
-    }
-    
+    // 이벤트 핸들러 등록
+    $('#duplicateEmail').click(duplicateEmail);
+    $('#duplicateNickname').click(duplicateNickname);
     $('#upload-image').click(function() {
         $('#file').click();
     });
+    $('#file').change(updateImagePreview);
+    $('#remove-image').click(resetImagePreview);
+    $('#userName').on('keyup', validateEmail);
+    $('#userName').on('keyup', resetEmailValidation);
+    $('#nickName').on('keyup', validateNickname);
+    $('#nickName').on('keyup', resetNicknameValidation);
+    $('#password1, #password2').on('keyup', validatePasswordAndMatch);
+    $('#phone').on('keyup', validatePhone);
+    $('#firstName').on('keyup', validateFirstName);
+    $('#lastName').on('keyup', validateLastName);
+    $('#gender').change(validateGenderSelect);
+    $('#birth').on('keyup',validateBirthDate);
+    $('#birth').on('blur',validateBirthDate);
+    $('form').on('submit', submitFormValidation);
+
+    function duplicateEmail() {
+        const userName = $('#userName').val();
+        if (!userName) {
+            alert('이메일을 입력해주세요.');
+            return;
+        }
+        if (validateEmail()) {
+            $.ajax({
+                url: '/member/signupcontroller/checkEmail',
+                type: 'POST',
+                dataType: 'json',
+                data: { userName: userName },
+                success: function(response) {
+                    handleEmailResponse(response);
+                },
+                error: function() {
+                    alert('이메일 중복 확인 중 오류가 발생했습니다.');
+                    return false;
+                }
+            });
+        } else {
+            alert('올바른 이메일 형식이 아닙니다.');
+            return false;
+        }
+    }
+
+    function handleEmailResponse(response) {
+        if (response.isDuplicate) {
+            alert('이미 사용 중인 이메일입니다.');
+            $('#email-duplication-check-message').text('❌ 이미 사용 중인 이메일입니다.').css('color', 'red');
+            isEmailDuplicateChecked = false;
+            return false;
+        } else {
+            if (confirm('사용 가능한 이메일입니다.\n확인 버튼을 누르시면 해당 이메일을 사용하며 \n수정이 불가능합니다.')) {
+                $('#email-duplication-check-message').text('✔️ 사용 가능한 이메일입니다.').css('color', 'green');
+                $('#duplicateEmail').val('중복확인 완료');
+                $('#userName').attr('readonly', true);
+                $('#duplicateEmail').attr('disabled', true);
+                isEmailDuplicateChecked = true;
+                return true;
+            }
+        }
+    }
+
+    function duplicateNickname() {
+        const nickName = $('#nickName').val();
+        if (!nickName) {
+            alert('닉네임을 입력해주세요.');
+            return;
+        }
+        if (validateNickname()) {
+            $.ajax({
+                url: '/member/signupcontroller/checkNickname',
+                type: 'POST',
+                dataType: 'json',
+                data: { nickName: nickName },
+                success: function(response) {
+                    handleNicknameResponse(response);
+                },
+                error: function() {
+                    alert('닉네임 중복 확인 중 오류가 발생했습니다.');
+                    return false;
+                }
+            });
+        } else {
+            alert('올바른 닉네임 형식이 아닙니다.');
+            return false;
+        }
+    }
+
+    function handleNicknameResponse(response) {
+        if (response.isDuplicate) {
+            alert('이미 사용 중인 닉네임입니다.');
+            $('#nickname-duplication-check-message').text('❌ 이미 사용 중인 닉네임입니다.').css('color', 'red');
+            isNicknameDuplicateChecked = false;
+            return false;
+        } else {
+            if (confirm('사용 가능한 닉네임입니다.\n확인 버튼을 누르시면 해당 닉네임을 사용하며 \n수정이 불가능합니다.')) {
+                $('#nickname-duplication-check-message').text('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
+                $('#duplicateNickname').val('중복확인 완료');
+                $('#nickName').attr('readonly', true);
+                $('#duplicateNickname').attr('disabled', true);
+                isNicknameDuplicateChecked = true;
+                return true;
+            }
+        }
+    }
 
     // 이미지 미리보기 및 파일 정보 표시
-    $('#file').change(function(event) {
+    function updateImagePreview(event) {
         const file = event.target.files[0];
+        const fileInfo = $('#file-info');
 
-        // 파일이 이미지인지 확인
+        if (!file) {
+            fileInfo.html(`등록된 파일이 없습니다. <br>기본 이미지가 적용됩니다.`);
+            return;
+        }
+
         if (!file.type.match('image.*')) {
             alert('이미지 파일만 업로드 가능합니다.');
             $('#file').val("");
+            fileInfo.html(`50mb이하의 이미지 파일만 등록 가능합니다. <br>다시 등록해주세요.`);
             return;
         }
 
-        // 파일 사이즈 체크 (50MB 제한)
         if (file.size > 52428800) {
             alert('파일 크기가 너무 큽니다. 50MB 이하의 파일을 선택해주세요.');
             $('#file').val("");
+            fileInfo.html(`50mb이하의 이미지 파일만 등록 가능합니다. <br>다시 등록해주세요.`);
             return;
         }
 
-        // 이미지 미리보기 및 파일 정보 표시
-        const preview = $('.image-preview');
-        const fileInfo = $('#file-info');
         let fileSize = file.size / 1024; // KB 단위로 변환
         let fileSizeUnit = 'KB';
         if (fileSize > 1024) {
@@ -90,137 +148,121 @@ $(document).ready(function() {
         fileInfo.html(`파일이름 : ${file.name}<br> 파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
 
         const reader = new FileReader();
-        reader.onload = function() {
-            preview.attr('src', reader.result);
+        reader.onload = function(e) {
+            $('.image-preview').attr('src', e.target.result);
         };
         reader.readAsDataURL(file);
-    });
+    }
 
     // 이미지 삭제 및 초기화
-    $('#remove-image').click(function() {
-        const preview = $('.image-preview');
-        const fileInfo = $('#file-info');
-        preview.attr('src', 'https://i.imgur.com/0Vhk4jx.png'); // 기본 이미지로 재설정
-        fileInfo.html(''); // 파일 정보 초기화
-        $('#file').val(""); // 파일 입력 필드 초기화
-    });
+    function resetImagePreview() {
+        $('.image-preview').attr('src', 'https://i.imgur.com/0Vhk4jx.png');
+        $('#file').val("");
+        $('#file-info').html(`등록된 파일이 없습니다. <br>기본 이미지가 적용됩니다.`);
+    }
 
-    // 이메일 입력란
-    $('#userName').on('keyup', function() {
-        validateEmail();
-    });
-
-    $('#password1, #password2').on('keyup', function() {
-        validatePassword();
-        checkPasswordMatch();
-    });
-
-    $('#phone').on('keyup', function() {
-        validatePhone();
-    });
-    
-
-    // 폼 제출 시 유효성 검사
-    $('form').on('submit', function(event) {
-        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !isEmailDuplicateChecked || !isNicknameDuplicateChecked) {
-            event.preventDefault();
-            // 이메일, 비밀번호 불일치나 유효성 검사 실패 시 스크롤 이동
-            if (!validateEmail()) {
-                scrollError('userName'); // 이메일 유효성 검사 실패 시 스크롤 이동
-                alert('올바른 이메일 형식이 아닙니다.');
-            }
-            if (!checkPasswordMatch()) {
-                scrollError('password2'); // 비밀번호 불일치 시 스크롤 이동
-                alert('비밀번호가 일치하지 않습니다.');
-            }
-            if (!validatePassword()) {
-                scrollError('password1'); // 비밀번호 유효성 검사 실패 시 스크롤 이동
-                alert('비밀번호는 영문, 숫자, 특수문자를 포함한 \n8자 이상이어야 합니다.');
-            }
-            if (!validatePhone()) {
-                scrollError('phone'); // 연락처 유효성 검사 실패 시 스크롤 이동
-                alert('전화번호 형식에 맞추어서\n입력해주시기 바랍니다.');
-            }
-            if (!isEmailDuplicateChecked) {
-                scrollError('userName'); // 이메일 입력란으로 스크롤 이동
-                alert('이메일 중복 확인을 해주세요.');
-            }
-            if (!isNicknameDuplicateChecked) {
-                scrollError('nickName'); // 닉네임 입력란으로 스크롤 이동
-                alert('닉네임 중복 확인을 해주세요.');
-            }
+    // 이메일 입력란 변경 시 로직
+    function resetEmailValidation() {
+        if (isEmailDuplicateChecked == true) {
+            isEmailDuplicateChecked = false;
+            $('#duplicateEmail').val('중복확인');
+            $('#userName').attr('readonly', false);
+            $('#duplicateEmail').attr('disabled', false);
+            alert('⚠ 중복확인 후 입력값 수정을 시도하셨습니다.\n아이디 중복확인을 다시 시도해주세요.');
         }
-    });
+    }
 
-
-
-    // 이메일 유효성 검사 input
+    // 이메일 유효성 검사 keyup
     function validateEmail() {
         const emailInput = $('#userName');
-        const emailValidationMessage = $('#email-validation-message');
+        const email = emailInput.val(); // 앞뒤 공백을 제거하지 않은 원본 이메일 값
+        const emailValidationMessage = $('#email-duplication-check-message');
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-        if (emailPattern.test(emailInput.val())) {
-            emailValidationMessage.text('✔️ 올바른 이메일 형식입니다.');
-            emailValidationMessage.css('color', 'green');
-            return true;
-        } else {
+        // 입력값의 시작이나 끝에 공백이 있는지 검사하는 정규식
+        const leadingOrTrailingWhitespacePattern = /^\s+|\s+$/;
+
+        if (leadingOrTrailingWhitespacePattern.test(email)) {
+            // 입력값의 시작이나 끝에 공백이 있는 경우
+            emailValidationMessage.text('❌ 이메일 주소의 시작이나 끝에 공백을 포함할 수 없습니다.');
+            emailValidationMessage.css('color', 'red');
+            return false;
+        } else if (!emailPattern.test(email)) {
+            // 이메일 형식이 올바르지 않음
             emailValidationMessage.text('❌ 올바른 이메일 형식이 아닙니다.');
             emailValidationMessage.css('color', 'red');
             return false;
-        }
-    }
-
-    // 비밀번호 유효성 검사 input
-    function validatePassword() {
-        const password1 = $('#password1').val();
-        const validationMessage = $('#password-validation-message');
-    
-        // 조건 검사
-        const hasLetter = /[a-zA-Z]/.test(password1);
-        const hasDigit = /\d/.test(password1);
-        const hasSpecialChar = /[!@#$%^&*()\-_=+\[\]{}|;:'",<.>/?]/.test(password1);
-        const isLongEnough = password1.length >= 8;
-    
-        // 상세한 조건 불충족 메시지
-        let message = '';
-        if (!hasLetter) message += '영문자, ';
-        if (!hasDigit) message += '숫자, ';
-        if (!hasSpecialChar) message += '특수문자, ';
-        if (!isLongEnough) message += '8자 이상, ';
-    
-        if (message !== '') {
-            // 마지막 쉼표 제거
-            message = message.slice(0, -2);
-            validationMessage.html(`❌ 다음을 포함해야 합니다: ${message}`).css('color', 'red');
-            return false;
         } else {
-            validationMessage.text('✔️ 사용 가능한 비밀번호 입니다.').css('color', 'green');
+            // 올바른 이메일 형식
+            emailValidationMessage.text('✔️ 올바른 이메일 형식입니다.');
+            emailValidationMessage.css('color', 'green');
             return true;
         }
     }
 
-    // 비밀번호 일치 확인 input
+    // 비밀번호 유효성 검사 및 일치 확인
+    function validatePasswordAndMatch() {
+        validatePassword();
+        checkPasswordMatch();
+    }
+
+    // 비밀번호 유효성 검사 keyup
+    function validatePassword() {
+        const password = $('#password1').val();
+        const validationMessage = $('#password-validation-message');
+
+        // 조건 검사
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasDigit = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*()\-_=+\[\]{}|;:'",<.>/?]/.test(password);
+        const isLongEnough = password.length >= 8;
+        const hasInvalidChar = /[^a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|;:'",<.>/?]/.test(password);
+
+        // 상세한 조건 불충족 메시지 초기화
+        let message = '';
+
+        // 조건별 메시지 추가
+        message += hasLetter ? '✔️ 영문, ' : '❌ 영문, ';
+        message += hasDigit ? '✔️ 숫자, ' : '❌ 숫자, ';
+        message += hasSpecialChar ? '✔️ 특수문자, ' : '❌ 특수문자, ';
+        message += isLongEnough ? '✔️ 8자 이상 ' : '❌ 8자 이상 ';
+        message += !hasInvalidChar ? '' : '<br>❌ 유효하지 않은 문자 포함(공백, 허용되지 않는 특수문자 등)';
+
+        message = message.trim().replace(/, $/, '');
+        validationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar ? 'green' : 'red');
+        if (hasLetter && hasDigit && hasSpecialChar && hasSpecialChar && isLongEnough && !hasInvalidChar) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 비밀번호 일치 확인 keyup
     function checkPasswordMatch() {
         const password1 = $('#password1').val();
         const password2 = $('#password2').val();
         const matchMessage = $('#password-match-message');
     
-        if (password1 === '' && password2 === '') {
-            matchMessage.text('');
-            return true; // 두 필드가 모두 비어있는 경우는 초기 상태로 간주함
-        } else if (password1 === '') {
-            matchMessage.text('❌ 사용할 비밀번호가 입력되지 않았습니다.').css('color', 'red');
-            return false;
-        } else if (password2 === '') {
-            matchMessage.text('❌ 비밀번호가 입력되지 않았습니다.').css('color', 'red');
-            return false;
-        } else if (password1 !== password2) {
-            matchMessage.text('❌ 비밀번호 불일치').css('color', 'red');
-            return false;
+        if (validatePassword()) {
+            if (password1 === '' && password2 === '') {
+                matchMessage.text('');
+                return true;
+            } else if (password1 === '') {
+                matchMessage.text('❌ 사용할 비밀번호가 입력되지 않았습니다.').css('color', 'red');
+                return false;
+            } else if (password2 === '') {
+                matchMessage.text('❌ 비밀번호가 입력되지 않았습니다.').css('color', 'red');
+                return false;
+            } else if (password1 !== password2) {
+                matchMessage.text('❌ 비밀번호 불일치').css('color', 'red');
+                return false;
+            } else {
+                matchMessage.text('✔️ 비밀번호 일치').css('color', 'green');
+                return true;
+            }
         } else {
-            matchMessage.text('✔️ 비밀번호 일치').css('color', 'green');
-            return true;
+            matchMessage.text('❌ 비밀번호 패턴 불만족').css('color', 'red');
+            return false;
         }
     }
 
@@ -229,19 +271,226 @@ $(document).ready(function() {
         const message = $('#phone-validation-message');
         const phoneValue = phoneInput.val().replace(/-/g, ''); // 하이픈 제거
     
-        // 한국 전화번호 패턴 (휴대전화, 유선전화, 인터넷전화)
-        const phonePattern = /^(01(?:0|1|[6-9])\d{7,8})|(0(?:2|3[1-3]|4[1-4]|5[1-5]|6[1-4])\d{7,8})|(070\d{7,8})$/;
+        // 국제 전화번호 패턴 검사 (한국 포함)
+        const phonePattern = /^(\+\d{1,3}-?)?(01[016-9]|02|0[3-6][1-5]?|070)-?([1-9]\d{2,3}-?\d{4})$/;
     
         if (!phonePattern.test(phoneValue)) {
-            message.text('❌ 유효하지 않은 전화번호 형식입니다. (하이픈 제외)').css('color', 'red');
+            message.text('❌ 유효하지 않은 전화번호 형식입니다.').css('color', 'red');
             return false;
         } else {
             message.text('✔️ 유효한 전화번호 형식입니다.').css('color', 'green');
             return true;
         }
     }
-    
 
+    // 닉네임 입력란 변경 시 로직
+    function resetNicknameValidation() {
+        if (isNicknameDuplicateChecked == true) {
+            isNicknameDuplicateChecked = false;
+            $('#duplicateNickname').val('중복확인');
+            $('#nickName').attr('readonly', false);
+            $('#duplicateNickname').attr('disabled', false);
+            alert('⚠ 중복확인 후 입력값 수정을 시도하셨습니다.\n닉네임 중복확인을 다시 시도해주세요.');
+        }
+    }
+
+    // 닉네임 유효성 검사
+    function validateNickname() {
+        const nicknameInput = $('#nickName').val();
+        const nicknameValidationMessage = $('#nickname-duplication-check-message');
+
+        // 길이 검사
+        const lengthCheck = nicknameInput.length >= 2 && nicknameInput.length <= 10;
+        const hasKoreanOrEnglish = /[가-힣a-zA-Z]+/.test(nicknameInput);
+        const hasInvalidCharacter = /[^가-힣a-zA-Z0-9]/.test(nicknameInput);
+
+        // 상세 메시지 생성
+        let message = '';
+
+        // 길이 조건
+        message += lengthCheck ? '✔️ 2~10글자<br>' : '❌ 2~10글자<br>';
+        
+        // 문자 유형 조건
+        if (hasKoreanOrEnglish && !hasInvalidCharacter) {
+            message += '✔️ 한글 또는 영문 대소문자, 숫자 선택적<br>';
+        } else {
+            if (!hasKoreanOrEnglish) {
+                message += '❌ 한글 또는 영문 대소문자 반드시 포함<br>';
+            }
+            if (hasInvalidCharacter) {
+                message = '❌ 유효하지 않은 문자 포함<br>';
+            }
+        }
+
+        // 메시지 출력
+        nicknameValidationMessage.html(message).css('color', lengthCheck && hasKoreanOrEnglish && !hasInvalidCharacter ? 'green' : 'red');
+        return lengthCheck && hasKoreanOrEnglish && !hasInvalidCharacter;
+    }
+
+    // 이름 유효성 검사
+    function validateFirstName() {
+        const firstName = $('#firstName').val().trim();
+        const firstNameMessage = $('#firstname-validation-message');
+    
+        if (firstName == null || firstName == '') {
+            firstNameMessage.text('❌ 이름을 입력해주세요.').css('color', 'red');
+            return false;
+        }
+        if (!nameRegex.test(firstName)) {
+            firstNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
+            return false;
+        } else {
+            firstNameMessage.text('');
+            return true;
+        }
+
+    }
+
+    // 성 유효성 검사
+    function validateLastName() {
+        const lastName = $('#lastName').val().trim();
+        const lastNameMessage = $('#lastname-validation-message');
+    
+        if (lastName == null || lastName == '') {
+            lastNameMessage.text('❌ 성을 입력해주세요.').css('color', 'red');
+            return false;
+        }
+        if (!nameRegex.test(lastName)) {
+            lastNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
+            return false;
+        } else {
+            lastNameMessage.text('');
+            return true;
+        }
+    }
+
+    // 성별 유효성검사
+    function validateGenderSelect() {
+        const genderSelect = $('#gender');
+        const genderValidationMessage = $('#gender-validation-message');
+    
+        // 드롭다운의 현재 값이 'true' 또는 'false'가 아니라면 유효하지 않은 것으로 간주
+        if (genderSelect.val() !== 'true' && genderSelect.val() !== 'false') {
+            genderValidationMessage.text('❌ 유효하지 않은 성별값입니다.').css('color', 'red');
+    
+            // 드롭다운을 초기 상태로 설정
+            genderSelect.empty(); // 기존의 option들을 모두 제거
+            // 초기 옵션 추가
+            genderSelect.append($('<option>', {
+                value: '',
+                text: '성별을 선택하세요',
+                selected: true,
+                disabled: true
+            }));
+            // 유효한 옵션 추가
+            genderSelect.append($('<option>', { value: 'true', text: '남성' }));
+            genderSelect.append($('<option>', { value: 'false', text: '여성' }));
+    
+            return false;
+        } else {
+            genderValidationMessage.text('✔️ 유효한 성별입니다.').css('color', 'green');
+            return true;
+        }
+    }
+
+    // 생년월일 유효성 검사
+    function validateBirthDate() {
+        const inputDate = $('#birth').val();
+        const inputDateError = $('#birth-validation-message');
+        const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작으로 설정
+    
+        // 현재 연도 및 최소/최대 유효 연도 설정
+        const currentYear = today.getFullYear();
+        const minYear = currentYear - 120; // 지금으로부터 120년 전
+        const maxYear = currentYear; // 현재 연도
+    
+        if (inputDate === '') {
+            inputDateError.text('');
+            return true; // 입력하지 않은 경우에도 true를 반환
+        }
+    
+        if (!datePattern.test(inputDate)) {
+            inputDateError.text('❌ 올바른 날짜 형식을 입력해주세요.').css('color', 'red');
+            return false;
+        }
+    
+        const [year, month, day] = inputDate.split('-').map(Number);
+        const inputDateObj = new Date(year, month - 1, day);
+    
+        const isDateValid = inputDateObj.getFullYear() === year && 
+                            inputDateObj.getMonth() + 1 === month && 
+                            inputDateObj.getDate() === day;
+    
+        if (!isDateValid) {
+            inputDateError.text('❌ 존재하지 않는 날짜입니다.').css('color', 'red');
+            return false;
+        }
+    
+        // 입력된 생년월일이 유효한 연도 범위 내에 있는지 검사
+        if (year < minYear || year > maxYear) {
+            inputDateError.text(`❌ 생년월일의 년도는 ${minYear}년부터 ${maxYear}년 사이여야 합니다.`).css('color', 'red');
+            return false;
+        }
+    
+        // 입력 날짜가 오늘 날짜를 초과하는지 검사
+        if (inputDateObj > today) {
+            inputDateError.text('❌ 생년월일은 오늘 날짜를 초과할 수 없습니다.').css('color', 'red');
+            return false;
+        }
+    
+        // 모든 검사를 통과한 경우
+        inputDateError.text('✔️ 유효한 날짜입니다.').css('color', 'green');
+        return true;
+    }
+
+    // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
+    function submitFormValidation(event) {
+        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !validateNickname() || !validateFirstName() || !validateLastName() || !validateGenderSelect() || !isEmailDuplicateChecked || !isNicknameDuplicateChecked) {
+            event.preventDefault();
+            if (!validateEmail()) {
+                scrollError('userName');
+                alert('올바른 이메일 형식이 아닙니다.');
+            }
+            if (!checkPasswordMatch()) {
+                scrollError('password2');
+                alert('비밀번호가 일치하지 않습니다.');
+            }
+            if (!validatePassword()) {
+                scrollError('password1');
+                alert('비밀번호는 영문, 숫자, 특수문자를 포함한 \n8자 이상이어야 합니다.');
+            }
+            if (!validatePhone()) {
+                scrollError('phone');
+                alert('전화번호 형식에 맞추어서\n입력해주시기 바랍니다.');
+            }
+            if (!validateNickname()) {
+                scrollError('nickName');
+                alert('닉네임 형식에 맞추어서\n입력해주시기 바랍니다.');
+            }
+            if (!validateFirstName()) {
+                scrollError('firstName');
+                alert('이름(First name / Given name) 입력이 잘못되었습니다.');
+            }
+            if (!validateLastName()) {
+                scrollError('lastName');
+                alert('성(Last name / Family name) 입력이 잘못되었습니다.');
+            }
+            if (!validateGenderSelect()) {
+                scrollError('gender');
+                alert('성별 입력이 잘못되었습니다.');
+            }
+            if (!isEmailDuplicateChecked) {
+                scrollError('userName');
+                alert('이메일 중복 확인을 해주세요.');
+            }
+            if (!isNicknameDuplicateChecked) {
+                scrollError('nickName');
+                alert('닉네임 중복 확인을 해주세요.');
+            }
+        }
+    }
 
     // 앵커
     function scrollError(elementId) {
@@ -253,46 +502,4 @@ $(document).ready(function() {
             element.focus();
         }
     }
-
-    $('#birth').on('input', function() {
-        const inputDate = $('#birth').val();
-        const inputDateError = $('#birthDateError');
-        const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-        const currentYear = new Date().getFullYear();
-        const minYear = currentYear - 120; // 120년 전까지 유효한 날짜로 설정
-        const maxYear = currentYear; // 현재 연도까지 유효
-    
-        
-        if (!datePattern.test(inputDate)) {
-            inputDateError.text('❌ 올바른 날짜 형식을 입력해주세요.');
-            inputDateError.css('visibility', 'visible');
-            return;
-        }
-            
-        const [year, month, day] = inputDate.split('-').map(Number);
-        const dateObj = new Date(year, month - 1, day); // JavaScript의 월은 0부터 시작
-        if (dateObj.getFullYear() !== year || dateObj.getMonth() + 1 !== month || dateObj.getDate() !== day) {
-            inputDateError.text('❌ 존재하지 않는 날짜입니다.');
-            inputDateError.css('visibility', 'visible');
-            return;
-        }
-            
-        if (year < minYear || year > maxYear) {
-            inputDateError.text(`❌ 생년월일은 ${minYear}년부터 ${maxYear}년 사이여야 합니다.`);
-            inputDateError.css('visibility', 'visible');
-            return;
-        }
-        inputDateError.css('visibility', 'hidden');
-    });
-
 });
-
-function updateFileName() {
-    var input = document.getElementById('file');
-    var fileName = document.getElementById('file-name');
-    if (input.files && input.files.length > 0) {
-        fileName.textContent = input.files[0].name;
-    } else {
-        fileName.textContent = '';
-    }
-}

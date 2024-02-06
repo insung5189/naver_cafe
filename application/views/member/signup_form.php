@@ -23,7 +23,7 @@
                 <form method="POST" action="/member/SignupController/processMemberSignup" enctype="multipart/form-data">
                     <!-- 사용자 아이디 (이메일) -->
                     <div class="form-box">
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="userName">
@@ -37,7 +37,7 @@
 
                         </div>
                         <hr>
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="userName">
@@ -49,20 +49,22 @@
 
                             <div class="input-box">
                                 <input autofocus class="custom-input" id="userName" maxlength="50" placeholder="ex) example@email.com" required name="userName" type="email">
-                                <input id="duplicateEmail" type="button" value="중복확인" class="btn">
-                                <span class="description pl-5" id="email-duplication-check-message"></span>
-                                <span class="description pl-5" id="email-validation-message"></span>
+                                <div class="message-box">
+                                    <input id="duplicateEmail" type="button" value="중복확인" class="btn">
+                                    <span class="description pl-5" id="email-validation-message"></span>
+                                    <span class="description pl-5" id="email-duplication-check-message"></span>
+                                </div>
                             </div>
 
                         </div>
                         <hr>
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
-                                <label class="label-section" for="">
+                                <div class="label-section">
                                     <span class="label-text">프로필 이미지</span>
                                     <span class="description">(최대50MB)</span>
-                                </label>
+                                </div>
                             </div>
 
                             <!-- 프로필 이미지 업로드 -->
@@ -81,7 +83,7 @@
 
                         </div>
                         <hr>
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="password1">
@@ -92,12 +94,24 @@
 
                             <div class="input-box">
                                 <input class="custom-input" id="password1" maxlength="50" placeholder="비밀번호를 입력해주세요." required name="password1" type="password">
-                                <span class="description pl-5" id="password-validation-message"> * 영문, 숫자, 특수문자를 포함한 8자 이상</span>
+                                <span class="description pl-5" id="password-validation-message"></span>
+                            </div>
+
+                        </div>
+                        <div class="caption-box">
+
+                            <div class="label-box">
+                                <div class="label-section">
+                                </div>
+                            </div>
+
+                            <div class="input-box">
+                                <span class="description pl-5 caption"> * 영문, 숫자, 특수문자를 포함한 8자 이상</span>
                             </div>
 
                         </div>
                         <hr>
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="password2">
@@ -113,24 +127,23 @@
 
                         </div>
                         <hr>
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="phone">
                                     <span class="label-text">연락처</span>
-                                    <span class="description">(-제외)</span>
                                     <span class="required-field">*</span>
                                 </label>
                             </div>
 
                             <div class="input-box">
-                                <input class="custom-input" id="phone" placeholder="ex) 01012345678" required name="phone" type="number">
+                                <input class="custom-input" id="phone" placeholder="ex) 01012345678" required name="phone" type="text">
                                 <span class="description pl-5" id="phone-validation-message"></span>
                             </div>
 
                         </div>
                         <hr>
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="nickName">
@@ -141,14 +154,29 @@
 
                             <div class="input-box">
                                 <input class="custom-input" id="nickName" maxlength="50" placeholder="닉네임" required name="nickName" type="text">
-                                <input id="duplicateNickname" type="button" value="중복확인" class="btn">
-                                <span class="description pl-5" id="nickname-duplication-check-message"></span>
+                                <div class="message-box">
+                                    <input id="duplicateNickname" type="button" value="중복확인" class="btn">
+                                    <span class="description pl-5" id="nickname-validation-message"></span>
+                                    <span class="description pl-5" id="nickname-duplication-check-message"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="caption-box">
+
+                            <div class="label-box">
+                                <div class="label-section">
+                                </div>
+                            </div>
+
+                            <div class="input-box">
+                                <span class="description pl-5 caption"> * 영문(대ㆍ소문자 구분없음)또는 한글, 숫자(선택)를 포함한 2~10글자</span>
                             </div>
 
                         </div>
                         <hr>
                         <!-- 이름 -->
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="firstName">
@@ -160,12 +188,15 @@
 
                             <div class="input-box">
                                 <input class="custom-input" id="firstName" placeholder="ex) 길동" required name="firstName" type="text">
+                                <div class="message-box">
+                                    <span class="description pl-5" id="firstname-validation-message"></span>
+                                </div>
                             </div>
 
                         </div>
                         <hr>
                         <!-- 성 -->
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="lastName">
@@ -177,12 +208,15 @@
 
                             <div class="input-box">
                                 <input class="custom-input" id="lastName" placeholder="ex) 홍" required name="lastName" type="text">
+                                <div class="message-box">
+                                    <span class="description pl-5" id="lastname-validation-message"></span>
+                                </div>
                             </div>
 
                         </div>
                         <hr>
                         <!-- 성별 -->
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="gender">
@@ -196,12 +230,15 @@
                                     <option value="true">남성</option>
                                     <option value="false">여성</option>
                                 </select>
+                                <div class="message-box">
+                                    <span class="description pl-5" id="gender-validation-message"></span>
+                                </div>
                             </div>
 
                         </div>
                         <hr>
                         <!-- 생년월일 -->
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="birthDate">
@@ -211,13 +248,27 @@
 
                             <div class="input-box">
                                 <input class="custom-input" id="birth" pattern="\d{4}-\d{2}-\d{2}" name="birth" type="date">
-                                <span class="" id="birthDateError" style='color: #E50122; visibility: hidden; font-size:12px'>올바른 날짜 형식을 입력해주세요. (예: 1993-11-03)</span>
+                                <div class="message-box">
+                                    <span class="description pl-5" id="birth-validation-message"></span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="caption-box">
+
+                            <div class="label-box">
+                                <div class="label-section">
+                                </div>
+                            </div>
+
+                            <div class="input-box">
+                                <span class="description pl-5 caption"> * 올바른 날짜 형식을 입력해주세요. (예: 1993-11-03)</span>
                             </div>
 
                         </div>
                         <hr>
 
-                        <div class="feild-box adrs-box">
+                        <div class="field-box adrs-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_postcode">
@@ -226,13 +277,13 @@
                             </div>
 
                             <div class="input-box">
-                                <input class="custom-input" id="sample4_postcode" placeholder="우편번호" name="postalNum" type="text">
-                                <input onclick="sample4_execDaumPostcode()" type="button" value="우편번호 찾기" class="btn">
+                                <input class="custom-input" id="sample4_postcode" placeholder="우편번호" name="postalNum" type="text" readonly>
+                                <input onclick="sample4_execDaumPostcode()" type="button" value="우편번호 찾기" class="btn"> <!--address.js-->
                             </div>
 
                         </div>
 
-                        <div class="feild-box adrs-box">
+                        <div class="field-box adrs-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_roadAddress">
@@ -241,12 +292,12 @@
                             </div>
 
                             <div class="input-box">
-                                <input class="custom-input" id="sample4_roadAddress" placeholder="도로명" name="roadAddress" type="text">
+                                <input class="custom-input" id="sample4_roadAddress" placeholder="도로명" name="roadAddress" type="text" readonly>
                             </div>
 
                         </div>
 
-                        <div class="feild-box adrs-box">
+                        <div class="field-box adrs-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_jibunAddress">
@@ -255,14 +306,14 @@
                             </div>
 
                             <div class="input-box">
-                                <input class="custom-input" id="sample4_jibunAddress" placeholder="지번주소" name="jibunAddress" type="text">
+                                <input class="custom-input" id="sample4_jibunAddress" placeholder="지번주소" name="jibunAddress" type="text" readonly>
                                 <span id="guide" style="color:#999;display:none"></span>
                             </div>
 
                         </div>
 
 
-                        <div class="feild-box adrs-box">
+                        <div class="field-box adrs-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_extraAddress">
@@ -271,12 +322,12 @@
                             </div>
 
                             <div class="input-box">
-                                <input class="custom-input" id="sample4_extraAddress" placeholder="참고항목" name="extraAddress" type="text">
+                                <input class="custom-input" id="sample4_extraAddress" placeholder="참고항목" name="extraAddress" type="text" readonly>
                             </div>
 
                         </div>
 
-                        <div class="feild-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_detailAddress">
@@ -286,10 +337,10 @@
 
                             <div class="input-box">
                                 <input class="custom-input" id="sample4_detailAddress" placeholder="상세주소" name="detailAddress" type="text">
+                                <input type="button" onclick="resetAllAddressFields()" class="btn" value="주소 초기화"> <!--address.js-->
                             </div>
 
                         </div>
-
                         <hr>
                         <div>
                             <ul>
@@ -305,9 +356,11 @@
                         </div>
                     </div>
 
-                    <div class="">
-                        <a class="" href="/">취소</a>
-                        <input type="submit" value="회원가입">
+                    <div class="container btn-box">
+                        <input class="form-btn-box" type="submit" value="동의 후 가입">
+                        <a href="/">
+                            <input class="form-btn-box" type="button" value="취소">
+                        </a>
                     </div>
 
                 </form>

@@ -13,6 +13,7 @@
     <script src="/assets/js/member/address.js"></script>
     <title>PHP 게시판</title>
 </head>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <body>
 <nav class="col"> <!-- class 에 col 추가 -->
   <ul class="nav flex-row"> <!-- list 생성란 -->

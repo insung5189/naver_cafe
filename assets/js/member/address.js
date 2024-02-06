@@ -53,3 +53,19 @@ function sample4_execDaumPostcode() {
         }
     }).open();
     }
+
+    function resetAllAddressFields() {
+        // 모든 주소 관련 필드의 ID를 배열로 정의
+        const addressFieldIds = [
+            'sample4_postcode',
+            'sample4_roadAddress',
+            'sample4_jibunAddress',
+            'sample4_extraAddress',
+            'sample4_detailAddress' // 상세주소 포함, 필요에 따라 제외 가능
+        ];
+    
+        // 각 필드를 순회하며 값을 초기화
+        addressFieldIds.forEach(function(fieldId) {
+            document.getElementById(fieldId).value = '';
+        });
+    }

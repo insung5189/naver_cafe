@@ -145,12 +145,11 @@ class Member
 
     public function setBirth($birth)
     {
-        // 만약 입력된 값이 문자열이면 DateTime 객체로 변환
-        if (is_string($birth)) {
-            $birth = new \DateTime($birth);
+        if (empty($birth)) {
+            $this->birth = null;
+        } else {
+            $this->birth = $birth instanceof \DateTime ? $birth : new \DateTime($birth);
         }
-    
-        $this->birth = $birth;
     }
 
     /**
