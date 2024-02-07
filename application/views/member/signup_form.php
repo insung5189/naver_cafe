@@ -10,19 +10,28 @@
 
 <body>
     <main>
-        <section>
+        <section class="section-container">
             <div class="container">
-                <h1 class="page-title">
+                <h1 class="title">
                     <i class="fa-solid fa-user-plus"></i>
                     카페 가입하기
                 </h1>
-                <div>
+                <div class="title">
                     <div class="page-guide">카페 가입을 위한 정보를 입력해주세요.</div>
                     <span class="required-field">*</span><span class="page-guide"> 는 필수 입력사항 입니다.</span>
                 </div>
+                <?php if (!empty($errors)) : ?>
+                    <div class="error-messages">
+                        <p><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                        <?php foreach ($errors as $field => $error) : ?>
+                            <p><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
                 <form method="POST" action="/member/SignupController/processMemberSignup" enctype="multipart/form-data">
-                    <!-- 사용자 아이디 (이메일) -->
                     <div class="form-box">
+                        <!-- 카페 설명 -->
                         <div class="field-box">
 
                             <div class="label-box">
@@ -37,6 +46,7 @@
 
                         </div>
                         <hr>
+                        <!-- 사용자 아이디 (Email) -->
                         <div class="field-box">
 
                             <div class="label-box">
@@ -51,6 +61,7 @@
                                 <input autofocus class="custom-input" id="userName" maxlength="50" placeholder="ex) example@email.com" required name="userName" type="email">
                                 <div class="message-box">
                                     <input id="duplicateEmail" type="button" value="중복확인" class="btn">
+                                    <input type="hidden" name="isUserNameChecked" id="isUserNameChecked" value="false">
                                     <span class="description pl-5" id="email-validation-message"></span>
                                     <span class="description pl-5" id="email-duplication-check-message"></span>
                                 </div>
@@ -58,6 +69,7 @@
 
                         </div>
                         <hr>
+                        <!-- 프로필 이미지 -->
                         <div class="field-box">
 
                             <div class="label-box">
@@ -67,7 +79,6 @@
                                 </div>
                             </div>
 
-                            <!-- 프로필 이미지 업로드 -->
                             <div class="input-box">
                                 <label for="file" class="label-section"></label>
                                 <div class="img-wrap">
@@ -83,11 +94,13 @@
 
                         </div>
                         <hr>
+                        <!-- 비밀번호 -->
                         <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="password1">
                                     <span class="label-text">비밀번호</span>
+                                    <span class="description">(Password)</span>
                                     <span class="required-field">*</span>
                                 </label>
                             </div>
@@ -111,11 +124,13 @@
 
                         </div>
                         <hr>
+                        <!-- 비밀번호 확인 -->
                         <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="password2">
                                     <span class="label-text">비밀번호 확인</span>
+                                    <span class="description">(Confirm PW)</span>
                                     <span class="required-field">*</span>
                                 </label>
                             </div>
@@ -127,11 +142,13 @@
 
                         </div>
                         <hr>
+                        <!-- 연락처 -->
                         <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="phone">
                                     <span class="label-text">연락처</span>
+                                    <span class="description">(Phone)</span>
                                     <span class="required-field">*</span>
                                 </label>
                             </div>
@@ -143,11 +160,13 @@
 
                         </div>
                         <hr>
+                        <!-- 닉네임 -->
                         <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="nickName">
                                     <span class="label-text">닉네임</span>
+                                    <span class="description">(NickName)</span>
                                     <span class="required-field">*</span>
                                 </label>
                             </div>
@@ -156,6 +175,7 @@
                                 <input class="custom-input" id="nickName" maxlength="50" placeholder="닉네임" required name="nickName" type="text">
                                 <div class="message-box">
                                     <input id="duplicateNickname" type="button" value="중복확인" class="btn">
+                                    <input type="hidden" name="isNickNameChecked" id="isNickNameChecked" value="false">
                                     <span class="description pl-5" id="nickname-validation-message"></span>
                                     <span class="description pl-5" id="nickname-duplication-check-message"></span>
                                 </div>
@@ -221,6 +241,7 @@
                             <div class="label-box">
                                 <label class="label-section" for="gender">
                                     <span class="label-text">성별</span>
+                                    <span class="description">(Gender)</span>
                                 </label>
                             </div>
 
@@ -243,6 +264,7 @@
                             <div class="label-box">
                                 <label class="label-section" for="birthDate">
                                     <span class="label-text">생년월일</span>
+                                    <span class="description">(Birth)</span>
                                 </label>
                             </div>
 
@@ -267,7 +289,7 @@
 
                         </div>
                         <hr>
-
+                        <!-- 다음카카오 주소API(우편번호) -->
                         <div class="field-box adrs-box">
 
                             <div class="label-box">
@@ -283,6 +305,7 @@
 
                         </div>
 
+                        <!-- 다음카카오 주소API(도로명주소) -->
                         <div class="field-box adrs-box">
 
                             <div class="label-box">
@@ -297,6 +320,7 @@
 
                         </div>
 
+                        <!-- 다음카카오 주소API(지번주소) -->
                         <div class="field-box adrs-box">
 
                             <div class="label-box">
@@ -312,7 +336,7 @@
 
                         </div>
 
-
+                        <!-- 다음카카오 주소API(참고항목-법정동명) -->
                         <div class="field-box adrs-box">
 
                             <div class="label-box">
@@ -327,6 +351,7 @@
 
                         </div>
 
+                        <!-- 다음카카오 주소API(상세주소) -->
                         <div class="field-box">
 
                             <div class="label-box">
@@ -342,6 +367,7 @@
 
                         </div>
                         <hr>
+                        <!-- 카페 이용안내 동의 -->
                         <div>
                             <ul>
                                 <li>
@@ -356,6 +382,7 @@
                         </div>
                     </div>
 
+                    <!-- 가입버튼 -->
                     <div class="container btn-box">
                         <input class="form-btn-box" type="submit" value="동의 후 가입">
                         <a href="/">

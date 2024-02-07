@@ -1,6 +1,5 @@
 $(document).ready(function() {
     // 중복확인 상태 변수
-    var isEmailDuplicateChecked = false;
     var isNicknameDuplicateChecked = false;
 
     // 이름, 성 유니코드 정규검사식
@@ -57,7 +56,6 @@ $(document).ready(function() {
         if (response.isDuplicate) {
             alert('이미 사용 중인 이메일입니다.');
             $('#email-duplication-check-message').text('❌ 이미 사용 중인 이메일입니다.').css('color', 'red');
-            isEmailDuplicateChecked = false;
             return false;
         } else {
             if (confirm('사용 가능한 이메일입니다.\n확인 버튼을 누르시면 해당 이메일을 사용하며 \n수정이 불가능합니다.')) {
@@ -65,7 +63,7 @@ $(document).ready(function() {
                 $('#duplicateEmail').val('중복확인 완료');
                 $('#userName').attr('readonly', true);
                 $('#duplicateEmail').attr('disabled', true);
-                isEmailDuplicateChecked = true;
+                $('#isUserNameChecked').val('true');
                 return true;
             }
         }
@@ -101,7 +99,6 @@ $(document).ready(function() {
         if (response.isDuplicate) {
             alert('이미 사용 중인 닉네임입니다.');
             $('#nickname-duplication-check-message').text('❌ 이미 사용 중인 닉네임입니다.').css('color', 'red');
-            isNicknameDuplicateChecked = false;
             return false;
         } else {
             if (confirm('사용 가능한 닉네임입니다.\n확인 버튼을 누르시면 해당 닉네임을 사용하며 \n수정이 불가능합니다.')) {
@@ -109,7 +106,7 @@ $(document).ready(function() {
                 $('#duplicateNickname').val('중복확인 완료');
                 $('#nickName').attr('readonly', true);
                 $('#duplicateNickname').attr('disabled', true);
-                isNicknameDuplicateChecked = true;
+                $('#isNickNameChecked').val('true');
                 return true;
             }
         }
@@ -163,8 +160,8 @@ $(document).ready(function() {
 
     // 이메일 입력란 변경 시 로직
     function resetEmailValidation() {
-        if (isEmailDuplicateChecked == true) {
-            isEmailDuplicateChecked = false;
+        if ($('#isUserNameChecked').val() === 'true') {
+            $('#isUserNameChecked').val('false');
             $('#duplicateEmail').val('중복확인');
             $('#userName').attr('readonly', false);
             $('#duplicateEmail').attr('disabled', false);
@@ -266,6 +263,7 @@ $(document).ready(function() {
         }
     }
 
+    // 연락처 유효성 검사
     function validatePhone() {
         const phoneInput = $('#phone');
         const message = $('#phone-validation-message');
@@ -285,8 +283,8 @@ $(document).ready(function() {
 
     // 닉네임 입력란 변경 시 로직
     function resetNicknameValidation() {
-        if (isNicknameDuplicateChecked == true) {
-            isNicknameDuplicateChecked = false;
+        if ($('#isNickNameChecked').val() === 'true') {
+            $('#isNickNameChecked').val('false');
             $('#duplicateNickname').val('중복확인');
             $('#nickName').attr('readonly', false);
             $('#duplicateNickname').attr('disabled', false);
@@ -366,26 +364,26 @@ $(document).ready(function() {
 
     // 성별 유효성검사
     function validateGenderSelect() {
-        const genderSelect = $('#gender');
+        const genderSelect = $('#gender').val();
         const genderValidationMessage = $('#gender-validation-message');
+
+        if (genderSelect === null) {
+            return true;
+        }
     
-        // 드롭다운의 현재 값이 'true' 또는 'false'가 아니라면 유효하지 않은 것으로 간주
-        if (genderSelect.val() !== 'true' && genderSelect.val() !== 'false') {
+        if (genderSelect !== 'true' && genderSelect !== 'false') {
             genderValidationMessage.text('❌ 유효하지 않은 성별값입니다.').css('color', 'red');
-    
-            // 드롭다운을 초기 상태로 설정
+
             genderSelect.empty(); // 기존의 option들을 모두 제거
-            // 초기 옵션 추가
             genderSelect.append($('<option>', {
                 value: '',
                 text: '성별을 선택하세요',
                 selected: true,
                 disabled: true
             }));
-            // 유효한 옵션 추가
             genderSelect.append($('<option>', { value: 'true', text: '남성' }));
             genderSelect.append($('<option>', { value: 'false', text: '여성' }));
-    
+
             return false;
         } else {
             genderValidationMessage.text('✔️ 유효한 성별입니다.').css('color', 'green');
@@ -447,19 +445,19 @@ $(document).ready(function() {
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitFormValidation(event) {
-        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !validateNickname() || !validateFirstName() || !validateLastName() || !validateGenderSelect() || !isEmailDuplicateChecked || !isNicknameDuplicateChecked) {
+        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !validateNickname() || !validateFirstName() || !validateLastName() || !validateGenderSelect() || $('#isUserNameChecked').val() !== 'true' || $('#isNickNameChecked').val() !== 'true') {
             event.preventDefault();
             if (!validateEmail()) {
                 scrollError('userName');
                 alert('올바른 이메일 형식이 아닙니다.');
             }
-            if (!checkPasswordMatch()) {
-                scrollError('password2');
-                alert('비밀번호가 일치하지 않습니다.');
-            }
             if (!validatePassword()) {
                 scrollError('password1');
                 alert('비밀번호는 영문, 숫자, 특수문자를 포함한 \n8자 이상이어야 합니다.');
+            }
+            if (!checkPasswordMatch()) {
+                scrollError('password2');
+                alert('비밀번호가 일치하지 않습니다.');
             }
             if (!validatePhone()) {
                 scrollError('phone');
@@ -481,11 +479,11 @@ $(document).ready(function() {
                 scrollError('gender');
                 alert('성별 입력이 잘못되었습니다.');
             }
-            if (!isEmailDuplicateChecked) {
+            if ($('#isUserNameChecked').val() !== 'true') {
                 scrollError('userName');
                 alert('이메일 중복 확인을 해주세요.');
             }
-            if (!isNicknameDuplicateChecked) {
+            if ($('#isNickNameChecked').val() !== 'true') {
                 scrollError('nickName');
                 alert('닉네임 중복 확인을 해주세요.');
             }

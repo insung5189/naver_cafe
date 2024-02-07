@@ -63,9 +63,6 @@ class Member
 
     public function setUserName($userName)
     {
-        if (!filter_var($userName, FILTER_VALIDATE_EMAIL)) {
-            throw new \InvalidArgumentException("잘못된 이메일 형식입니다.");
-        }
         $this->userName = $userName;
     }
 
@@ -81,11 +78,7 @@ class Member
 
     public function setPassword($password)
     {
-        if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/', $password)) {
-            throw new \InvalidArgumentException("비밀번호는 영문, 숫자, 특수문자 포함 8자 이상이어야 합니다.");
-        }
-        // 비밀번호 해싱
-        $this->password = password_hash($password, PASSWORD_BCRYPT);
+        $this->password = $password;
     }
 
     /**
@@ -104,7 +97,7 @@ class Member
     }
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255, nullable=false)
      */
     private $firstName;
 
@@ -145,11 +138,7 @@ class Member
 
     public function setBirth($birth)
     {
-        if (empty($birth)) {
-            $this->birth = null;
-        } else {
-            $this->birth = $birth instanceof \DateTime ? $birth : new \DateTime($birth);
-        }
+        $this->birth = $birth;
     }
 
     /**
@@ -254,7 +243,6 @@ class Member
 
     public function setIsActive($isActive)
     {
-        $this->$isActive = true;
         $this->isActive = $isActive;
     }
 
