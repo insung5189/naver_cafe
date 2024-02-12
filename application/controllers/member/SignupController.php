@@ -1,6 +1,5 @@
 <?
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class SignupController extends CI_Controller {
     public function __construct() {
         parent::__construct();
@@ -11,6 +10,8 @@ class SignupController extends CI_Controller {
     public function index() {
         $this->load->view('templates/header');
         $this->load->view('member/signup_form');
+        // phpinfo();
+        $this->output->enable_profiler(true);
         $this->load->view('templates/footer');
     }
 

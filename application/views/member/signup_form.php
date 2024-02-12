@@ -33,7 +33,6 @@
                     <div class="form-box">
                         <!-- 카페 설명 -->
                         <div class="field-box">
-
                             <div class="label-box">
                                 <label class="label-section" for="userName">
                                     <span class="label-text">카페 설명</span>
@@ -43,12 +42,10 @@
                             <div class="input-box">
                                 <span>비드코칭연구소 제품완성팀 미션 카페 입니다.</span>
                             </div>
-
                         </div>
                         <hr>
                         <!-- 사용자 아이디 (Email) -->
                         <div class="field-box">
-
                             <div class="label-box">
                                 <label class="label-section" for="userName">
                                     <span class="label-text">사용자 아이디</span>
@@ -66,7 +63,6 @@
                                     <span class="description pl-5" id="email-duplication-check-message"></span>
                                 </div>
                             </div>
-
                         </div>
                         <hr>
                         <!-- 프로필 이미지 -->
@@ -246,7 +242,7 @@
                             </div>
 
                             <div class="input-box">
-                                <select id="gender" name="gender">
+                                <select id="gender" name="gender" class="custom-input">
                                     <option value="" disabled selected>성별</option>
                                     <option value="true">남성</option>
                                     <option value="false">여성</option>
@@ -384,9 +380,9 @@
 
                     <!-- 가입버튼 -->
                     <div class="container btn-box">
-                        <input class="form-btn-box" type="submit" value="동의 후 가입">
+                        <input class="form-btn-box submit-btn" type="submit" value="동의 후 가입">
                         <a href="/">
-                            <input class="form-btn-box" type="button" value="취소">
+                            <input class="form-btn-box btn" type="button" value="취소">
                         </a>
                     </div>
 
