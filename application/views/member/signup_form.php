@@ -17,14 +17,16 @@
                     카페 가입하기
                 </h1>
                 <div class="title">
-                    <div class="page-guide">카페 가입을 위한 정보를 입력해주세요.</div>
-                    <span class="required-field">*</span><span class="page-guide"> 는 필수 입력사항 입니다.</span>
+                    <p class="page-guide">카페 가입을 위한 정보를 입력해주세요.</p>
+                    <p>
+                        <span class="required-field">*</span><span class="page-guide"> 는 필수 입력사항 입니다.</span>
+                    </p>
                 </div>
                 <?php if (!empty($errors)) : ?>
                     <div class="error-messages">
-                        <p><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                        <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
                         <?php foreach ($errors as $field => $error) : ?>
-                            <p><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                            <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
@@ -243,7 +245,7 @@
 
                             <div class="input-box">
                                 <select id="gender" name="gender" class="custom-input">
-                                    <option value="" disabled selected>성별</option>
+                                    <option value="">성별</option>
                                     <option value="true">남성</option>
                                     <option value="false">여성</option>
                                 </select>

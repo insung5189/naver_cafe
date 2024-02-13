@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>로그인</title>
     <link rel="stylesheet" type="text/css" href="/assets/css/member/login.css">
+    <script src="/assets/js/member/login.js"></script>
 </head>
 
 <body>
@@ -21,14 +22,14 @@
                 </div>
                 <?php if (!empty($errors)) : ?>
                     <div class="error-messages">
-                        <p><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                        <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
                         <?php foreach ($errors as $field => $error) : ?>
-                            <p><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                            <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
 
-                <form method="POST" action="/member/login">
+                <form method="POST" action="/member/LoginController/processLogin">
                     <div class="form-box">
                         <div class="field-box">
                             <div class="label-box">
@@ -39,7 +40,8 @@
                             </div>
 
                             <div class="input-box">
-                                <input autofocus class="custom-input" maxlength="50" name="userName" id="userName" placeholder="사용자 아이디 (이메일)" type="text">
+                                <input autofocus class="custom-input" maxlength="50" name="userName" id="userName" placeholder="사용자 아이디 (이메일)" type="text" autocomplete="off">
+                                <span class="description pl-5" id="email-validation-message"></span>
                             </div>
                         </div>
 
@@ -53,7 +55,7 @@
                             </div>
 
                             <div class="input-box">
-                                <input autofocus class="custom-input" maxlength="50" name="password" id="password" placeholder="비밀번호를 입력해주세요" type="password">
+                                <input autofocus class="custom-input" maxlength="50" name="password" id="password" placeholder="비밀번호를 입력해주세요" type="password" autocomplete="off">
                             </div>
                         </div>
                         <hr>
@@ -62,11 +64,16 @@
                     <div class="action-btn-box">
                         <div class="container btn-box">
                             <input class="form-btn-box submit-btn" type="submit" value="로그인">
-                            <a href="/">
-                                <input class="form-btn-box btn" type="button" value="취소">
+                            <a href="/member/signupcontroller">
+                                <input class="form-btn-box btn signup-btn" type="button" value="회원가입">
                             </a>
                         </div>
-                        <a href="/member/findAccountController" class="container btn">Email / 비밀번호 찾기</a>
+                        <div class="container btn-box">
+                            <a href="/member/findAccountController">
+                                <input class="form-btn-box btn find-account-btn" type="button" value="Email / 비밀번호 찾기">
+                            </a>
+                        </div>
+                        
                     </div>
 
                 </form>

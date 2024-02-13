@@ -39,7 +39,8 @@ class SignupController extends CI_Controller {
         $result = $this->signupModel->processSignup($formData);
     
         if ($result['success']) {
-            echo "<script>alert('회원이 등록되었습니다.'); location.href='/';</script>";
+            echo "<script>alert('회원이 등록되었습니다.');</script>";
+            redirect('/');
         } else {
             $this->load->view('templates/header');
             $this->load->view('member/signup_form', ['errors' => $result['errors']]);

@@ -338,7 +338,7 @@ $(document).ready(function() {
             firstNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
             return false;
         } else {
-            firstNameMessage.text('');
+            firstNameMessage.text('✔️');
             return true;
         }
 
@@ -357,36 +357,37 @@ $(document).ready(function() {
             lastNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
             return false;
         } else {
-            lastNameMessage.text('');
+            lastNameMessage.text('✔️');
             return true;
         }
     }
 
     // 성별 유효성검사
     function validateGenderSelect() {
-        const genderSelect = $('#gender').val();
+        const genderSelect = $('#gender'); // jQuery 객체로 select 요소 자체를 참조
+        const selectedValue = genderSelect.val(); // 선택된 값
         const genderValidationMessage = $('#gender-validation-message');
 
-        if (genderSelect === null) {
+        if (selectedValue === null || selectedValue === '') {
+            genderValidationMessage.text('✔️');
             return true;
         }
-    
-        if (genderSelect !== 'true' && genderSelect !== 'false') {
-            genderValidationMessage.text('❌ 유효하지 않은 성별값입니다.').css('color', 'red');
 
+        if (selectedValue !== 'true' && selectedValue !== 'false' && selectedValue !== '' && selectedValue !== null) {
+            genderValidationMessage.text('❌ 유효하지 않은 성별값입니다.').css('color', 'red');
+            alert('성별 입력이 잘못되었습니다.\n성별을 다시 선택해주세요.');
             genderSelect.empty(); // 기존의 option들을 모두 제거
             genderSelect.append($('<option>', {
                 value: '',
                 text: '성별을 선택하세요',
-                selected: true,
-                disabled: true
+                selected: true
             }));
             genderSelect.append($('<option>', { value: 'true', text: '남성' }));
             genderSelect.append($('<option>', { value: 'false', text: '여성' }));
 
             return false;
         } else {
-            genderValidationMessage.text('✔️ 유효한 성별입니다.').css('color', 'green');
+            genderValidationMessage.text('✔️').css('color', 'green');
             return true;
         }
     }
@@ -439,13 +440,13 @@ $(document).ready(function() {
         }
     
         // 모든 검사를 통과한 경우
-        inputDateError.text('✔️ 유효한 날짜입니다.').css('color', 'green');
+        inputDateError.text('✔️').css('color', 'green');
         return true;
     }
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitFormValidation(event) {
-        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !validateNickname() || !validateFirstName() || !validateLastName() || !validateGenderSelect() || $('#isUserNameChecked').val() !== 'true' || $('#isNickNameChecked').val() !== 'true') {
+        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !validateNickname() || !validateFirstName() || !validateLastName() || !validateGenderSelect() || !validateBirthDate() || $('#isUserNameChecked').val() !== 'true' || $('#isNickNameChecked').val() !== 'true') {
             event.preventDefault();
             if (!validateEmail()) {
                 scrollError('userName');
@@ -477,7 +478,10 @@ $(document).ready(function() {
             }
             if (!validateGenderSelect()) {
                 scrollError('gender');
-                alert('성별 입력이 잘못되었습니다.');
+            }
+            if (!validateBirthDate()) {
+                scrollError('birth');
+                alert('생년월일을 다시 확인해주세요.');
             }
             if ($('#isUserNameChecked').val() !== 'true') {
                 scrollError('userName');
