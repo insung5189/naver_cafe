@@ -1,31 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="/assets/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/errors.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/home/layout.css">
-    <script src="/assets/js/home/layout.js"></script>
+    <!-- 폰트어썸 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 제이쿼리 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- 다음카카오 주소검색API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="/assets/js/member/address.js"></script>
+
+    <title><?php echo isset($title) ? $title : '비드카페'; ?> | 비드카페</title>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 </head>
 
 <body>
-    <main>
 
-        <!-- 카페 메인배너 -->
-        <div id="front-img">
-            <div id="front-cafe">
-                <a href="/MyCafeIntro.nhn?clubid=31126391">
-                    <span class="cafe_default">
-                        <span class="inner_default">
-                            <strong class="cafe_name">비드코칭연구소 제품완성 카페</strong>
-                            <p class="cafe_url">https://cafe.naver.com/bidco</p>
-                        </span>
-                    </span>
-                </a>
-            </div>
+    <header>
+        <div class="cafe-banner">
+            <a href="/">
+                <img src="https://i.imgur.com/ohX8mhO.png" alt="카페 배너">
+            </a>
         </div>
+    </header>
 
-
+    <main>
         <div id="content-area">
             <div id="group-area" class="skin-1080 fl">
                 <div class="cafe-info-action" id="cafe-info-action">
@@ -115,7 +122,44 @@
                         </ul>
                         <div class="box-g" role="tabpanel">
                             <h4 class="d-none">나의활동</h4>
-                            <div id="ia-action-data"></div>
+                            <div id="ia-action-data">
+                                <div class="ia-action-data">
+                                    <ul>
+                                        <li title="인성" class="name gm-tcol-c" id="editLayer">
+                                            <div class="prfl_thmb">
+                                                <a href="#" onclick="cafeMemberInfoEdit(event);clickcr(this, 'cia*a.nick', '', '', event);return false;" class="lab_thmb">프로필 변경하기</a>
+                                                <img src="https://cafeptthumb-phinf.pstatic.net/MjAyNDAyMDFfMjUg/MDAxNzA2NzcxMzQyNTQ0._aOpVDxESncEppxtDyzDcgTB5uwIU0-i30IzNtS4GTcg.UwQMbHxxSO1F4xOBoXenWli-XYU8n_56WCahwt_lyZAg.JPEG/237-900x1350.jpg?type=s70" width="58" height="58" alt="프로필사진" onerror="this.onerror=null;this.src='https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_profile_70.png'">
+                                                <div class="mask"></div>
+                                            </div>
+                                            <div class="prfl_info"><a href="/ca-fe/cafes/31126391/members/EsyMQqSK3SY_dsmYwFTn8g?tab=articles" target="cafe_main">인성</a></div>
+                                        </li>
+                                        <li class="date gm-tcol-c"><em>2024.01.16.</em> 가입</li>
+                                    </ul>
+                                </div>
+                                <div class="ia-info-data3">
+                                    <ul class="gm-tcol-c">
+
+                                        <li class="info grade" title="카페 멤버">
+                                            <div class="ellipsis">카페 멤버</div>
+                                        </li>
+                                        <li class="info">
+                                            <span class="tit"><span class="ico_vst"></span><strong class="gm-tcol-c">방문</strong></span>
+                                            <em class="gm-tcol-c">70<span>회</span></em>
+                                        </li>
+                                        <li class="info2">
+                                            <span class="tit"><span class="ico_wrt"></span><strong class="gm-tcol-c"><a href="/ca-fe/cafes/31126391/members/EsyMQqSK3SY_dsmYwFTn8g?tab=articles" target="cafe_main" class="gm-tcol-c" onclick="clickcr(this, 'cia*a.post', '', '', event);">내가 쓴 게시글</a></strong></span>
+                                            <em><a href="/ca-fe/cafes/31126391/members/EsyMQqSK3SY_dsmYwFTn8g" target="cafe_main" class="gm-tcol-c" onclick="clickcr(this, 'cia*a.post', '', '', event);">13</a><span>개</span></em>
+                                        </li>
+                                        <li class="info3">
+                                            <span class="tit"><span class="ico_cmt"></span><strong class="gm-tcol-c"><a href="/ca-fe/cafes/31126391/members/EsyMQqSK3SY_dsmYwFTn8g?tab=comments" target="cafe_main" class="gm-tcol-c" onclick="clickcr(this, 'cia*a.comment', '', '', event);">내가 쓴 댓글</a></strong></span>
+                                            <em><a href="/ca-fe/cafes/31126391/members/EsyMQqSK3SY_dsmYwFTn8g?tab=comments" target="cafe_main" class="gm-tcol-c" onclick="clickcr(this, 'cia*a.comment', '', '', event);">10</a><span>개</span></em>
+                                        </li>
+                                        <li class="info4">
+                                            <span class="tit"><span class="ico_pay"></span><strong class="gm-tcol-c"><a href="/NpayTradeHistoryList.nhn?cafeId=31126391&amp;type=S" target="cafe_main" onclick="clickcr(this, 'cia*a.mylist', '', '', event);">내 거래내역 보기</a></strong></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="cafe-write-btn">
@@ -133,7 +177,20 @@
                 <div id="cafe-menu">
                     <div class="box-g-t"></div>
                     <div class="box-g-m">
-
+                        <div class="cafe-menu-tit frst">
+                            <h3><img src="https://cafe.pstatic.net/cafe4/hidden.gif" width="12" height="12" class="ico-bookmark" alt="">
+                                <a href="#" onclick="toggleFavoriteMenuGroup();clickcr(this, 'mnu.favgroup', '', '', event);return false;" title="즐겨찾는 게시판" class="gm-tcol-t">즐겨찾는 게시판</a>
+                            </h3>
+                            <p id="favoriteMenuGroupBtn" class="up-btn">
+                                <a onclick="toggleFavoriteMenuGroup();return false;" href="#"><img width="13" height="13" alt="열기/닫기" src="https://cafe.pstatic.net/cafe4/hidden.gif"></a>
+                            </p>
+                        </div>
+                        <ul id="favoriteMenuGroup" style="display: block;" class="cafe-menu-list">
+                            <li>
+                                <p class="bmk_noti gm-tcol-c">게시판 상단의 <img src="https://cafe.pstatic.net/cafe4/hidden.gif" width="12" height="12" class="ico-bookmark2">아이콘을<br> 클릭하시면 추가됩니다.</p>
+                            </li>
+                        </ul>
+                        <div class="cafe-menu-space" id="gend141"></div>
                         <ul class="cafe-menu-list">
                             <li>
                                 <img src="https://cafe.pstatic.net/cafe4/hidden.gif" width="10" height="11" class="ico-list" alt=""><a href="/ArticleList.nhn?search.clubid=31126391&amp;search.boardtype=L" target="cafe_main" onclick="goMenu('0');clickcr(this, 'mnu.all','','',event);" class="gm-tcol-c" id="menuLink0">전체글보기</a>
@@ -327,8 +384,17 @@
                     <a href="https://talk.naver.com/ct/w4nd8o" class="chatbot"><img src="https://ssl.pstatic.net/static/cafe/banner_chatbot.png" width="171" height="55" alt="궁금한게 있을 땐 카페 스마트봇"></a>
                 </div>
             </div>
+            <!-- 동적으로 삽입될 페이지의 내용 -->
+            <?php echo isset($contents) ? $contents : ''; ?>
         </div>
+
+
     </main>
+
+    <footer>
+        <p>&copy; 2024 비드코칭연구소(주).</p>
+    </footer>
+
 </body>
 
 </html>

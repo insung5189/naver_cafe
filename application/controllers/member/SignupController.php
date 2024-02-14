@@ -1,18 +1,14 @@
 <?
 defined('BASEPATH') OR exit('No direct script access allowed');
-class SignupController extends CI_Controller {
+class SignupController extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('member/SignupModel', 'signupModel');
-        $this->load->library('doctrine');
     }
 
     public function index() {
-        $this->load->view('templates/header');
-        $this->load->view('member/signup_form');
-        // phpinfo();
-        $this->output->enable_profiler(true);
-        $this->load->view('templates/footer');
+        $page_view_data['title'] = '회원가입';
+        $this->layout->view('member/signup_form', $page_view_data);
     }
 
     public function processMemberSignup() {
@@ -42,9 +38,9 @@ class SignupController extends CI_Controller {
             echo "<script>alert('회원이 등록되었습니다.');</script>";
             redirect('/');
         } else {
-            $this->load->view('templates/header');
-            $this->load->view('member/signup_form', ['errors' => $result['errors']]);
-            $this->load->view('templates/footer');
+            $page_view_data['title'] = '회원가입';
+            $page_view_data['errors'] = $result['errors'];
+            $this->layout->view('member/login_form', $page_view_data);
         }
     }
 

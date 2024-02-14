@@ -306,14 +306,14 @@ $(document).ready(function() {
         let message = '';
 
         // 길이 조건
-        message += lengthCheck ? '✔️ 2~10글자<br>' : '❌ 2~10글자<br>';
+        message += lengthCheck ? '✔️ 2~10글자(필수)<br>' : '❌ 2~10글자(필수)<br>';
         
         // 문자 유형 조건
         if (hasKoreanOrEnglish && !hasInvalidCharacter) {
-            message += '✔️ 한글 또는 영문 대소문자, 숫자 선택적<br>';
+            message += '✔️ 한글 또는 영문 대소문자(필수)<br>✔️ 숫자(선택)<br>';
         } else {
             if (!hasKoreanOrEnglish) {
-                message += '❌ 한글 또는 영문 대소문자 반드시 포함<br>';
+                message += '❌ 한글 또는 영문 대소문자(필수)<br>✔️ 숫자(선택)<br>';
             }
             if (hasInvalidCharacter) {
                 message = '❌ 유효하지 않은 문자 포함<br>';
@@ -429,7 +429,7 @@ $(document).ready(function() {
     
         // 입력된 생년월일이 유효한 연도 범위 내에 있는지 검사
         if (year < minYear || year > maxYear) {
-            inputDateError.text(`❌ 생년월일의 년도는 ${minYear}년부터 ${maxYear}년 사이여야 합니다.`).css('color', 'red');
+            inputDateError.text(`❌ 년도는 ${minYear}년부터 ${maxYear}년 사이여야 합니다.`).css('color', 'red');
             return false;
         }
     

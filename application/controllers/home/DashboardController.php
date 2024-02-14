@@ -1,7 +1,7 @@
 <?
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class DashboardController extends CI_Controller {
+class DashboardController extends MY_Controller {
     public function __construct() {
         parent::__construct();
     }
@@ -9,6 +9,7 @@ class DashboardController extends CI_Controller {
 
     public function index()
     {
-        $this->load->view('dashboard/dashboard');
+        $page_view_data['title'] = '메인';
+        $this->layout->view('dashboard/dashboard', $page_view_data);
     }
 }

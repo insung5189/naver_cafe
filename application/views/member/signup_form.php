@@ -3,13 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>회원가입</title>
     <link rel="stylesheet" type="text/css" href="/assets/css/member/signup.css">
     <script src="/assets/js/member/signup.js"></script>
 </head>
 
-<body>
-    <main>
         <section class="section-container">
             <div class="container">
                 <h1 class="title">
@@ -288,7 +285,7 @@
                         </div>
                         <hr>
                         <!-- 다음카카오 주소API(우편번호) -->
-                        <div class="field-box adrs-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_postcode">
@@ -304,7 +301,7 @@
                         </div>
 
                         <!-- 다음카카오 주소API(도로명주소) -->
-                        <div class="field-box adrs-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_roadAddress">
@@ -319,7 +316,7 @@
                         </div>
 
                         <!-- 다음카카오 주소API(지번주소) -->
-                        <div class="field-box adrs-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_jibunAddress">
@@ -335,7 +332,7 @@
                         </div>
 
                         <!-- 다음카카오 주소API(참고항목-법정동명) -->
-                        <div class="field-box adrs-box">
+                        <div class="field-box">
 
                             <div class="label-box">
                                 <label class="label-section" for="sample4_extraAddress">
@@ -367,8 +364,8 @@
                         <hr>
                         <!-- 카페 이용안내 동의 -->
                         <div>
-                            <ul>
-                                <li>
+                            <ul class="terms-ul">
+                                <li class="terms-li">
                                     <span class="bold h3">이 카페에서 활동하는 동안 원활한 카페 운영을 위하여&nbsp;</span>
                                     <span class="remov-space">Email, 닉네임, 활동내역, 이름/성, 연락처가&nbsp;</span>
                                     <span class="bold h3">이 카페의 운영진</span>
@@ -391,7 +388,4 @@
                 </form>
             </div>
         </section>
-    </main>
-</body>
-
 </html>

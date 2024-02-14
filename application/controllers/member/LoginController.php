@@ -1,25 +1,20 @@
 <?
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class LoginController extends CI_Controller {
+class LoginController extends MY_Controller {
     public function __construct() {
         parent::__construct();
         $this->load->model('member/LoginModel', 'loginModel');
-        $this->load->library('doctrine');
-        $this->load->library('session');
     }
 
     public function index() {
         if ($this->session->userdata('user_data')) {
-            // 이미 로그인한 사용자는 메인 페이지로 리다이렉션
             redirect('/');
         }
     
         // 로그인 페이지 뷰 로드
-        $this->load->view('templates/header');
-        $this->load->view('member/login_form');
-        $this->output->enable_profiler(true);
-        $this->load->view('templates/footer');
+        $page_view_data['title'] = '로그인';
+        $this->layout->view('member/login_form', $page_view_data);
     }
 
     public function processLogin() {
@@ -39,9 +34,9 @@ class LoginController extends CI_Controller {
             redirect('/');
             echo "<script>alert('반갑다.');</script>";
         } else {
-            $this->load->view('templates/header');
-            $this->load->view('member/login_form', ['errors' => $user['errors']]);
-            $this->load->view('templates/footer');
+            $page_view_data['title'] = '로그인';
+            $page_view_data['errors'] = $user['errors'];
+            $this->layout->view('member/login_form', $page_view_data);
         }
     }
 
