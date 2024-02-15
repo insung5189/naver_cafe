@@ -49,11 +49,11 @@
                         </ul>
 
                         <div class="cafe-info-container">
-                            <!-- 현재 여기 작업 중(24-02-15) -->
+
                             <div class="cafe-info-content">
                                 <ul>
-                                    <li class="info-content-ls">
-                                        <a href="/">
+                                    <li class="cafe-info-content-ls">
+                                        <a class="info-contents-ls-a" href="/">
                                             <img src="https://ssl.pstatic.net/static/cafe/cafe_pc/default/cafe_thumb_noimg_55.png" width="58" height="58" alt="카페아이콘">
                                         </a>
                                     </li>
