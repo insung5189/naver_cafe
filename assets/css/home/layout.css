@@ -357,6 +357,16 @@ address {
     vertical-align: top;
 }
 
+.skin-1080 #cafe-menu .cafe-menu-list .bmk_noti .ico-bookmark2,
+.skin-1080 .article-invite .btn_invite .ico_add,
+.skin-1080 .article-invite .add_email .ico_del,
+.skin-1080 .article-invite .txt_help .ico_more {
+    display: inline-block;
+    background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_white_72ca546e.svg);
+    background-repeat: no-repeat;
+    vertical-align: top;
+}
+
 .ico_newcafe,
 #naver-gnb #gnb-menu .gnb_service_li .gnb_icon,
 .footer .naver_cafe,
@@ -459,6 +469,22 @@ address {
     background-image: url(https://ssl.pstatic.net/static/cafe/cafe_pc/sp/sp_icon_06952b76.svg);
     background-repeat: no-repeat;
     vertical-align: top;
+}
+
+.skin-1080 #cafe-menu .cafe-menu-list .bmk_noti .ico-bookmark2 {
+    margin: 1px 3px 0 0;
+    background-position: -44px -90px;
+    width: 12px;
+    height: 12px;
+}
+
+.skin-1080 #cafe-menu .cafe-menu-list .bmk_noti {
+    color: #666;
+}
+
+.skin-1080 #cafe-menu .cafe-menu-list .bmk_noti {
+    font-size: 12px;
+    line-height: 16px;
 }
 
 .skin-1080 .cafe-write-btn a {
@@ -651,23 +677,23 @@ address {
 }
 
 .skin-1080 #cafe-menu .cafe-menu-tit.frst {
-    border-top-color: #333;
-    color: #000;
-}
-
-.skin-1080 #cafe-menu .cafe-menu-tit.frst {
     padding: 12px 11px 9px;
 }
 
-.skin-1080 #cafe-menu .cafe-menu-tit {
-    border-top-color: #e5e5e5;
-    border-bottom-color: #e5e5e5;
+.skin-1080 #cafe-menu .cafe-menu-tit.frst {
+    border-top-color: #333;
+    color: #000;
 }
 
 .skin-1080 #cafe-menu .cafe-menu-tit {
     position: relative;
     border-top: 2px solid;
     border-bottom: 1px solid;
+}
+
+.skin-1080 #cafe-menu .cafe-menu-tit {
+    border-top-color: #e5e5e5;
+    border-bottom-color: #e5e5e5;
 }
 
 .skin-1080 #cafe-menu .cafe-menu-tit .ico-bookmark {
@@ -696,13 +722,15 @@ address {
     vertical-align: top;
 }
 
-.skin-1080 #cafe-menu .cafe-menu-tit .down-btn {
+.skin-1080 #cafe-menu .cafe-menu-tit .down-btn,
+.skin-1080 #cafe-menu .cafe-menu-tit .up-btn {
     background-position: -72px -52px;
     width: 7px;
     height: 4px;
 }
 
-.skin-1080 #cafe-menu .cafe-menu-tit .down-btn {
+.skin-1080 #cafe-menu .cafe-menu-tit .down-btn,
+.skin-1080 #cafe-menu .cafe-menu-tit .up-btn {
     position: absolute;
     top: 50%;
     right: 12px;
@@ -868,4 +896,34 @@ address {
     float: none;
     width: auto;
     line-height: 22px;
+}
+
+.skin-1080 #cafe-banner {
+    height: 60px;
+    background-size: 200px 60px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.skin-1080 #cafe-banner {
+    background-image: url(https://i.imgur.com/dCtwRkK.png);
+}
+
+.skin-1080 #cafe-banner .cafe {
+    color: #333;
+}
+
+.skin-1080 #cafe-banner .cafe {
+    display: block;
+    max-width: 180px;
+    padding-top: 35px;
+    margin: 0 auto;
+    font-weight: normal;
+    font-size: 11px;
+    line-height: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-all;
+    word-wrap: break-word;
 }

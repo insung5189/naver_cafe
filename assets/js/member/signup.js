@@ -118,7 +118,9 @@ $(document).ready(function() {
         const fileInfo = $('#file-info');
 
         if (!file) {
-            fileInfo.html(`등록된 파일이 없습니다. <br>기본 이미지가 적용됩니다.`);
+            $('.image-preview').attr('src', 'https://i.imgur.com/0Vhk4jx.png');
+            $('#file').val("");
+            $('#file-info').html(`등록된 파일이 없습니다. <br>기본 이미지가 적용됩니다.`);
             return;
         }
 
