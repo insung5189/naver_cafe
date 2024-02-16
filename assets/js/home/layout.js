@@ -1,17 +1,16 @@
 $(document).ready(function () {
-    // 공통 기능을 처리하는 함수
+    // 카페정보/나의활동 탭 토글
+    switchTab('.cafe-info-tab', '.user-activity-tab', '.cafe-details', '.user-activity');
+
     function switchTab(activeTabClass, inactiveTabClass, showSelector, hideSelector) {
-        // 비활성 탭 스타일 초기화
         $(inactiveTabClass + ' button').css({
             'color': '',
             'font-weight': ''
         });
-        // 활성 탭 스타일 적용
         $(activeTabClass + ' button').css({
             'color': '#000',
             'font-weight': 'bold'
         });
-        // 관련 섹션 표시 및 숨김 처리
         $(showSelector).show();
         $(hideSelector).hide();
     }
@@ -19,10 +18,19 @@ $(document).ready(function () {
     $('.cafe-info-tab').click(function () {
         switchTab('.cafe-info-tab', '.user-activity-tab', '.cafe-details', '.user-activity');
     });
-
     $('.user-activity-tab').click(function () {
         switchTab('.user-activity-tab', '.cafe-info-tab', '.user-activity', '.cafe-details');
     });
 
-    switchTab('.cafe-info-tab', '.user-activity-tab', '.cafe-details', '.user-activity');
+    // 즐겨찾기 게시판 버튼 토글
+    $('.toggle-favorite-board').click(function () {
+        $('.board-instructions').toggle();
+
+        var isOpen = $('.board-instructions').is(':hide');
+        if (isOpen) {
+            $('.up-and-down-btn').css('background-image', "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"12\" viewBox=\"-4 -4 15 12\" x=\"68\" y=\"48\"><path fill=\"%23777\" fill-rule=\"evenodd\" d=\"M3.5 0L7 4H0z\"/></svg>')");
+        } else {
+            $('.up-and-down-btn').css('background-image', "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"12\" viewBox=\"-4 -4 15 12\" x=\"68\" y=\"48\"><path fill=\"%23777\" fill-rule=\"evenodd\" d=\"M3.5 4L7 0H0z\"/></svg>')");
+        }
+    });
 });
