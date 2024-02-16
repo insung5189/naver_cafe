@@ -1,18 +1,45 @@
 <?php
-class Layout 
+// /application/libraries/Layout.php
+class Layout
 {
-
 	public function __construct()
 	{
-		$this->obj = &get_instance(); // ci 코어 객체를 가져옴
+		$this->obj = &get_instance();
+		$this->obj->load->model('member/MyActivityModel', 'MyActivityModel');
 	}
 
-	function view($view = "", $page_view_data = array())
+	public function view($view = "", $page_view_data = array())
 	{
+		$page_view_data['masterNickName'] = $this->getMasterAdminNickName();
+
+		if ($userId = $this->obj->session->userdata('user_data')['user_id'] ?? null) {
+			$activityInfo = $this->getUserActivityInfo($userId);
+			$page_view_data = array_merge($page_view_data, $activityInfo);
+		}
+
 		$layout_view_data = array(
 			"title" => isset($page_view_data['title']) ? $page_view_data['title'] : '기본 제목',
-			"contents" => $this->obj->load->view($view, $page_view_data, true)
+			"contents" => $this->obj->load->view($view, $page_view_data, true),
+			'masterNickName' => $page_view_data['masterNickName']
 		);
+
 		$this->obj->load->view("/layouts/main_layout_view", $layout_view_data);
+	}
+
+	protected function getMasterAdminNickName()
+	{
+		$masterAdmin = $this->obj->doctrine->em->getRepository('Models\Entities\Member')->findOneBy(['role' => 'ROLE_MASTER']);
+		return $masterAdmin ? $masterAdmin->getNickName() : '마스터 계정 없음';
+	}
+
+	protected function getUserActivityInfo($userId)
+	{
+		$articleCount = $this->obj->MyActivityModel->getArticleCount($userId);
+		$commentCount = $this->obj->MyActivityModel->getCommentCount($userId);
+
+		return [
+			'articleCount' => $articleCount,
+			'commentCount' => $commentCount,
+		];
 	}
 }

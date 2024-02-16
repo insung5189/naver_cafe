@@ -43,6 +43,7 @@ class SignupModel extends CI_Model
             $member->setIsActive(true);
             $member->setBlacklist(false);
             $member->setRole('ROLE_ADMIN');
+            $member->setVisit(1);
             $member->setIntroduce(NULL);
             if (!empty($formData['birth'])) {
                 $member->setBirth(new \DateTime($formData['birth']));

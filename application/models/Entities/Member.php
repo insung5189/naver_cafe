@@ -304,7 +304,7 @@ class Member
 
     public function setRole($role)
     {
-        if (!in_array($role, ['ROLE_MEMBER', 'ROLE_ADMIN'])) {
+        if (!in_array($role, ['ROLE_MEMBER', 'ROLE_ADMIN', 'ROLE_MASTER'])) {
             throw new \InvalidArgumentException("접근 권한이 없습니다.");
         }
         $this->role = $role;

@@ -26,7 +26,7 @@ $(document).ready(function () {
     $('.toggle-favorite-board').click(function () {
         $('.board-instructions').toggle();
 
-        var isOpen = $('.board-instructions').is(':hide');
+        var isOpen = $('.board-instructions').is(':visible');
         if (isOpen) {
             $('.up-and-down-btn').css('background-image', "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"15\" height=\"12\" viewBox=\"-4 -4 15 12\" x=\"68\" y=\"48\"><path fill=\"%23777\" fill-rule=\"evenodd\" d=\"M3.5 0L7 4H0z\"/></svg>')");
         } else {

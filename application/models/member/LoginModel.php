@@ -3,14 +3,16 @@ defined('BASEPATH') or exit('직접적인 스크립트 접근은 허용되지 �
 
 class LoginModel extends CI_Model
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->library('doctrine');
         $this->load->library('session');
         $this->em = $this->doctrine->em;
     }
 
-    public function authenticate($formData) {
+    public function authenticate($formData)
+    {
 
         $errorData = ['errors' => []];
 
@@ -18,7 +20,6 @@ class LoginModel extends CI_Model
         if (!empty($errorData['errors'])) {
             return ['success' => false, 'errors' => $errorData['errors']];
         }
-
 
         try {
             $userRepo = $this->em->getRepository('Models\Entities\Member');
@@ -43,7 +44,7 @@ class LoginModel extends CI_Model
 
                 $this->incrementLoginAttempt($user->getId());
                 $attemptCount = $this->getLoginAttemptCount($user->getId());
-        
+
                 if ($attemptCount >= 5) {
                     // 실패 횟수가 5회 이상인 경우 사용자 계정 비활성화
                     $user->setIsActive(false);
@@ -60,13 +61,15 @@ class LoginModel extends CI_Model
                     return $blacklistCheck;
                 }
 
-                // 로그인 성공: 로그인 시도 횟수 초기화 및 계정 상태 업데이트
                 $this->resetLoginAttempts($user->getId());
                 if (!$user->getIsActive() || $user->getBlacklist()) {
                     $user->setIsActive(true);
                     $user->setBlacklist(false);
-                    $this->em->flush();
+                    $currentVisitCount = $user->getVisit();
+                    $user->setVisit($currentVisitCount + 1);
                 }
+
+                $this->em->flush();
                 // 회원의 모든 정보를 배열로 준비
                 $userSessData = [
                     'user_id'        => $user->getId(),
@@ -97,7 +100,7 @@ class LoginModel extends CI_Model
 
                 // 세션에 회원 정보 배열 저장
                 $this->session->set_userdata('user_data', $userSessData);
-        
+
                 return ['success' => true, 'errors' => []];
             }
         } catch (\Exception $e) {
@@ -106,9 +109,10 @@ class LoginModel extends CI_Model
         }
     }
 
-    private function duplicateSession($formData, &$errorData) {
+    private function duplicateSession($formData, &$errorData)
+    {
         $userSessData = $this->session->userdata('user_data');
-        
+
         if (!empty($userSessData)) {
             if (isset($userSessData['userName']) && $userSessData['userName'] === $formData['userName']) {
                 $errorData['errors']['session'] = '이미 로그인된 계정입니다. 다른 계정으로 로그인하려면 먼저 로그아웃 해주세요.';
@@ -118,9 +122,10 @@ class LoginModel extends CI_Model
         }
     }
 
-    private function incrementLoginAttempt($memberId) {
+    private function incrementLoginAttempt($memberId)
+    {
         $loginAttempt = $this->em->getRepository('Models\Entities\LoginAttempt')->findOneBy(['member' => $memberId]);
-    
+
         if (!$loginAttempt) {
             // 해당 회원의 로그인 시도 기록이 없으면 새로 생성
             $loginAttempt = new \Models\Entities\LoginAttempt();
@@ -132,14 +137,15 @@ class LoginModel extends CI_Model
             $loginAttempt->setAttemptCount($loginAttempt->getAttemptCount() + 1);
         }
         $loginAttempt->setLastAttemptAt(new \DateTime());
-    
+
         $this->em->persist($loginAttempt);
         $this->em->flush();
     }
 
-    private function getLoginAttemptCount($memberId) {
+    private function getLoginAttemptCount($memberId)
+    {
         $loginAttempt = $this->em->getRepository('Models\Entities\LoginAttempt')->findOneBy(['member' => $memberId]);
-    
+
         if ($loginAttempt) {
             return $loginAttempt->getAttemptCount();
         } else {
@@ -147,7 +153,8 @@ class LoginModel extends CI_Model
         }
     }
 
-    private function resetLoginAttempts($memberId) {
+    private function resetLoginAttempts($memberId)
+    {
         $loginAttempt = $this->em->getRepository('Models\Entities\LoginAttempt')->findOneBy(['member' => $memberId]);
         if ($loginAttempt) {
             $loginAttempt->setAttemptCount(0);
@@ -155,14 +162,16 @@ class LoginModel extends CI_Model
         }
     }
 
-    private function isActiveCheck($user) {
+    private function isActiveCheck($user)
+    {
         if (!$user->getIsActive()) {
             return ['success' => false, 'errors' => ['account' => '비활성화된 계정입니다. 관리자에게 문의하세요.']];
         }
         return null;
     }
-    
-    private function blacklistCheck($user) {
+
+    private function blacklistCheck($user)
+    {
         if ($user->getBlacklist()) {
             return ['success' => false, 'errors' => ['account' => '카페로부터 접속을 거부당했습니다.']];
         }
