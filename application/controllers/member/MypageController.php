@@ -48,11 +48,11 @@ class MypageController extends MY_Controller
         }
     }
 
-    private function validateNewPassword($newPassword, $newPasswordConfirm)
-    {
-        return preg_match('/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/', $newPassword) &&
-            $newPassword === $newPasswordConfirm;
+    private function validateNewPassword($newPassword, $newPasswordConfirm) {
+        $regex = '/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\[\]{}|;:\'",<.>/?]).{8,}$/';
+        return preg_match($regex, $newPassword) && $newPassword === $newPasswordConfirm;
     }
+    
 
     public function CT_validation() {
         $userId = $this->session->userdata('resetMemberId');
