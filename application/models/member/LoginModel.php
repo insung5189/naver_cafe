@@ -100,7 +100,7 @@ class LoginModel extends CI_Model
 
                 // 세션에 회원 정보 배열 저장
                 $this->session->set_userdata('user_data', $userSessData);
-
+                $this->session->set_flashdata('welcome_message', $userSessData['nickName'] . '님 반갑습니다.');
                 return ['success' => true, 'errors' => []];
             }
         } catch (\Exception $e) {

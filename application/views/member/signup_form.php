@@ -1,9 +1,9 @@
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="/assets/css/member/signup.css">
-    <script src="/assets/js/member/signup.js"></script>
-</head>
-
+<?
+$GLOBALS['pageResources'] = [
+    'css' => ['/assets/css/member/signup.css'],
+    'js' => ['/assets/js/member/signup.js']
+];
+?>
 <section class="section-container">
     <div class="container">
         <h1 class="title">
@@ -16,14 +16,14 @@
                 <span class="required-field">*</span><span class="page-guide"> 는 필수 입력사항 입니다.</span>
             </p>
         </div>
-        <?php if (!empty($errors)) : ?>
+        <? if (!empty($errors)) : ?>
             <div class="error-messages">
                 <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
-                <?php foreach ($errors as $field => $error) : ?>
+                <? foreach ($errors as $field => $error) : ?>
                     <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
-                <?php endforeach; ?>
+                <? endforeach; ?>
             </div>
-        <?php endif; ?>
+        <? endif; ?>
 
         <form method="POST" action="/member/SignupController/processMemberSignup" enctype="multipart/form-data">
             <div class="form-box">
@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="input-box">
-                        <span>비드코칭연구소 제품완성팀 미션 카페 입니다.</span>
+                        <span class="introduce">비드코칭연구소 제품완성팀 미션 카페 입니다.</span>
                     </div>
                 </div>
                 <hr>
@@ -44,7 +44,7 @@
                 <div class="field-box">
                     <div class="label-box">
                         <label class="label-section" for="userName">
-                            <span class="label-text">사용자 아이디</span>
+                            <span class="label-text">아이디</span>
                             <span class="description">(Email)</span>
                             <span class="required-field">*</span>
                         </label>
@@ -375,7 +375,7 @@
             </div>
 
             <!-- 가입버튼 -->
-            <div class="container btn-box">
+            <div class="center btn-box">
                 <input class="form-btn-box submit-btn" type="submit" value="동의 후 가입">
                 <a href="/">
                     <input class="form-btn-box btn" type="button" value="취소">

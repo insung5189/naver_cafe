@@ -1,7 +1,5 @@
 $(document).ready(function () {
     // 카페정보/나의활동 탭 토글
-    switchTab('.cafe-info-tab', '.user-activity-tab', '.cafe-details', '.user-activity');
-
     function switchTab(activeTabClass, inactiveTabClass, showSelector, hideSelector) {
         $(inactiveTabClass + ' button').css({
             'color': '',
@@ -19,7 +17,14 @@ $(document).ready(function () {
         switchTab('.cafe-info-tab', '.user-activity-tab', '.cafe-details', '.user-activity');
     });
     $('.user-activity-tab').click(function () {
-        switchTab('.user-activity-tab', '.cafe-info-tab', '.user-activity', '.cafe-details');
+        var isLoggedIn = $('#userStatus').data('logged-in');
+        if (!isLoggedIn) {
+            if (confirm('로그인이 필요합니다.\n확인 버튼을 누르시면 로그인 페이지로 이동합니다.')) {
+                window.location.href = '/member/logincontroller';
+            }
+        } else {
+            switchTab('.user-activity-tab', '.cafe-info-tab', '.user-activity', '.cafe-details');
+        }
     });
 
     // 즐겨찾기 게시판 버튼 토글
