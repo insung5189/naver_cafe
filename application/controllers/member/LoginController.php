@@ -11,6 +11,15 @@ class LoginController extends MY_Controller
 
     public function index()
     {
+        // 로그인 페이지에 진입하면 불필요한 세션데이터는 삭제함.
+        $sessionData = $this->session->userdata();
+
+        foreach ($sessionData as $key => $value) {
+            if ($key != 'user_data') {
+                $this->session->unset_userdata($key);
+            }
+        }
+
         $page_view_data['title'] = '로그인';
         $this->layout->view('member/login_form', $page_view_data);
     }

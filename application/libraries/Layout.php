@@ -11,6 +11,7 @@ class Layout
 	public function view($view = "", $page_view_data = array())
 	{
 		$page_view_data['masterNickName'] = $this->getMasterAdminNickName();
+		$page_view_data['totalMemberCount'] = $this->getTotalMemberCount();
 
 		if ($userId = $this->obj->session->userdata('user_data')['user_id'] ?? null) {
 			$activityInfo = $this->getUserActivityInfo($userId);
@@ -20,7 +21,8 @@ class Layout
 		$layout_view_data = array(
 			"title" => isset($page_view_data['title']) ? $page_view_data['title'] : '기본 제목',
 			"contents" => $this->obj->load->view($view, $page_view_data, true),
-			'masterNickName' => $page_view_data['masterNickName']
+			'masterNickName' => $page_view_data['masterNickName'],
+			'totalMemberCount' => $page_view_data['totalMemberCount']
 		);
 
 		$this->obj->load->view("/layouts/main_layout_view", $layout_view_data);
@@ -31,6 +33,12 @@ class Layout
 		$masterAdmin = $this->obj->doctrine->em->getRepository('Models\Entities\Member')->findOneBy(['role' => 'ROLE_MASTER']);
 		return $masterAdmin ? $masterAdmin->getNickName() : '마스터 계정 없음';
 	}
+
+	protected function getTotalMemberCount()
+    {
+        $totalMemberCount = $this->obj->doctrine->em->getRepository('Models\Entities\Member')->count([]);
+        return $totalMemberCount;
+    }
 
 	protected function getUserActivityInfo($userId)
 	{

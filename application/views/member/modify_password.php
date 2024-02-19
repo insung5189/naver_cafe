@@ -17,27 +17,29 @@ $GLOBALS['pageResources'] = [
 ?>
 <section class="section-container">
     <div class="container">
-        <h1 class="title">
-            <i class="fa-solid fa-arrows-rotate"></i>
-            비밀번호 변경
-        </h1>
-        <div class="title">
-            <p class="page-guide">비밀번호를 변경합니다. 영문, 숫자, 특수문자 포함 8자리 이상으로 구성해주세요.</p>
-        </div>
-
-        <? if (!empty($errors)) : ?>
-            <div class="error-messages">
-                <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
-                <? foreach ($errors as $field => $error) : ?>
-                    <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
-                <? endforeach; ?>
-            </div>
-        <? endif; ?>
-        <? if (!empty($this->session->flashdata('error'))) : ?>
-        <div class="error-message center"><? echo $this->session->flashdata('error'); ?></div>
-        <? endif; ?>
         <? if ($email = $this->session->userdata('resetMemberEmail')) : ?>
             <? $createDate = $this->session->userdata('resetMemberCreateDate'); ?>
+            <h1 class="title">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                비밀번호 변경
+            </h1>
+            <div class="title">
+                <p class="page-guide">비밀번호를 변경합니다. 영문, 숫자, 특수문자 포함 8자리 이상으로 구성해주세요.</p>
+            </div>
+
+            <? if (!empty($errors)) : ?>
+                <div class="error-messages">
+                    <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                    <? foreach ($errors as $field => $error) : ?>
+                        <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                    <? endforeach; ?>
+                </div>
+            <? endif; ?>
+
+
+            <? if (!empty($this->session->flashdata('error'))) : ?>
+                <div class="error-message center"><? echo $this->session->flashdata('error'); ?></div>
+            <? endif; ?>
             <div class="account-count">
                 <span>귀하의 가입된 계정 내역입니다.</span>
             </div>
@@ -81,7 +83,7 @@ $GLOBALS['pageResources'] = [
                                 </div>
                             </div>
 
-                            <div class="input-box position-absolute">
+                            <div class="input-box position">
                                 <span class="description" id="oldpassword-validation-message"></span>
                             </div>
 
@@ -107,7 +109,7 @@ $GLOBALS['pageResources'] = [
                                 </div>
                             </div>
 
-                            <div class="input-box position-absolute">
+                            <div class="input-box position">
                                 <span class="description" id="newpassword-validation-message"></span>
                             </div>
 
@@ -133,7 +135,7 @@ $GLOBALS['pageResources'] = [
                                 </div>
                             </div>
 
-                            <div class="input-box position-absolute">
+                            <div class="input-box position">
                                 <span class="description" id="newpasswordcf-validation-message"></span>
                             </div>
 
@@ -148,6 +150,18 @@ $GLOBALS['pageResources'] = [
                     </div>
                 </form>
             </div>
-        <? endif; ?>
+        <?php else : ?>
+            <div class="error-message">
+                <h1 class="title">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    잘못된 접근입니다.
+                </h1>
+                <p class="page-guide">비밀번호 변경을 위해서는 올바른 절차를 따라야 합니다.</p>
+                <div class="btn-box flex-end">
+                    <a href="/member/logincontroller" class="btn btn-primary">로그인 페이지로 이동</a>
+                    <a href="/" class="btn btn-secondary">메인 페이지로 이동</a>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
 </section>

@@ -14,7 +14,7 @@ class MypageModel extends CI_Model
     public function updatePassword($userId, $oldPassword, $newPassword)
     {
         try {
-            $user = $this->em->getRepository('Entites\Member')->find($userId);
+            $user = $this->em->getRepository('Models\Entities\Member')->find($userId);
             if (!$user) {
                 throw new Exception('사용자를 찾을 수 없습니다.');
             }

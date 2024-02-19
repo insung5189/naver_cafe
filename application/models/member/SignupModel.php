@@ -42,7 +42,7 @@ class SignupModel extends CI_Model
             $member->setExtraAddress($formData['extraAddress']);
             $member->setIsActive(true);
             $member->setBlacklist(false);
-            $member->setRole('ROLE_ADMIN');
+            $member->setRole('ROLE_MEMBER');
             $member->setVisit(1);
             $member->setIntroduce(NULL);
             if (!empty($formData['birth'])) {
@@ -57,7 +57,7 @@ class SignupModel extends CI_Model
             $em = $this->doctrine->em;
             $em->persist($member);
             $em->flush();
-
+            $this->session->set_flashdata('welcome_message', $formData['nickName'] . '님 환영합니다.\n가입하신 계정으로 로그인해주세요.');
             return ['success' => true, 'errors' => []];
         } catch (\Exception $e) {
             log_message('error', '회원 가입 실패: ' . $e->getMessage());
@@ -100,7 +100,10 @@ class SignupModel extends CI_Model
     private function validatePhone($formData, &$errorData) {
         // 연락처 유효성검사
         if (!empty($formData['phone'])) {
-            if (!preg_match('/^(\+\d{1,3}-?)?(01[016-9]|02|0[3-6][1-5]?|070)-?([1-9]\d{2,3}-?\d{4})$/', $formData['phone'])) {
+            // 전화번호에서 하이픈('-') 제거
+            $phoneWithoutHyphens = preg_replace('/-/', '', $formData['phone']);
+    
+            if (!preg_match('/^(\+\d{1,3})?(01[016-9]|02|0[3-6][1-5]?|070)([1-9]\d{2,3}\d{4})$/', $phoneWithoutHyphens)) {
                 $errorData['errors']['phone'] = '유효하지 않은 전화번호 형식입니다.';
             }
         } else {
@@ -200,22 +203,19 @@ class SignupModel extends CI_Model
     }
 
     private function processProfileImage(&$formData, &$errorData) {
-        // 파일 업로드 설정
         $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
         $config['allowed_types'] = 'jpg|jpeg|png|bmp';
         $config['max_size'] = '51200';
 
         $this->load->library('upload', $config);
 
-        if (isset($_FILES['file']) && $_FILES['file']['name'] != '') { // 파일 배열에 파일내용이 존재한다면 조건문 수행
+        if (isset($_FILES['file']) && $_FILES['file']['name'] != '') {
             if ($this->upload->do_upload('file')) {
-                // 파일 업로드 성공
                 $uploadData = $this->upload->data();
                 $originalName = trim(pathinfo($uploadData['client_name'], PATHINFO_FILENAME));
                 $fileExt = $uploadData['file_ext'];
                 $uploadDate = date('Ymd');
                 $uuid = uniqid();
-                // 규칙에 맞는 새 파일명 지정
                 $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}"; // 새 파일명 생성 => {원본파일명}-{파일등록일}-{uuid}.{확장자}
 
                 // 새 파일명을 활용해서 경로 변경

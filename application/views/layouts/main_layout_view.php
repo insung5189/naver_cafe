@@ -18,7 +18,7 @@
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script src="/assets/js/member/address.js"></script>
 
-    <title><? echo isset($title) ? $title : '비드카페'; ?> | 비드카페</title>
+    <title><? echo isset($title) ? htmlspecialchars($title, ENT_QUOTES, 'UTF-8') : '비드카페'; ?> | 비드카페</title>
     <link rel="icon" href="data:;base64,iVBORw0KGgo=">
 
     <script src="/assets/js/home/layout.js"></script>
@@ -35,7 +35,7 @@
 
     <? if ($this->session->flashdata('welcome_message')) : ?>
         <script>
-            alert('<? echo $this->session->flashdata('welcome_message'); ?>');
+            alert('<? echo htmlspecialchars($this->session->flashdata('welcome_message'), ENT_QUOTES, 'UTF-8'); ?>');
         </script>
     <? endif; ?>
 </head>
@@ -78,7 +78,7 @@
                                     <li class="cafe-manager">
                                         <a href="/카페매니저의_카페활동내역">
                                             <div class="manager-info">
-                                                <div class="manager-name"><? echo htmlspecialchars($masterNickName, ENT_QUOTES, 'UTF-8'); ?></div>
+                                                <div class="manager-name hover-underline"><? echo htmlspecialchars($masterNickName, ENT_QUOTES, 'UTF-8'); ?></div>
                                             </div>
                                         </a>
                                         <em class="ico-manager">매니저</em>
@@ -86,7 +86,7 @@
                                             <a href="/카페연혁페이지_선택사항">2024.01.08. 개설</a>
                                         </div>
                                         <div class="cafe-description-link">
-                                            <a href="/카페소개페이지_필수사항">카페소개</a>
+                                            <a href="/home/layoutcontroller/cafeInfo">카페소개</a>
                                         </div>
                                     </li>
                                 </ul>
@@ -94,18 +94,13 @@
 
                             <div class="member-count">
                                 <ul>
-                                    <li>
+                                    <li class="member-count-invited">
                                         <strong>카페멤버수</strong>
                                         <a href="/가입한_회원목록">
                                             <img src="https://ssl.pstatic.net/static/cafe/cafe_pc/svg/ico_member.svg" alt="멤버수">
-                                            <em class="cafe-mem-numb">멤버 숫자 표시자리
-                                                <!-- 자물쇠 svg아이콘(비공개처리시 사용) -->
-                                                <!-- <span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="17" height="19" viewBox="-4 -4 17 19" x="115" y="20"><title>3747584E-313D-42C0-80EB-7145691BB49A</title><defs><path id="o" d="M0 6.324h8.757V0H0v6.324z"/></defs><g fill="none" fill-rule="evenodd" opacity=".6"><g transform="translate(0 3.892)"><mask id="p" fill="#fff"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#o"/></mask><path d="M4.865 3.892h-.973V2.189h.973v1.703zM8.749 0H.009A.008.008 0 0 0 0 .008v6.308c0 .005.004.008.008.008h8.74a.008.008 0 0 0 .009-.008V.008A.008.008 0 0 0 8.749 0z" fill="#575756" mask="url(#p)"/></g><path d="M7.734 4.096h-.73v-.632C7.004 1.979 5.845.753 4.421.73a2.622 2.622 0 0 0-2.668 2.625v.74h-.73v-.74A3.354 3.354 0 0 1 4.433 0c1.82.03 3.3 1.583 3.3 3.464v.632z" fill="#575756"/></g></svg>
-                                                </span> -->
-                                            </em>
+                                            <em class="cafe-mem-numb"><?php echo htmlspecialchars($totalMemberCount, ENT_QUOTES, 'UTF-8'); ?></em>
                                         </a>
-                                        <a href="/카페초대페이지">카페 초대하기</a>
+                                        <a href="javascript:void(0);" id="inviteLink">카페 링크복사</a>
                                     </li>
                                 </ul>
                             </div>
@@ -155,7 +150,11 @@
                                             <li class="profile-info">
                                                 <div class="profile-thumb">
                                                     <!-- 사용자 프로필 이미지 -->
-                                                    <img src="<? echo $user['memberFilePath']; ?>" width="58" height="58" alt="프로필사진">
+                                                    <?
+                                                    $fileUrl = base_url("assets/file/images/");
+                                                    $profileImagePath = ($user['memberFileName'] === 'default.png') ? 'defaultImg/default.png' : $user['memberFileName'];
+                                                    ?>
+                                                    <img src="<? echo $fileUrl . $profileImagePath; ?>" width="58" height="58" alt="<? echo htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?>">
                                                 </div>
                                                 <div class="activity-info">
                                                     <!-- 사용자 닉네임 -->
@@ -164,10 +163,10 @@
                                             </li>
                                             <li class="membership-date">
                                                 <!-- 사용자 가입 날짜 -->
-                                                <em><? echo $user['create_date']; ?></em> 가입
+                                                <em><? echo htmlspecialchars($user['create_date'], ENT_QUOTES, 'UTF-8'); ?></em> 가입
                                             </li>
                                             <li>
-                                                <a href="/마이페이지(내_정보_조회_및_수정)" class="edit-thumb">프로필 변경</a>
+                                                <a href="/member/mypagecontroller" class="edit-thumb">프로필 변경</a>
                                             </li>
                                         </ul>
                                     </div>

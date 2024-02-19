@@ -40,7 +40,7 @@ class SignupController extends MY_Controller {
         } else {
             $page_view_data['title'] = '회원가입';
             $page_view_data['errors'] = $result['errors'];
-            $this->layout->view('member/login_form', $page_view_data);
+            $this->layout->view('member/signup_form', $page_view_data);
         }
     }
 

@@ -207,6 +207,11 @@ header {
     color: #666666;
 }
 
+.member-count-invited {
+    display: flex;
+    justify-content: space-between;
+}
+
 .manager-info {
     display: inline-block;
     max-width: 70px;
@@ -314,6 +319,7 @@ header {
     padding-top: 3px;
     font-weight: bold;
     font-size: 14px;
+    margin-bottom: 2px;
 }
 
 .membership-date {
@@ -376,7 +382,8 @@ header {
     border-bottom: 1px solid #e5e5e5;
 }
 
-.favorite-board h3:hover {
+.favorite-board h3:hover,
+.hover-underline:hover {
     text-decoration: underline;
 }
 
@@ -404,6 +411,10 @@ header {
     justify-content: space-between;
 }
 
+.board-list li:hover {
+    text-decoration: underline;
+}
+
 .board-group {
     display: flex;
     justify-content: space-between;
@@ -418,15 +429,18 @@ header {
 }
 
 .banner-item {
-    margin: 16px 0;
+    margin: 16px auto;
 }
 
 .banner-content {
     height: 60px;
+    width: 200px;
+    margin: 0 auto;
     background-size: 200px 60px;
     text-align: center;
     cursor: pointer;
     background-image: url(https://i.imgur.com/dCtwRkK.png);
+    background-repeat: no-repeat;
 }
 
 .banner-title {
@@ -437,11 +451,8 @@ header {
     font-weight: normal;
     font-size: 11px;
     line-height: 14px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-break: break-all;
-    word-wrap: break-word;
+    text-decoration: none;
+    color: black;
 }
 
 .comment-content,

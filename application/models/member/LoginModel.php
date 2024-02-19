@@ -65,16 +65,14 @@ class LoginModel extends CI_Model
                 if (!$user->getIsActive() || $user->getBlacklist()) {
                     $user->setIsActive(true);
                     $user->setBlacklist(false);
-                    $currentVisitCount = $user->getVisit();
-                    $user->setVisit($currentVisitCount + 1);
                 }
-
+                $user->setVisit($user->getVisit() + 1);
                 $this->em->flush();
                 // 회원의 모든 정보를 배열로 준비
                 $userSessData = [
                     'user_id'        => $user->getId(),
-                    'create_date'    => $user->getCreateDate() ? $user->getCreateDate()->format('Y-m-d H:i:s') : null,
-                    'modify_date'    => $user->getModifyDate() ? $user->getModifyDate()->format('Y-m-d H:i:s') : null,
+                    'create_date'    => $user->getCreateDate() ? $user->getCreateDate()->format('Y-m-d') : null,
+                    'modify_date'    => $user->getModifyDate() ? $user->getModifyDate()->format('Y-m-d') : null,
                     'userName'       => trim($user->getUserName()),
                     'nickName'       => trim($user->getNickName()),
                     'firstName'      => trim($user->getFirstName()),

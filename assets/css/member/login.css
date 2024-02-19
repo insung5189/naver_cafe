@@ -42,14 +42,13 @@ h1 {
 }
 
 form {
-    width: 860px;
+    width: 820px;
     display: flex;
     flex-direction: column;
 }
 
 .form-box {
     display: block;
-    width: 92%;
     padding: 0.375rem 0.75rem;
     font-size: 1rem;
     line-height: 1.5;
