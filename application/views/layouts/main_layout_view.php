@@ -109,7 +109,7 @@
                         <? if (isset($_SESSION['user_data']) && $_SESSION['user_data']) : ?>
                             <!-- 로그인 상태일 때 -->
                             <div class="write-cafe">
-                                <a href="/article/articlecontroller/write">카페 글쓰기</a>
+                                <a href="/article/articleeditcontroller">카페 글쓰기</a>
                             </div>
                             <div class="cafe-logout">
                                 <ul>
@@ -229,7 +229,7 @@
                         <? if (isset($_SESSION['user_data']) && $_SESSION['user_data']) : ?>
                             <!-- 로그인 상태일 때 -->
                             <div class="write-cafe">
-                                <a href="/article/articlecontroller/write">카페 글쓰기</a>
+                                <a href="/article/articleeditcontroller">카페 글쓰기</a>
                             </div>
                             <div class="cafe-logout">
                                 <ul>

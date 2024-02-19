@@ -1,4 +1,5 @@
 <?php
+
 namespace Models\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -159,6 +160,21 @@ class Article
     public function setDepth($depth)
     {
         $this->depth = $depth;
+    }
+
+    /**
+     * @ORM\Column(type="string", nullable=true, options={"default":null})
+     **/
+    private $topic;
+
+    public function getTopic()
+    {
+        return $this->topic;
+    }
+
+    public function setTopic($topic = null)
+    {
+        $this->topic = $topic;
     }
 
     // Foreign key references
