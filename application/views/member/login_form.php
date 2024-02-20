@@ -34,7 +34,7 @@ $GLOBALS['pageResources'] = [
             </div>
         <?php endif; ?>
 
-        <form method="POST" action="/member/LoginController/processLogin">
+        <form method="POST" action="/member/LoginController/processLogin" class="login-form">
             <div class="form-box">
                 <div class="field-box">
                     <div class="label-box">

@@ -1,21 +1,21 @@
 $(document).ready(function() {
     $('#board-select').change(function() {
         var board = $(this).val();
-        var topicSelect = $('#topic-select');
+        var prefixSelect = $('#prefix-select');
 
-        topicSelect.empty().append($('<option>', { value: '', text: '말머리 선택' })).prop('disabled', true);
+        prefixSelect.empty().append($('<option>', { value: '', text: '말머리 선택' })).prop('disabled', true);
 
-        if (board === '지식공유') {
-            var topics = ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타'];
-            topicSelect.prop('disabled', false);
-            $(topics).each(function(index, topic) {
-                topicSelect.append($('<option>', { value: topic, text: topic }));
+        if (board === '4') {
+            var prefixs = ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타'];
+            prefixSelect.prop('disabled', false);
+            $(prefixs).each(function(index, prefix) {
+                prefixSelect.append($('<option>', { value: prefix, text: prefix }));
             });
-        } else if (board === '질문/답변게시판') {
-            var topics = ['질문', '답변'];
-            topicSelect.prop('disabled', false);
-            $(topics).each(function(index, topic) {
-                topicSelect.append($('<option>', { value: topic, text: topic }));
+        } else if (board === '5') {
+            var prefixs = ['질문', '답변'];
+            prefixSelect.prop('disabled', false);
+            $(prefixs).each(function(index, prefix) {
+                prefixSelect.append($('<option>', { value: prefix, text: prefix }));
             });
         }
     });

@@ -75,21 +75,24 @@ button {
     cursor: pointer;
 }
 
-header {
-    display: flex;
-    justify-content: center;
-}
-
 .d-none {
     display: none;
 }
 
+.wrap-main {
+    display: flex;
+    position: relative;
+    width: 1080px;
+    margin: 0 auto;
+    flex-direction: column;
+}
+
 .cafe-banner {
     background-image: url(https://i.imgur.com/cvAN5sB.png);
-    width: 1076px;
+    width: 1072px;
     height: 178px;
     border: 4px solid #e5e5e5;
-    margin: 20px;
+    margin-top: 20px;
 }
 
 .content-wrap {
@@ -97,7 +100,39 @@ header {
     position: relative;
     width: 1080px;
     margin: 0 auto;
-    clear: both;
+}
+
+.search-box-main {
+    padding: 16px 0 16px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.search-form-main {
+    display: flex;
+    align-items: center;
+}
+
+.custom-search-input-main {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 300px;
+}
+
+.search-btn-main {
+    padding: 8px 15px;
+    background-color: #03C75A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.search-btn-main:hover {
+    background-color: #04a74d;
 }
 
 .menu-bar {
@@ -224,7 +259,8 @@ header {
     text-overflow: ellipsis;
 }
 
-.manager-name {
+.manager-name,
+.member-nick-name {
     max-width: 70px;
     font-weight: bold;
     font-size: 13px;
@@ -315,6 +351,7 @@ header {
 }
 
 .activity-info {
+    display: flex;
     color: #000000;
     padding-top: 3px;
     font-weight: bold;

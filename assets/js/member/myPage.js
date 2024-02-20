@@ -1,7 +1,7 @@
 $(document).ready(function () {
 
     $('#modifyPasswordTitle, #modifyPasswordGuide, #modifyPasswordSection').hide();
-    $('#myPageTitle, #myPageGuide, .profile-info').show();
+    $('#myPageTitle, #myPageGuide, .my-profile-info').show();
 
     $('.sort_area a').click(function () {
         $('.sort_area a').removeClass('on underline');
@@ -10,9 +10,9 @@ $(document).ready(function () {
 
         if ($(this).text().trim() === "내 정보 조회 / 수정") {
             $('#modifyPasswordTitle, #modifyPasswordGuide, #modifyPasswordSection').hide();
-            $('#myPageTitle, #myPageGuide, .profile-info').show();
+            $('#myPageTitle, #myPageGuide, .my-profile-info').show();
         } else if ($(this).text().trim() === "비밀번호 변경") {
-            $('#myPageTitle, #myPageGuide, .profile-info').hide();
+            $('#myPageTitle, #myPageGuide, .my-profile-info').hide();
             $('#modifyPasswordTitle, #modifyPasswordGuide, #modifyPasswordSection').show();
         }
     });

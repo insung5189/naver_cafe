@@ -13,7 +13,13 @@ class ArticleEditController extends MY_Controller
     public function index()
     {
         if ($this->session->userdata('user_data')) {
+            // 게시판 데이터 조회
+            $boardRepo = $this->em->getRepository('Models\Entities\ArticleBoard');
+            $boards = $boardRepo->findBy(['isDeleted' => 0], ['createDate' => 'DESC']);
+
+            // 데이터를 뷰에 전달
             $page_view_data['title'] = '카페 글쓰기';
+            $page_view_data['boards'] = $boards;
             $this->layout->view('article/article_form', $page_view_data);
         } else {
             $page_view_data['title'] = '오류 발생';
@@ -21,18 +27,30 @@ class ArticleEditController extends MY_Controller
         }
     }
 
-    public function processWrite ($formData) {
-        $formData = [
-            'articleBoardId' => trim($this->input->post('articleBoardId', TRUE)),
-            'memberId' => trim($this->input->post('memberId', TRUE)),
-            'parentId' => trim($this->input->post('parentId', TRUE)),
-            'createDate' => trim($this->input->post('createDate', TRUE)),
-            'ip' => trim($this->input->post('ip', TRUE)),
-            'title' => trim($this->input->post('title', TRUE)),
-            'content' => trim($this->input->post('content', TRUE)),
-            'hit' => trim($this->input->post('hit', TRUE)),
-            'publicScope' => trim($this->input->post('publicScope', TRUE)),
-            'depth' => trim($this->input->post('depth', TRUE))
-        ];
+    public function processWrite()
+    {
+        if (!$this->session->userdata('user_data')) {
+            show_error('로그인이 필요한 기능입니다.');
+            return;
+        }
+
+        try {
+            $formData = [
+                'boardId' => $this->input->post('board'),
+                'prefix' => $this->input->post('prefix'),
+                'title' => $this->input->post('title'),
+                'content' => $this->input->post('content'),
+                'parentId' => $this->input->post('parent_id'),
+                'publicScope' => $this->input->post('publicScope'),
+            ];
+
+            $this->ArticleEditModel->createArticle($formData);
+
+            redirect('/');
+        } catch (Exception $e) {
+            $errorMessage = $e->getMessage();
+            log_message('error', $errorMessage);
+            show_error($errorMessage);
+        }
     }
 }

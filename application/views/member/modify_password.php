@@ -63,7 +63,7 @@ $GLOBALS['pageResources'] = [
 
             <div class="inline">
                 <!-- FindEmailForm -->
-                <form method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword">
+                <form method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword" class="modify-password-form">
                     <div class="form-box">
                         <div class="field-box">
                             <div class="label-box">

@@ -10,7 +10,7 @@ h1 {
 
 .section-container {
     display: flex;
-    width: 820px;
+    width: 860px;
 }
 
 .container {
@@ -75,6 +75,10 @@ h1 {
     margin-bottom: 20px;
 }
 
+.title-box {
+    margin-bottom: 20px;
+}
+
 .custom-input {
     width: 100%;
     height: 35px;
@@ -87,8 +91,20 @@ h1 {
     border-radius: 0.25rem;
 }
 
+.article-content-area {
+    height: 100px;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #fff;
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 .board-select-box,
-.topic-select-box {
+.prefix-select-box {
     width: 100%;
     margin-bottom: 20px;
 }
@@ -98,4 +114,17 @@ h1 {
     flex-direction: row;
     justify-content: space-between;
     gap: 2%;
+}
+
+.public-scope-box {
+    margin-bottom: 20px;
+}
+
+.public-scope-box h3 {
+    margin-bottom: 10px;
+}
+
+.public-scope-box label {
+    display: block;
+    margin-bottom: 5px;
 }

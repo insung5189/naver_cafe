@@ -141,8 +141,9 @@ class Article
 
     public function setPublicScope($publicScope)
     {
-        if (!in_array($publicScope, ['ROLE_MEMBER', 'ROLE_ADMIN'])) {
-            throw new \InvalidArgumentException("접근 권한이 없습니다");
+        $validScopes = ['public', 'members', 'admins'];
+        if (!in_array($publicScope, $validScopes)) {
+            throw new \InvalidArgumentException("유효하지 않은 공개 범위 값입니다.");
         }
         $this->publicScope = $publicScope;
     }
@@ -165,16 +166,16 @@ class Article
     /**
      * @ORM\Column(type="string", nullable=true, options={"default":null})
      **/
-    private $topic;
+    private $prefix;
 
-    public function getTopic()
+    public function getPrefix()
     {
-        return $this->topic;
+        return $this->prefix;
     }
 
-    public function setTopic($topic = null)
+    public function setPrefix($prefix)
     {
-        $this->topic = $topic;
+        $this->prefix = $prefix;
     }
 
     // Foreign key references

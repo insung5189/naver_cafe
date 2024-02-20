@@ -7,8 +7,6 @@ $GLOBALS['pageResources'] = [
 
 <section class="section-container">
     <div class="container">
-
-
         <h1 class="title" id="myPageTitle">
             <i class="fa-solid fa-user"></i>
             마이페이지
@@ -17,11 +15,11 @@ $GLOBALS['pageResources'] = [
             <p class="page-guide">회원정보를 조회 및 수정할 수 있습니다.</p>
         </div>
 
-        <h1 class="title" id="modifyPasswordTitle">
+        <h1 class="title" id="modifyPasswordTitle" style="display:none;">
             <i class="fa-solid fa-arrows-rotate"></i>
             비밀번호 변경
         </h1>
-        <div class="title" id="modifyPasswordGuide">
+        <div class="title" id="modifyPasswordGuide" style="display:none;">
             <p class="page-guide">비밀번호를 변경합니다. 영문, 숫자, 특수문자 포함 8자리 이상으로 구성해주세요.</p>
         </div>
 
@@ -62,7 +60,7 @@ $GLOBALS['pageResources'] = [
                         )
                     </div>
                     <div class="info-area">
-                        <span>방문</span> <em class="count-num">85</em> <span class="ml-17">작성글</span> <em class="count-num">55</em>
+                        <span>방문</span> <em class="count-num"><?= $user['visit']; ?></em> <span class="ml-17">작성글</span> <em class="count-num"><?= $articleCount; ?></em>
                     </div>
                 </span>
             </div>
@@ -75,8 +73,8 @@ $GLOBALS['pageResources'] = [
                     </div>
                 </div>
                 <!-- 내 정보 조회 / 수정 탭 내용 -->
-                <div class="profile-info">
-                    <form method="POST" action="/" enctype="multipart/form-data">
+                <div class="my-profile-info">
+                    <form method="POST" action="/" enctype="multipart/form-data" class="my-page-form">
                         <div class="form-box">
                             <!-- 카페 설명 -->
                             <div class="field-box">
@@ -348,7 +346,7 @@ $GLOBALS['pageResources'] = [
         <? endif; ?>
 
         <!-- 비밀번호 변경 탭 내용 -->
-        <div id="modifyPasswordSection">
+        <div id="modifyPasswordSection" style="display:none;">
             <? if (isset($_SESSION['user_data'])) : ?>
                 <? $user = $_SESSION['user_data']; ?>
                 <? $createDate = $this->session->userdata('create_date'); ?>
@@ -358,7 +356,7 @@ $GLOBALS['pageResources'] = [
 
                 <div class="inline">
                     <!-- FindEmailForm -->
-                    <form method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword">
+                    <form method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword" class="my-page-form">
                         <div class="form-box">
                             <div class="pw-field-box">
                                 <div class="label-box">

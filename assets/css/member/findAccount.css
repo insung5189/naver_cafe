@@ -41,7 +41,7 @@ hr {
     margin: 16px 0 !important;
 }
 
-form {
+.find-account-form {
     width: 430px;
     display: flex;
     flex-direction: column;

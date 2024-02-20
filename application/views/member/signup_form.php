@@ -25,7 +25,7 @@ $GLOBALS['pageResources'] = [
             </div>
         <? endif; ?>
 
-        <form method="POST" action="/member/SignupController/processMemberSignup" enctype="multipart/form-data">
+        <form method="POST" action="/member/SignupController/processMemberSignup" enctype="multipart/form-data" class="sign-up-form">
             <div class="form-box">
                 <!-- 카페 설명 -->
                 <div class="field-box">

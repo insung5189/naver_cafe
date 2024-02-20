@@ -41,7 +41,7 @@ h1 {
     font-size: 11.5px;
 }
 
-form {
+.login-form {
     width: 820px;
     display: flex;
     flex-direction: column;

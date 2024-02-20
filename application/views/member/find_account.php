@@ -36,7 +36,7 @@ $GLOBALS['pageResources'] = [
 
         <div class="inline">
             <!-- FindEmailForm -->
-            <form method="POST" action="/member/FindAccountController/processFindEmail" id="findEmail">
+            <form method="POST" action="/member/FindAccountController/processFindEmail" id="findEmail" class="find-account-form">
                 <div class="form-box">
                     <div class="field-box">
                         <div class="label-box">
@@ -128,7 +128,7 @@ $GLOBALS['pageResources'] = [
             </form>
 
             <!-- FindPasswordForm -->
-            <form method="POST" action="/member/FindAccountController/processFindPassword" id="findPW">
+            <form method="POST" action="/member/FindAccountController/processFindPassword" id="findPW" class="find-account-form">
                 <div class="form-box">
                     <div class="field-box">
                         <div class="label-box">

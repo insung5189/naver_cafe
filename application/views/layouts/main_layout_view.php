@@ -41,7 +41,7 @@
 </head>
 
 <body>
-
+<div class="wrap-main">
     <header>
         <a href="/">
             <div class="cafe-banner"></div>
@@ -49,6 +49,14 @@
     </header>
 
     <main>
+        <div class="search-box-main">
+            <form action="/article/articlelistcontroller/search" method="GET" class="search-form-main">
+                <div class="search-keyword">
+                    <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-search-input-main">
+                    <button type="submit" class="search-btn-main">검색</button>
+                </div>
+            </form>
+        </div>
         <div class="content-wrap">
             <div class="menu-bar">
 
@@ -98,7 +106,7 @@
                                         <strong>카페멤버수</strong>
                                         <a href="/가입한_회원목록">
                                             <img src="https://ssl.pstatic.net/static/cafe/cafe_pc/svg/ico_member.svg" alt="멤버수">
-                                            <em class="cafe-mem-numb"><?php echo htmlspecialchars($totalMemberCount, ENT_QUOTES, 'UTF-8'); ?></em>
+                                            <em class="cafe-mem-numb"><?= htmlspecialchars($totalMemberCount, ENT_QUOTES, 'UTF-8'); ?></em>
                                         </a>
                                         <a href="javascript:void(0);" id="inviteLink">카페 링크복사</a>
                                     </li>
@@ -158,7 +166,7 @@
                                                 </div>
                                                 <div class="activity-info">
                                                     <!-- 사용자 닉네임 -->
-                                                    <a href="/내_카페_활동내용"><? echo htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                                    <a href="/내_카페_활동내용" class="member-nick-name"><? echo htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?></a>
                                                 </div>
                                             </li>
                                             <li class="membership-date">
@@ -270,8 +278,8 @@
                         </ul>
                         <ul class="board-list">
                             <li>
-                                <a href="/전체글_보기">📃전체글보기</a>
-                                <span class="article-count">37</span>
+                                <a href="/article/articlelistcontroller">📃전체글보기</a>
+                                <span class="article-count"><?= isset($totalArticleCount) ? htmlspecialchars($totalArticleCount, ENT_QUOTES, 'UTF-8') : '0'; ?></span>
                             </li>
 
                             <li class="popular-articles">
@@ -413,7 +421,7 @@
     <footer>
         <p>&copy; 2024 비드코칭연구소(주).</p>
     </footer>
-
+    </div>
 </body>
 
 </html>
