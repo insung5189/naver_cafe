@@ -13,22 +13,49 @@ class ArticleListController extends MY_Controller
     public function index()
     {
         $currentPage = $this->input->get('page') ?? 1;
-        $articlesPerPage = isset($_GET['articlesPerPage']) ? (int)$_GET['articlesPerPage'] : 5;
+        $articlesPerPage = $this->input->get('articlesPerPage') ? (int)$this->input->get('articlesPerPage') : 15;
+        $keyword = $this->input->get('keyword');
+        $element = $this->input->get('element');
+        $period = $this->input->get('period');
+        $startDate = $this->input->get('startDate');
+        $endDate = $this->input->get('endDate');
 
-        $totalArticleCount = $this->ArticleListModel->getTotalArticleCount();
+        if (!empty($keyword) || !empty($period) || !empty($startDate) || !empty($endDate)) {
+
+            $result = $this->ArticleListModel->searchArticles($keyword, $element, $period, $startDate, $endDate, $currentPage, $articlesPerPage);
+
+            if (isset($result['errors'])) {
+                $errors = $result['errors'];
+
+                $articles = $this->ArticleListModel->getArticlesByPage($currentPage, $articlesPerPage);
+                $totalArticleCount = $this->ArticleListModel->getTotalArticleCount();
+            } else {
+                $articles = $result;
+                $totalArticleCount = $this->ArticleListModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
+            }
+        } else {
+            $articles = $this->ArticleListModel->getArticlesByPage($currentPage, $articlesPerPage);
+            $totalArticleCount = $this->ArticleListModel->getTotalArticleCount();
+        }
+
         $totalPages = ceil($totalArticleCount / $articlesPerPage);
 
-        $articles = $this->ArticleListModel->getArticlesByPage($currentPage, $articlesPerPage);
-
         $page_view_data = [
-            'title' => '전체글보기',
+            'title' => !empty($keyword) ? '검색 결과' : '전체글보기',
             'articles' => $articles,
-            'totalArticleCount' => $totalArticleCount,
+            'totalArticleCountAll' => $totalArticleCount,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
-            'articlesPerPage' => $articlesPerPage
+            'articlesPerPage' => $articlesPerPage,
+            'keyword' => $keyword,
+            'element' => $element,
+            'period' => $period,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'errors' => $errors ?? []
         ];
 
+        // 데이터와 함께 뷰 로드
         $this->layout->view('article/article_list_all', $page_view_data);
     }
 }
