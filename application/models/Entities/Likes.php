@@ -1,4 +1,5 @@
 <?php
+
 namespace Models\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -8,18 +9,18 @@ use \DateTime;
  * @ORM\Entity
  * @ORM\Table(name="likes")
  */
-class Like
+class Likes
 {
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="bigint", options={"unsigned":true})
      */
-    private $likeId;
+    private $id;
 
-    public function getLikeId()
+    public function getId()
     {
-        return $this->likeId;
+        return $this->id;
     }
 
     /**
@@ -69,6 +70,22 @@ class Like
     }
 
     /**
+     * @ORM\ManyToOne(targetEntity="Comment")
+     * @ORM\JoinColumn(name="comment_id", referencedColumnName="id")
+     */
+    private $comment;
+
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    public function setComment(?Comment $comment)
+    {
+        $this->comment = $comment;
+    }
+
+    /**
      * @ORM\ManyToOne(targetEntity="Member")
      * @ORM\JoinColumn(name="member_id", referencedColumnName="id")
      */
@@ -88,5 +105,4 @@ class Like
     {
         $this->createDate = new DateTime();
     }
-
 }

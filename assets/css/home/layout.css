@@ -454,6 +454,10 @@ button {
     text-decoration: underline;
 }
 
+.article-count {
+    text-decoration: none;
+}
+
 .board-group {
     display: flex;
     justify-content: space-between;

@@ -6,7 +6,6 @@ class ArticleEditModel extends CI_Model
     public function __construct()
     {
         parent::__construct();
-        // Doctrine ORM과 세션 라이브러리 로드
         $this->load->library('doctrine');
         $this->load->library('session');
         $this->em = $this->doctrine->em;

@@ -11,7 +11,7 @@ class LoginController extends MY_Controller
 
     public function index()
     {
-        // 로그인 페이지에 진입하면 불필요한 세션데이터는 삭제함.
+        // 로그인 페이지에 진입하면 불필요한 세션데이터는 삭제
         $sessionData = $this->session->userdata();
 
         foreach ($sessionData as $key => $value) {
@@ -37,7 +37,13 @@ class LoginController extends MY_Controller
         $user = $this->loginModel->authenticate($formData);
 
         if ($user['success']) {
-            redirect('/');
+            $redirectUrl = $this->getRedirectCookie();
+            if (!empty($redirectUrl)) {
+                $this->deleteRedirectCookie(); // 쿠키 삭제
+                redirect($redirectUrl); // 원래 페이지로 리다이렉션
+            } else {
+                redirect('/');
+            }
         } else {
             $page_view_data['title'] = '로그인';
             $page_view_data['errors'] = $user['errors'];

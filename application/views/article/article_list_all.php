@@ -151,7 +151,7 @@ $GLOBALS['pageResources'] = [
 
                                 <div class="title-list">
                                     <div class="inner-title-name">
-                                        <a href="/해당 게시물 링크" class="article-title-link">
+                                        <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
                                             <? if (!empty($article->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>
@@ -183,12 +183,13 @@ $GLOBALS['pageResources'] = [
             </table>
         </div>
         <div class="pagination-box">
-            <?
-            echo '<div class="pagination">';
+            <?= '<div class="pagination">';
 
             for ($page = 1; $page <= $totalPages; $page++) {
                 $isActive = ($page == $currentPage) ? 'active' : '';
-                $link = "/article/articlelistcontroller?page=$page&articlesPerPage=$articlesPerPage"
+                $link = "/article/articlelistcontroller?"
+                    . "&page=$page"
+                    . "&articlesPerPage=$articlesPerPage"
                     . "&keyword=" . urlencode($keyword)
                     . "&element=$element"
                     . "&period=$period"
@@ -198,12 +199,12 @@ $GLOBALS['pageResources'] = [
                 echo '<a href="' . $link . '" class="' . $isActive . '">' . $page . '</a> ';
             }
 
-
             echo '</div>';
             ?>
         </div>
         <div class="search-box">
             <form action="/article/articlelistcontroller" method="GET" class="search-form">
+
                 <div class="search-criteria">
 
                     <select name="period" class="custom-input" id="select-period">
@@ -238,6 +239,7 @@ $GLOBALS['pageResources'] = [
                     <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
                     <button type="submit" class="search-btn">검색</button>
                 </div>
+
             </form>
         </div>
     </div>
