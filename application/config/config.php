@@ -23,6 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
+// $config['base_url'] = 'http://bidcafe.devh.me/';
 $config['base_url'] = 'http://211.238.132.177/';
 
 /*

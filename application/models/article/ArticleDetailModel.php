@@ -10,6 +10,10 @@ class ArticleDetailModel extends CI_Model
         $this->load->library('session');
         $this->em = $this->doctrine->em;
     }
+
+    private $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    private $documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'];
+
     public function getArticleById($articleId)
     {
         $article = $this->doctrine->em->find('Models\Entities\Article', $articleId);
@@ -39,5 +43,28 @@ class ArticleDetailModel extends CI_Model
             ->setParameter('articleId', $articleId);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getFilesByArticleId($articleId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('f')
+            ->from('Models\Entities\File', 'f')
+            ->where('f.article = :articleId')
+            ->setParameter('articleId', $articleId);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getFileFullPath($file)
+    {
+        if (in_array($file->getExt(), $this->imageExtensions)) {
+            $basePath = "assets/file/images/articleFiles/img/";
+        } elseif (in_array($file->getExt(), $this->documentExtensions)) {
+            $basePath = "assets/file/images/articleFiles/doc/";
+        } else {
+            $basePath = "assets/file/images/articleFiles/others/";
+        }
+        return base_url($basePath . $file->getCombinedName());
     }
 }

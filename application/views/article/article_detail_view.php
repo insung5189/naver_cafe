@@ -7,9 +7,9 @@ $GLOBALS['pageResources'] = [
 <div class="article-wrap">
     <div class="article-top-btn">
         <div class="article-top-left-btn">
-            <a href="/이동_링크" class="list-article-btn">
+            <!-- <a href="/이동_링크" class="list-article-btn">
                 이동
-            </a>
+            </a> -->
             <a href="/수정_링크" class="list-article-btn">
                 수정
             </a>
@@ -58,12 +58,12 @@ $GLOBALS['pageResources'] = [
                         <div class="prfl-thumb">
                             <!-- 사용자 프로필 이미지 -->
                             <?
-                            $fileUrl = base_url("assets/file/images/");
+                            $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");
                             $profileImageName = $article->getMember() && $article->getMember()->getMemberFileName() !== 'default.png'
                                 ? $article->getMember()->getMemberFileName()
                                 : 'defaultImg/default.png';
                             ?>
-                            <img class="prfl-img-thumb" src="<?= $fileUrl . $profileImageName; ?>" alt="<?= htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
+                            <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $profileImageName; ?>" alt="<?= htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
                         </div>
                         <div class="author-prfl-info">
                             <div class="author-prfl-nickname">
@@ -95,23 +95,40 @@ $GLOBALS['pageResources'] = [
                 <hr class="hr-line">
 
                 <div class="article-container">
-                    <div class="article-file-list">
-                        첨부파일 모아보기(justify-content : flex-end;)
+
+                    <div class="article-file-area">
+                        <a class="file-array-toggle" href="javascript:void(0);">
+                            <i class="fa-regular fa-folder-open"></i>
+                            첨부파일 모아보기
+                            <span class="file-array-count-num">
+                                <?= count($articleFilesInfo); ?>
+                            </span>
+                        </a>
+
+                        <!-- 게시물 첨부파일 리스트 -->
+                        <div class="article-file-list" style="display:none;">
+                            <? foreach ($articleFilesInfo as $articleFileInfo) : ?>
+                                <span class="article-file-list-name">
+                                    <?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                </span>
+                                <span class="boundary-pipe">
+                                    |
+                                </span>
+                                <a class="article-file-download-link" href="<?= htmlspecialchars($articleFileInfo['fullPath'], ENT_QUOTES, 'UTF-8'); ?>" download="<?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                    내 PC 저장
+                                </a>
+                                <br>
+                            <? endforeach; ?>
+                        </div>
                     </div>
                     <div class="article-viewer">
-
+                        <?= $article->getContent() ? htmlspecialchars($article->getContent(), ENT_QUOTES, 'UTF-8') : '내용 없음'; ?>
                     </div>
 
                     <div class="article-author">
                         <a class="article-author-link" href="/작성자의_활동내역_링크">
                             <!-- 사용자 프로필 이미지 -->
-                            <?
-                            $fileUrl = base_url("assets/file/images/");
-                            $profileImageName = $article->getMember() && $article->getMember()->getMemberFileName() !== 'default.png'
-                                ? $article->getMember()->getMemberFileName()
-                                : 'defaultImg/default.png';
-                            ?>
-                            <img class="prfl-img-thumb" src="<?= $fileUrl . $profileImageName; ?>" alt="<?= htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
+                            <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $profileImageName; ?>" alt="<?= htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
                             <span class="author-prfl-nickname-box">
                                 <div class="author-prfl-nickname article-author-nickname-text"><?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?></div>
                                 <span>님의 게시글 더보기</span>
@@ -176,13 +193,12 @@ $GLOBALS['pageResources'] = [
                                     <div class="comment-box">
                                         <!-- 사용자 프로필 이미지 -->
                                         <?
-                                        $fileUrl = base_url("assets/file/images/");
                                         $commmentsProfileImageName = $comment->getMember() && $comment->getMember()->getMemberFileName() !== 'default.png'
-                                            ? $article->getMember()->getMemberFileName()
+                                            ? $comment->getMember()->getMemberFileName()
                                             : 'defaultImg/default.png';
                                         ?>
                                         <a href="/작성자의_활동내역_링크">
-                                            <img class="prfl-img-thumb" src="<?= $fileUrl . $commmentsProfileImageName; ?>" alt="<?= htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
+                                            <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $commmentsProfileImageName; ?>" alt="<?= htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
                                         </a>
                                         <div class="comment-content-each">
                                             <div class="comment-author">
@@ -195,47 +211,120 @@ $GLOBALS['pageResources'] = [
                                             <? endif; ?>
                                         </div>
                                     </div>
-                                    <hr class="hr-line">
+                                    <div class="comment-content-area">
+                                        <p>
+                                            <span>
+                                                <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
+                                            </span>
+                                        </p>
+                                        <img src="<?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>" alt="">
+                                        <!-- 댓글 컨텐츠 이미지 -->
+                                        <?
+                                        $commentFileUrl = base_url("assets/file/commentFiles/img/");
+                                        $commentImageName = $comment->getCommentFileName() ? htmlspecialchars($comment->getCommentFileName(), ENT_QUOTES, 'UTF-8') : '';
+                                        ?>
+                                        <? if (!empty($commentImageName)) : ?>
+                                            <div>
+                                                <img src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
+                                            </div>
+                                        <? endif; ?>
+                                        <div class="comment-info-box">
+                                            <span>
+                                                <?= $comment->getModifyDate() ? $comment->getModifyDate()->format('Y.m.d H:i') : $comment->getCreateDate()->format('Y.m.d H:i'); ?>
+                                            </span>
+                                            <? if (isset($user) && !empty($user)) : ?>
+                                                <a href="/해당댓글_답글쓰기 링크">
+                                                    답글쓰기
+                                                </a>
+                                                <div class="session-comment-reply-write-box" id="reply-comment" style="display:none;">
+                                                    <form action="/댓글_작성하는_URL">
+                                                        <div class="comment-writer">
+                                                            <div class="name-and-textarea">
+                                                                <div class="session-comment-reply-author-nickname">
+                                                                    <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+                                                                </div>
+                                                                <textarea class="comment-text-area" name="" id="" cols="30" rows="10" placeholder="답글을 남겨보세요"></textarea>
+                                                            </div>
+                                                            <div class="comment-reply-img-file-upload-ico">
+                                                                <div class="upload-ico">
+                                                                    <a href="/댓글_사진_첨부하는_URL">
+                                                                        <i class="fa-solid fa-camera"></i>
+                                                                    </a>
+                                                                </div>
+                                                                <div class="comment-submit-btn">
+                                                                    <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
+                                                                    <input type="submit" value="등록">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            <? endif; ?>
+                                        </div>
+                                    </div>
+                                    <hr class="comment-hr-line">
                                 </li>
                             <? endforeach; ?>
                         <? endif; ?>
                     </ul>
                 </div>
+
                 <div class="session-comment-write-box">
-                    <form action="/댓글_작성하는_URL">
-                        <div class="session-comment-author-nickname">
-                        </div>
-                        <textarea name="" id="" cols="30" rows="10" placeholder="댓글을 남겨보세요"></textarea>
-                        <div class="comment-img-file-upload-ico">
-
-                        </div>
-                        <input type="submit">
-                    </form>
+                    <? if (isset($user) && !empty($user)) : ?>
+                        <form action="/댓글_작성하는_URL">
+                            <div class="comment-writer">
+                                <div class="name-and-textarea">
+                                    <div class="session-comment-author-nickname">
+                                        <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+                                    </div>
+                                    <textarea class="comment-text-area" name="" id="" cols="30" rows="10" placeholder="댓글을 남겨보세요"></textarea>
+                                    <div class="comment-img-file-upload-ico">
+                                        <div class="upload-ico">
+                                            <a href="/댓글_사진_첨부하는_URL">
+                                                <i class="fa-solid fa-camera"></i>
+                                            </a>
+                                        </div>
+                                        <div class="comment-submit-btn">
+                                            <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
+                                            <input type="submit" value="등록">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    <? else : ?>
+                        <a href="/member/signupcontroller" class="signup-link-btn">
+                            지금 가입하고 댓글에 참여해보세요!
+                            <i class="fa-solid fa-angle-right ml-2"></i>
+                        </a>
+                    <? endif; ?>
                 </div>
-
-
             </div>
+
             <div class="article-bottom-btn-box">
                 <div class="article-bottom-btn-left-box">
-                    <div>
-                        게시글쓰기 버튼
-                    </div>
-                    <div>
-                        답글쓰기 버튼
-                    </div>
+                    <a href="/article/articleeditcontroller" class="article-write">
+                        <i class="fa-solid fa-pen-clip fa-sm"></i>
+                        글쓰기
+                    </a>
+                    <a href="/해당_게시물에_답글쓰기_URL" class="article-base-btn">답글</a>
+                    <a href="/해당_게시물_수정하기_URL" class="article-base-btn">수정</a>
+                    <a href="/해당_게시물_삭제하기_URL" class="article-base-btn">삭제</a>
                 </div>
                 <div class="article-bottom-btn-right-box">
-                    <div>
-                        목록보기 버튼
-                    </div>
-                    <div>
-                        top 으로 스크롤 이동 버튼
-                    </div>
+                    <a href="/진입했던_게시판_목록보기" class="article-base-btn">목록</a>
+                    <a href="/스크롤_맨위로_이동하기" class="article-base-btn">
+                        <i class="fa-solid fa-caret-up"></i>
+                        TOP
+                    </a>
                 </div>
             </div>
+
+            <hr class="hr-line">
+
             <div class="related-articles">
                 <div class="related-articles-board-name">
-
+                    <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
                 </div>
                 <ul>
                     <li>

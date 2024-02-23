@@ -159,7 +159,7 @@
                                                     <div class="profile-thumb">
                                                         <!-- 사용자 프로필 이미지 -->
                                                         <?
-                                                        $fileUrl = base_url("assets/file/images/");
+                                                        $fileUrl = base_url("assets/file/images/memberImgs/");
                                                         $profileImagePath = ($user['memberFileName'] === 'default.png') ? 'defaultImg/default.png' : $user['memberFileName'];
                                                         ?>
                                                         <img src="<?= $fileUrl . $profileImagePath; ?>" width="58" height="58" alt="<?= htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -176,6 +176,7 @@
                                                 <li>
                                                     <a href="/member/mypagecontroller" class="edit-thumb">프로필 변경</a>
                                                 </li>
+
                                             </ul>
                                         </div>
 

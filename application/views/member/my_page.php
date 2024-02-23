@@ -37,7 +37,7 @@ $GLOBALS['pageResources'] = [
             <div class="prfl-box">
                 <span class="profile-img">
                     <?
-                    $fileUrl = base_url("assets/file/images/");
+                    $fileUrl = base_url("assets/file/images/memberImgs/");
                     $profileImagePath = ($user['memberFileName'] === 'default.png') ? 'defaultImg/default.png' : $user['memberFileName'];
                     ?>
                     <img src="<? echo $fileUrl . $profileImagePath; ?>" alt="프로필사진">
@@ -102,7 +102,7 @@ $GLOBALS['pageResources'] = [
                                 </div>
 
                                 <div class="input-box">
-                                    <input class="custom-input" id="nickName" maxlength="50" placeholder="닉네임" required name="nickName" type="text" readonly value="<?= $user['nickName'] ?>">
+                                    <input class="custom-input" id="nickName" maxlength="50" placeholder="닉네임" required name="nickName" type="text" value="<?= $user['nickName'] ?>">
                                     <div class="message-box">
                                         <input id="duplicateNickname" type="button" value="중복확인" class="btn">
                                         <input type="hidden" name="isNickNameChecked" id="isNickNameChecked" value="false">

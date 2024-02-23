@@ -203,7 +203,7 @@ class SignupModel extends CI_Model
     }
 
     private function processProfileImage(&$formData, &$errorData) {
-        $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR;
+        $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'memberImgs' . DIRECTORY_SEPARATOR;
         $config['allowed_types'] = 'jpg|jpeg|png|bmp';
         $config['max_size'] = '51200';
 

@@ -25,7 +25,7 @@ $(document).ready(function () {
     $('#upload-image').click(function () {
         $('#file').click();
     });
-    $('#nickName').on('keyup', validateNickname);
+    $('#nickName').on('keyup, focus', validateNickname);
     $('#nickName').on('keyup, focus', resetNicknameValidation);
     $('#phone').on('keyup, focus', validatePhone);
     $('#firstName').on('keyup, focus', validateFirstName);
