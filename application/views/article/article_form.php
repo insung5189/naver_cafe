@@ -11,7 +11,7 @@ $user = $_SESSION['user_data'];
 ?>
 <section class="section-container">
     <div class="container">
-        <form action="/article/articleeditcontroller/processWrite" method="POST">
+        <form action="/article/articleeditcontroller/processCreateArticle" method="POST">
             <div class="writingHeader">
                 <h1 class="title">카페 글쓰기</h1>
                 <input class="form-btn-box btn-box submit-btn" type="submit" value="등록">

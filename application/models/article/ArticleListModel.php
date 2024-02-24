@@ -31,7 +31,6 @@ class ArticleListModel extends CI_Model
 
     public function searchArticles($keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
     {
-
         $errors = $this->validateInputs($keyword, $element, $period, $startDate, $endDate);
         if (!empty($errors)) {
             return ['errors' => $errors];

@@ -27,7 +27,7 @@ class ArticleEditController extends MY_Controller
         }
     }
 
-    public function processWrite()
+    public function processCreateArticle()
     {
         if (!$this->session->userdata('user_data')) {
             show_error('로그인이 필요한 기능입니다.');

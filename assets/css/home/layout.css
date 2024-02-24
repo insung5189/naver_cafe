@@ -450,7 +450,7 @@ button {
     justify-content: space-between;
 }
 
-.board-list li:hover {
+.board-list li a:hover {
     text-decoration: underline;
 }
 

@@ -199,9 +199,6 @@ h1 {
 
 .article-file-area {
     position: relative;
-}
-
-.file-array-toggle {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -246,6 +243,7 @@ h1 {
 
 .article-author {
     margin: 26px 0;
+    width: fit-content;
 }
 
 .article-author-link {
@@ -390,10 +388,6 @@ h1 {
     background: #ffffff;
 }
 
-.comment-writer {
-    max-height: 500px;
-}
-
 .session-comment-reply-author-nickname,
 .session-comment-author-nickname {
     color: #000;
@@ -406,19 +400,42 @@ h1 {
     max-width: 130px;
 }
 
+.nickname-and-text-caculate {
+    display: flex;
+    justify-content: space-between;
+}
+
+.text-caculate {
+    color: #b7b7b7;
+    font-weight: 400;
+}
+
 .comment-text-area {
-    width: 100%;
     border: 0;
+    width: 100%;
+    height: 17px;
+    min-height: 17px; 
+    max-height: 500px;
+    overflow-y: auto;
     box-sizing: border-box;
     background: #ffffff;
-    overflow-wrap: break-word;
-    overflow: hidden;
-    max-height: 500px;
     resize: none;
-    min-height: 17px;
-    height: 17px;
     font-size: 13px;
-    outline: 0;
+    outline: none;
+    font-size: 13px;
+}
+
+.comment-img-preview {
+    margin-top: 8px;
+    width: 100%;
+    height: 100%;
+}
+
+.comment-img-preview img {
+    border-radius: 6px;
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
 }
 
 .comment-reply-img-file-upload-ico,
@@ -426,6 +443,11 @@ h1 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-top: 10px;
+}
+
+.upload-ico {
+    cursor: pointer;
 }
 
 .comment-submit-btn a,

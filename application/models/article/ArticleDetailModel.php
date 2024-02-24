@@ -60,11 +60,58 @@ class ArticleDetailModel extends CI_Model
     {
         if (in_array($file->getExt(), $this->imageExtensions)) {
             $basePath = "assets/file/images/articleFiles/img/";
-        } elseif (in_array($file->getExt(), $this->documentExtensions)) {
+        } else if (in_array($file->getExt(), $this->documentExtensions)) {
             $basePath = "assets/file/images/articleFiles/doc/";
         } else {
             $basePath = "assets/file/images/articleFiles/others/";
         }
         return base_url($basePath . $file->getCombinedName());
+    }
+
+    public function getLikesByArticleId($articleId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('l')
+            ->from('Models\Entities\Likes', 'l')
+            ->where('l.article = :articleId')
+            ->setParameter('articleId', $articleId);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function createComment($formData, $fileData)
+    {
+        $comment = new Models\Entities\Comment();
+        $comment->setArticle($this->em->find('Models\Entities\Article', $formData['articleId']));
+        $comment->setMember($this->em->find('Models\Entities\Member', $formData['userId']));
+        $comment->setContent($formData['content']);
+        $comment->setCreateDate(new DateTime('now'));
+
+        // 첨부 파일 처리
+        if ($fileData && $this->isValidImage($fileData['name'])) {
+            $imagePath = $this->uploadCommentImage($fileData);
+            if ($imagePath) {
+                $comment->setImage($imagePath); // 이미지 파일명 처리 확인할 것
+            }
+        }
+
+        $this->em->persist($comment);
+        $this->em->flush();
+    }
+
+    private function isValidImage($fileName)
+    {
+        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+        return in_array(strtolower($extension), $this->imageExtensions);
+    }
+
+    private function uploadCommentImage($file)
+    {
+        $targetDir = "assets/upload/comments/";
+        $targetFile = $targetDir . basename($file["name"]);
+        if (move_uploaded_file($file["tmp_name"], $targetFile)) {
+            return $targetFile;
+        }
+        return null;
     }
 }

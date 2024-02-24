@@ -14,7 +14,7 @@ class ArticleEditModel extends CI_Model
     public function createArticle($formData)
     {
         $boardId = $formData['boardId'];
-        $prefix = $formData['prefix'];
+        $prefix = isset($formData['prefix']) ? $formData['prefix'] : NULL;
         $title = $formData['title'];
         $content = $formData['content'];
         $parentId = $formData['parentId'];
@@ -38,10 +38,13 @@ class ArticleEditModel extends CI_Model
             '5' => ['질문', '답변'],
         ];
 
-        $currentValidPrefixes = isset($validPrefixes[$boardId]) ? $validPrefixes[$boardId] : [];
-
-        if (!in_array($prefix, $currentValidPrefixes)) {
-            throw new Exception('유효하지 않은 말머리입니다.');
+        if (isset($validPrefixes[$boardId])) {
+            $currentValidPrefixes = $validPrefixes[$boardId];
+            if (!in_array($prefix, $currentValidPrefixes)) {
+                throw new Exception('유효하지 않은 말머리입니다.');
+            }
+        } else {
+            $prefix = NULL;
         }
 
         $userId = $this->session->userdata('user_data')['user_id'];
@@ -53,7 +56,7 @@ class ArticleEditModel extends CI_Model
         $article = new Models\Entities\Article();
         $article->setArticleBoard($board);
         $article->setMember($member);
-        $article->setPrefix($prefix);
+        $article->setPrefix($prefix); // 조건에 따라 설정된 말머리 사용
         $article->setTitle($title);
         $article->setContent($content);
         $article->setPublicScope($publicScope);

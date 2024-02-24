@@ -97,29 +97,31 @@ $GLOBALS['pageResources'] = [
                 <div class="article-container">
 
                     <div class="article-file-area">
-                        <a class="file-array-toggle" href="javascript:void(0);">
-                            <i class="fa-regular fa-folder-open"></i>
-                            첨부파일 모아보기
-                            <span class="file-array-count-num">
-                                <?= count($articleFilesInfo); ?>
-                            </span>
-                        </a>
+                        <? if (isset($articleFilesInfo) && !empty($articleFilesInfo)) : ?>
+                            <a class="file-array-toggle" href="javascript:void(0);">
+                                <i class="fa-regular fa-folder-open"></i>
+                                첨부파일 모아보기
+                                <span class="file-array-count-num">
+                                    <?= count($articleFilesInfo); ?>
+                                </span>
+                            </a>
 
-                        <!-- 게시물 첨부파일 리스트 -->
-                        <div class="article-file-list" style="display:none;">
-                            <? foreach ($articleFilesInfo as $articleFileInfo) : ?>
-                                <span class="article-file-list-name">
-                                    <?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>
-                                </span>
-                                <span class="boundary-pipe">
-                                    |
-                                </span>
-                                <a class="article-file-download-link" href="<?= htmlspecialchars($articleFileInfo['fullPath'], ENT_QUOTES, 'UTF-8'); ?>" download="<?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>">
-                                    내 PC 저장
-                                </a>
-                                <br>
-                            <? endforeach; ?>
-                        </div>
+                            <!-- 게시물 첨부파일 리스트 -->
+                            <div class="article-file-list" style="display:none;">
+                                <? foreach ($articleFilesInfo as $articleFileInfo) : ?>
+                                    <span class="article-file-list-name">
+                                        <?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                    </span>
+                                    <span class="boundary-pipe">
+                                        |
+                                    </span>
+                                    <a class="article-file-download-link" href="<?= htmlspecialchars($articleFileInfo['fullPath'], ENT_QUOTES, 'UTF-8'); ?>" download="<?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                        내 PC 저장
+                                    </a>
+                                    <br>
+                                <? endforeach; ?>
+                            </div>
+                        <? endif; ?>
                     </div>
                     <div class="article-viewer">
                         <?= $article->getContent() ? htmlspecialchars($article->getContent(), ENT_QUOTES, 'UTF-8') : '내용 없음'; ?>
@@ -143,11 +145,9 @@ $GLOBALS['pageResources'] = [
                                 <a href="#">
                                     <i class="fa-regular fa-lg fa-heart" style="color: #f53535;"></i>
                                     <i class="fa-solid fa-lg fa-heart" style="color: #f53535; display:none;"></i>
-                                    <span>
-                                        좋아요
-                                    </span>
+                                    <span>좋아요</span>
                                     <span class="like-count-num">
-                                        좋아요 갯수 표시
+                                        <?= $likeCountByArticle ? htmlspecialchars($likeCountByArticle, ENT_QUOTES, 'UTF-8') : '0'; ?>
                                     </span>
                                 </a>
                             </div>
@@ -271,19 +271,25 @@ $GLOBALS['pageResources'] = [
 
                 <div class="session-comment-write-box">
                     <? if (isset($user) && !empty($user)) : ?>
-                        <form action="/댓글_작성하는_URL">
+                        <form action="/ArticleDetailController/postComment" method="POST" enctype="multipart/form-data">
                             <div class="comment-writer">
                                 <div class="name-and-textarea">
-                                    <div class="session-comment-author-nickname">
-                                        <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
-                                    </div>
-                                    <textarea class="comment-text-area" name="" id="" cols="30" rows="10" placeholder="댓글을 남겨보세요"></textarea>
-                                    <div class="comment-img-file-upload-ico">
-                                        <div class="upload-ico">
-                                            <a href="/댓글_사진_첨부하는_URL">
-                                                <i class="fa-solid fa-camera"></i>
-                                            </a>
+                                    <div class="nickname-and-text-caculate">
+                                        <div class="session-comment-author-nickname">
+                                            <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
                                         </div>
+                                        <div class="text-caculate" style="display:none;">
+                                            0 / 3000
+                                        </div>
+                                    </div>
+                                    <textarea class="comment-text-area" name="content" id="commentTextArea" cols="30" rows="10" placeholder="댓글을 남겨보세요" maxlength="3000"></textarea>
+                                    <div class="comment-img-preview" id="imgPreview">
+                                    </div>
+                                    <div class="comment-img-file-upload-ico">
+                                        <label for="commentImage" class="upload-ico">
+                                            <i class="fa-solid fa-lg fa-camera"></i>
+                                        </label>
+                                        <input type="file" id="commentImage" name="commentImage" accept="image/jpeg, image/png, image/gif, image/webp" style="display: none;">
                                         <div class="comment-submit-btn">
                                             <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
                                             <input type="submit" value="등록">
