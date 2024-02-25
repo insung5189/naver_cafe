@@ -35,7 +35,6 @@ class SignupController extends MY_Controller {
         $result = $this->signupModel->processSignup($formData);
     
         if ($result['success']) {
-            echo "<script>alert('회원이 등록되었습니다.');</script>";
             redirect('/');
         } else {
             $page_view_data['title'] = '회원가입';

@@ -218,23 +218,19 @@ class SignupModel extends CI_Model
                 $uuid = uniqid();
                 $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}"; // 새 파일명 생성 => {원본파일명}-{파일등록일}-{uuid}.{확장자}
 
-                // 새 파일명을 활용해서 경로 변경
                 rename($uploadData['full_path'], $uploadData['file_path'] . $newFileName);
 
                 $formData['memberFilePath'] = $config['upload_path'] . $newFileName;
                 $formData['memberFileName'] = $newFileName;
             } else {
-                // 파일 업로드 실패시 에러 메시지 설정
                 $errorData['errors']['file'] = $this->upload->display_errors('', '');
             }
         } else if (!isset($_FILES['file']) || $_FILES['file']['name'] == '') {
-            // 파일이 업로드되지 않았을 경우 기본 이미지 설정
             $defaultImagePath = $config['upload_path'] . 'defaultImg' . DIRECTORY_SEPARATOR . 'default.png';
             $defaultImageName = 'default.png';
             $formData['memberFilePath'] = $defaultImagePath;
             $formData['memberFileName'] = $defaultImageName;
         } else {
-            // 파일 업로드에 실패한 경우
             $errorData['errors']['file'] = $this->upload->display_errors('', '');
         }
     }

@@ -21,7 +21,8 @@ class ArticleDetailController extends MY_Controller
             return;
         }
 
-        $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId);
+        $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId,);
+
         $articleFiles = $this->ArticleDetailModel->getFilesByArticleId($articleId);
         $likes = $this->ArticleDetailModel->getLikesByArticleId($articleId);
         $likeCountByArticle = COUNT($likes);
@@ -54,16 +55,68 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
-    public function processCreateComment()
+    public function commentSortAction()
     {
-        $formData = $this->input->post();
-        $fileData = $_FILES['commentImage'];
+        $articleId = $this->input->get('articleId');
+        $sortOption = $this->input->get('sortOption') === 'DESC' ? 'DESC' : 'ASC';
 
-        try {
-            $this->ArticleDetailModel->createComment($formData, $fileData);
-            redirect('/해당 게시글_상세보기_URL');
-        } catch (Exception $e) {
-            log_message('error', $e->getMessage());
+        $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId, $sortOption);
+
+        $commentsData = [];
+
+        foreach ($comments as $comment) {
+            $commentData = [
+                'id' => $comment->getId(),
+                'authorName' => $comment->getMember()->getNickName(),
+                'profileImageUrl' => base_url("assets/file/images/memberImgs/") . ($comment->getMember()->getMemberFileName() ?: 'defaultImg/default.png'),
+                'content' => $comment->getContent(),
+                'commentImageUrl' => $comment->getCommentFilePath() ? base_url("assets/file/commentFiles/img/") . $comment->getCommentFileName() : null,
+                'date' => $comment->getCreateDate()->format('Y.m.d H:i'),
+                'isArticleAuthor' => $comment->getMember()->getId() == $articleId,
+                'isCommentAuthor' => $_SESSION['user_data']['user_id'] === $comment->getMember()->getId(),
+                'isRecent' => $comment->getCreateDate()->diff(new DateTime())->i < 1
+            ];
+            $commentsData[] = $commentData;
+        }
+
+        // JSON으로 반환
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode(['comments' => $commentsData]));
+    }
+
+    public function createComment()
+    {
+        $formData = [
+            'content' => $this->input->post('content', TRUE),
+            'articleId' => $this->input->post('articleId', TRUE),
+            'memberId' => $this->input->post('memberId', TRUE),
+            'file' => $_FILES['commentImage'] ?? null
+        ];
+
+        if (empty($formData['content']) && empty($formData['file']['name'])) {
+            $errorMessages = [
+                'content & file' => '댓글 내용이나 파일을 첨부해주세요.'
+            ];
+            $this->session->set_flashdata('error_messages', $errorMessages);
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
+            return;
+        }
+
+        $article = $this->ArticleDetailModel->getArticleById($formData['articleId']);
+        if (!$article) {
+            show_error('게시물을 찾을 수 없습니다.');
+            return;
+        }
+        $formData['publicScope'] = $article->getPublicScope();
+
+        $result = $this->ArticleDetailModel->processCreateComment($formData);
+
+        if ($result['success']) {
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId'] . '#comment-' . $result['commentId']);
+        } else {
+            $this->session->set_flashdata('error_messages', $result['errors']);
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
         }
     }
 

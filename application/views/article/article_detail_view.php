@@ -39,6 +39,16 @@ $GLOBALS['pageResources'] = [
                     <i class="fas fa-newspaper"></i>
                     게시글 상세보기
                 </h1>
+
+                <? if ($this->session->flashdata('error_messages')) : ?>
+                    <div class="error-messages">
+                        <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                        <? foreach ($this->session->flashdata('error_messages') as $field => $error) : ?>
+                            <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                        <? endforeach; ?>
+                    </div>
+                <? endif; ?>
+
                 <a href="/해당 게시판 링크" class="board-name">
                     <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
                     <i class="fa-solid fa-angle-right"></i>
@@ -172,12 +182,12 @@ $GLOBALS['pageResources'] = [
                     <div class="article-commment-box">
                         <div class="comment-sort-box">
                             <h3 class="comment-subject">댓글</h3>
-                            <a href="">
+                            <a href="#" class="comment-sort-option" data-sort="ASC" data-article-id="<?= $article->getId() ?>">
                                 <div class="create-date-asc-btn">
                                     등록순
                                 </div>
                             </a>
-                            <a href="">
+                            <a href="#" class="comment-sort-option" data-sort="DESC" data-article-id="<?= $article->getId() ?>">
                                 <div class="create-date-desc-btn">
                                     최신순
                                 </div>
@@ -189,35 +199,63 @@ $GLOBALS['pageResources'] = [
                     <ul>
                         <? if (isset($comments)) : ?>
                             <? foreach ($comments as $comment) : ?>
-                                <li>
-                                    <div class="comment-box">
-                                        <!-- 사용자 프로필 이미지 -->
-                                        <?
-                                        $commmentsProfileImageName = $comment->getMember() && $comment->getMember()->getMemberFileName() !== 'default.png'
-                                            ? $comment->getMember()->getMemberFileName()
-                                            : 'defaultImg/default.png';
-                                        ?>
-                                        <a href="/작성자의_활동내역_링크">
-                                            <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $commmentsProfileImageName; ?>" alt="<?= htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
-                                        </a>
-                                        <div class="comment-content-each">
-                                            <div class="comment-author">
-                                                <?= $comment->getMember() ? htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
-                                            </div>
-                                            <? if ($comment->getMember()->getNickName() === $article->getMember()->getNickName()) : ?>
-                                                <div class="is-article-author">
-                                                    작성자
+                                <?
+                                $interval = date_diff($comment->getCreateDate(), new DateTime());
+
+                                // 차이가 1분 이내인지 확인
+                                if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
+                                    $backgroundColor = 'style="background-color: #ffffe0;"'; // 연노랑색
+                                } else {
+                                    $backgroundColor = '';
+                                }
+                                ?>
+                                <li id="comment-<?= $comment->getId(); ?>" <?= $backgroundColor ?>>
+
+                                    <div class="comment-author-action-box">
+                                        <div class="comment-author-box">
+                                            <!-- 사용자 프로필 이미지 -->
+                                            <?
+                                            $commmentsProfileImageName = $comment->getMember() && $comment->getMember()->getMemberFileName() !== 'default.png'
+                                                ? $comment->getMember()->getMemberFileName()
+                                                : 'defaultImg/default.png';
+                                            ?>
+                                            <a href="/작성자의_활동내역_링크">
+                                                <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $commmentsProfileImageName; ?>" alt="<?= htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
+                                            </a>
+                                            <div class="comment-content-each">
+                                                <div class="comment-author">
+                                                    <?= $comment->getMember() ? htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
                                                 </div>
-                                            <? endif; ?>
+                                                <? if ($comment->getMember()->getNickName() === $article->getMember()->getNickName()) : ?>
+                                                    <div class="is-article-author">
+                                                        작성자
+                                                    </div>
+                                                <? endif; ?>
+                                            </div>
                                         </div>
+                                        <? if ($user['user_id'] === $comment->getMember()->getId()) : ?>
+                                            <div class="comment-edit-delete-btn">
+                                                <a href="javascript:void(0);" id="comment-edit-delete-toggle">
+                                                    <i class="fa-solid fa-xl fa-ellipsis-vertical"></i>
+                                                </a>
+                                                <div class="comment-edit-and-delete-btn-box" style="display:none;" id="comment-edit-delete-toggle-box">
+                                                    <a href="javascript:void(0);" class="comment-edit-btn">
+                                                        수정
+                                                    </a>
+                                                    <a href="javascript:void(0);" class="comment-delete-btn">
+                                                        삭제
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <? endif; ?>
                                     </div>
+
                                     <div class="comment-content-area">
                                         <p>
                                             <span>
                                                 <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                             </span>
                                         </p>
-                                        <img src="<?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>" alt="">
                                         <!-- 댓글 컨텐츠 이미지 -->
                                         <?
                                         $commentFileUrl = base_url("assets/file/commentFiles/img/");
@@ -271,7 +309,9 @@ $GLOBALS['pageResources'] = [
 
                 <div class="session-comment-write-box">
                     <? if (isset($user) && !empty($user)) : ?>
-                        <form action="/ArticleDetailController/postComment" method="POST" enctype="multipart/form-data">
+                        <form action="/article/ArticleDetailController/createComment" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
+                            <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
                             <div class="comment-writer">
                                 <div class="name-and-textarea">
                                     <div class="nickname-and-text-caculate">
@@ -289,7 +329,7 @@ $GLOBALS['pageResources'] = [
                                         <label for="commentImage" class="upload-ico">
                                             <i class="fa-solid fa-lg fa-camera"></i>
                                         </label>
-                                        <input type="file" id="commentImage" name="commentImage" accept="image/jpeg, image/png, image/gif, image/webp" style="display: none;">
+                                        <input type="file" id="commentImage" name="commentImage" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
                                         <div class="comment-submit-btn">
                                             <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
                                             <input type="submit" value="등록">

@@ -1,4 +1,5 @@
 <?php
+
 namespace Models\Entities;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -15,7 +16,7 @@ class Comment
         $this->createDate = new DateTime();
         $this->isActive = true;
     }
-    
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -52,7 +53,7 @@ class Comment
     {
         return $this->modifyDate;
     }
-    
+
     public function setModifyDate(?DateTime $modifyDate)
     {
         $this->modifyDate = $modifyDate;
@@ -67,12 +68,12 @@ class Comment
     {
         return $this->content;
     }
-    
+
     public function setContent($content)
     {
         $this->content = $content;
     }
-    
+
 
     /**
      * @ORM\Column(type="boolean", options={"default":1})
@@ -83,12 +84,12 @@ class Comment
     {
         return $this->isActive;
     }
-    
+
     public function setIsActive($isActive)
     {
         $this->isActive = $isActive;
     }
-    
+
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -99,7 +100,7 @@ class Comment
     {
         return $this->publicScope;
     }
-    
+
     public function setPublicScope($publicScope)
     {
         $this->publicScope = $publicScope;
@@ -114,14 +115,14 @@ class Comment
     {
         return $this->depth;
     }
-    
+
     public function setDepth($depth)
     {
         $this->depth = $depth;
     }
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $commentFilePath;
 
@@ -129,14 +130,14 @@ class Comment
     {
         return $this->commentFilePath;
     }
-    
+
     public function setCommentFilePath($commentFilePath)
     {
         $this->commentFilePath = $commentFilePath;
     }
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=false)
+     * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $commentFileName;
 
@@ -144,10 +145,25 @@ class Comment
     {
         return $this->commentFileName;
     }
-    
+
     public function setCommentFileName($commentFileName)
     {
         $this->commentFileName = $commentFileName;
+    }
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $uniqueIdentifier;
+
+    public function getUniqueIdentifier()
+    {
+        return $this->uniqueIdentifier;
+    }
+
+    public function setUniqueIdentifier($uniqueIdentifier)
+    {
+        $this->uniqueIdentifier = $uniqueIdentifier;
     }
 
     /**
@@ -160,7 +176,7 @@ class Comment
     {
         return $this->member;
     }
-    
+
     public function setMember(?Member $member)
     {
         $this->member = $member;
@@ -176,7 +192,7 @@ class Comment
     {
         return $this->article;
     }
-    
+
     public function setArticle(?Article $article)
     {
         $this->article = $article;
@@ -192,7 +208,7 @@ class Comment
     {
         return $this->parent;
     }
-    
+
     public function setParent(?Comment $parent)
     {
         $this->parent = $parent;

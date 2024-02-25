@@ -219,9 +219,9 @@ h1 {
     max-width: 500px;
     max-height: 416px;
     padding: 8px 15px;
-    border: 1px solid rgba(0,0,0,.06);
+    border: 1px solid rgba(0, 0, 0, .06);
     border-radius: 6px;
-    box-shadow: 0 1px 12px 0 rgba(0,0,0,.06);
+    box-shadow: 0 1px 12px 0 rgba(0, 0, 0, .06);
     background-color: #fff;
     box-sizing: border-box;
     color: #000;
@@ -312,7 +312,50 @@ h1 {
     width: 100%;
 }
 
-.comment-box {
+.comment-author-action-box {
+    display: flex;
+    justify-content: space-between;
+}
+
+.comment-edit-delete-btn {
+    position: relative;
+    margin: 20px;
+    cursor: pointer;
+}
+
+.comment-edit-and-delete-btn-box {
+    display: flex;
+    position: absolute;
+    top: 100%;
+    right: 0px;
+    padding: 8px 0px;
+    border: 1px solid rgba(0, 0, 0, .06);
+    border-radius: 6px;
+    box-shadow: 0 1px 12px 0 rgba(0, 0, 0, .06);
+    background-color: #fff;
+    box-sizing: border-box;
+    color: #000;
+    flex-direction: column;
+}
+
+.comment-edit-btn,
+.comment-delete-btn {
+    width: max-content;
+    padding: 6px 25px;
+}
+
+.comment-edit-btn:hover,
+.comment-delete-btn:hover {
+    text-decoration: underline;
+    background: #c7c7ca;
+}
+
+.fa-ellipsis-vertical {
+    padding: 10px;
+    color: #b7b7b7;
+}
+
+.comment-author-box {
     display: flex;
     padding: 10px 20px;
 }
@@ -414,7 +457,7 @@ h1 {
     border: 0;
     width: 100%;
     height: 17px;
-    min-height: 17px; 
+    min-height: 17px;
     max-height: 500px;
     overflow-y: auto;
     box-sizing: border-box;
@@ -490,7 +533,7 @@ h1 {
     margin: 0;
 }
 
-.article-bottom-btn-left-box a{
+.article-bottom-btn-left-box a {
     margin-left: 10px;
 }
 
@@ -498,7 +541,7 @@ h1 {
     margin: 0;
 }
 
-.article-bottom-btn-right-box a{
+.article-bottom-btn-right-box a {
     margin-right: 10px;
 }
 

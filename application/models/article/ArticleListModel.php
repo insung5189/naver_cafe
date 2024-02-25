@@ -57,7 +57,6 @@ class ArticleListModel extends CI_Model
                             ->where('c.content LIKE :keyword')
                             ->getDQL();
 
-                        // 서브쿼리 결과(키워드를 포함하는 댓글이 있는 게시글 ID)를 기준으로 게시글 검색
                         $queryBuilder->orWhere($queryBuilder->expr()->in('a.id', $subQuery));
 
                         $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
@@ -233,24 +232,20 @@ class ArticleListModel extends CI_Model
     {
         $errors = [];
 
-        // 키워드 길이제한
         if (!empty($keyword) && strlen($keyword) > 20) {
             $errors['keyword'] = '키워드는 20자를 초과할 수 없습니다.';
         }
 
-        // 검색 요소 유효성 검사
         $validElements = ['all', 'article-comment', 'title', 'author', 'comment', 'commentAuthor'];
         if (!empty($element) && !in_array($element, $validElements)) {
             $errors['element'] = '지원되지 않는 검색 요소입니다.';
         }
 
-        // 기간 유효성 검사
         $validPeriods = ['all', '1day', '1week', '1month', '6months', '1year', 'custom'];
         if (!empty($period) && !in_array($period, $validPeriods)) {
             $errors['period'] = '지원되지 않는 기간입니다.';
         }
 
-        // 날짜 유효성 검사
         $today = new DateTime();
         $today->setTime(23, 59, 59);
 

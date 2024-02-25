@@ -34,13 +34,14 @@ class ArticleDetailModel extends CI_Model
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getCommentsByArticleId($articleId)
+    public function getCommentsByArticleId($articleId, $sortOption = 'ASC')
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('c')
             ->from('Models\Entities\Comment', 'c')
             ->where('c.article = :articleId')
-            ->setParameter('articleId', $articleId);
+            ->setParameter('articleId', $articleId)
+            ->orderBy('c.createDate', $sortOption);
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -59,11 +60,11 @@ class ArticleDetailModel extends CI_Model
     public function getFileFullPath($file)
     {
         if (in_array($file->getExt(), $this->imageExtensions)) {
-            $basePath = "assets/file/images/articleFiles/img/";
+            $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR;
         } else if (in_array($file->getExt(), $this->documentExtensions)) {
-            $basePath = "assets/file/images/articleFiles/doc/";
+            $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'doc' . DIRECTORY_SEPARATOR;
         } else {
-            $basePath = "assets/file/images/articleFiles/others/";
+            $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR;
         }
         return base_url($basePath . $file->getCombinedName());
     }
@@ -79,39 +80,83 @@ class ArticleDetailModel extends CI_Model
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function createComment($formData, $fileData)
+    public function processCreateComment($formData)
     {
-        $comment = new Models\Entities\Comment();
-        $comment->setArticle($this->em->find('Models\Entities\Article', $formData['articleId']));
-        $comment->setMember($this->em->find('Models\Entities\Member', $formData['userId']));
-        $comment->setContent($formData['content']);
-        $comment->setCreateDate(new DateTime('now'));
 
-        // 첨부 파일 처리
-        if ($fileData && $this->isValidImage($fileData['name'])) {
-            $imagePath = $this->uploadCommentImage($fileData);
-            if ($imagePath) {
-                $comment->setImage($imagePath); // 이미지 파일명 처리 확인할 것
+        $errorData = ['errors' => []];
+
+        $this->processCommentImage($formData, $errorData);
+
+        if (!empty($errorData['errors'])) {
+            return ['success' => false, 'errors' => $errorData['errors']];
+        }
+
+        try {
+            // 고유 식별 정보 생성
+            $uniqueIdentifier = $this->generateUniqueIdentifier($formData['memberId']);
+
+            $comment = new Models\Entities\Comment();
+            $comment->setArticle($this->em->find('Models\Entities\Article', $formData['articleId']));
+            $comment->setMember($this->em->find('Models\Entities\Member', $formData['memberId']));
+            $comment->setContent($formData['content']);
+            $comment->setCreateDate(new \DateTime(date('Y-m-d H:i')));
+            $comment->setPublicScope($formData['publicScope']);
+            $comment->setUniqueIdentifier($uniqueIdentifier);
+
+            if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
+                $comment->setCommentFilePath($formData['commentFilePath']);
+                $comment->setCommentFileName($formData['commentFileName']);
+            } else {
+                $comment->setCommentFilePath(null);
+                $comment->setCommentFileName(null);
+            }
+            $this->em->persist($comment);
+            $this->em->flush();
+
+            // 저장된 댓글의 고유 식별 정보를 기반으로 댓글 조회
+            $newComment = $this->em->getRepository(Models\Entities\Comment::class)->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
+
+            // 새로 생성된 댓글의 ID 반환
+            return ['success' => true, 'commentId' => $newComment->getId()];
+        } catch (\Exception $e) {
+            log_message('error', '댓글 등록 실패: ' . $e->getMessage());
+            return ['success' => false, 'errors' => ['general' => '댓글 등록 중 오류가 발생했습니다.']];
+        }
+    }
+
+    private function processCommentImage(&$formData, &$errorData)
+    {
+
+        $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'commentFiles' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR;
+        $config['allowed_types'] = 'jpg|jpeg|png|bmp|webp|gif'; // 허용하는 이미지파일 확장자
+        $config['max_size'] = '20480'; // 20메가로 제한
+
+        $this->load->library('upload', $config);
+
+        if (isset($_FILES['commentImage']) && $_FILES['commentImage']['name'] != '') {
+            if ($this->upload->do_upload('commentImage')) {
+                $uploadData = $this->upload->data();
+                $originalName = trim(pathinfo($uploadData['client_name'], PATHINFO_FILENAME));
+                $fileExt = $uploadData['file_ext'];
+                $uploadDate = date('Ymd');
+                $uuid = uniqid();
+                $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}";
+
+                rename($uploadData['full_path'], $uploadData['file_path'] . $newFileName);
+
+                $formData['commentFilePath'] = $config['upload_path'] . $newFileName;
+                $formData['commentFileName'] = $newFileName;
+            } else {
+                $errorData['errors']['file'] = $this->upload->display_errors('', '');
             }
         }
-
-        $this->em->persist($comment);
-        $this->em->flush();
     }
 
-    private function isValidImage($fileName)
+    // 댓글 앵커(#)를 위한 고유 식별정보 생성 및 부여
+    private function generateUniqueIdentifier($memberId)
     {
-        $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-        return in_array(strtolower($extension), $this->imageExtensions);
-    }
-
-    private function uploadCommentImage($file)
-    {
-        $targetDir = "assets/upload/comments/";
-        $targetFile = $targetDir . basename($file["name"]);
-        if (move_uploaded_file($file["tmp_name"], $targetFile)) {
-            return $targetFile;
-        }
-        return null;
+        $timestamp = microtime(true);
+        $sessionId = session_id();
+        return hash('sha256', $memberId . $timestamp . $sessionId);
     }
 }
