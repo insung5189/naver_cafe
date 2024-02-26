@@ -1,14 +1,5 @@
 <?
-if (isset($_SESSION['user_data'])) {
-    echo "<script>
-    if (confirm('이미 로그인되어 있습니다. 다른 계정으로 로그인하시겠습니까?')) {
-        window.location.href = '/member/logincontroller/processLogoutAndRedirectLoginPage';
-    } else {
-        window.history.back();
-    }
-    </script>";
-    exit;
-}
+
 
 $GLOBALS['pageResources'] = [
     'css' => ['/assets/css/member/login.css'],

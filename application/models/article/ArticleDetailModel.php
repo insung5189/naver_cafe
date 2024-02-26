@@ -102,6 +102,8 @@ class ArticleDetailModel extends CI_Model
             $comment->setCreateDate(new \DateTime(date('Y-m-d H:i')));
             $comment->setPublicScope($formData['publicScope']);
             $comment->setUniqueIdentifier($uniqueIdentifier);
+            $comment->setParent($this->em->find('Models\Entities\Comment', $formData['parentId']));
+            $comment->setDepth($formData['depth']);
 
             if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
                 $comment->setCommentFilePath($formData['commentFilePath']);
@@ -116,7 +118,6 @@ class ArticleDetailModel extends CI_Model
             // 저장된 댓글의 고유 식별 정보를 기반으로 댓글 조회
             $newComment = $this->em->getRepository(Models\Entities\Comment::class)->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
 
-            // 새로 생성된 댓글의 ID 반환
             return ['success' => true, 'commentId' => $newComment->getId()];
         } catch (\Exception $e) {
             log_message('error', '댓글 등록 실패: ' . $e->getMessage());

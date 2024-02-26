@@ -21,7 +21,7 @@ class ArticleDetailController extends MY_Controller
             return;
         }
 
-        $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId,);
+        $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId);
 
         $articleFiles = $this->ArticleDetailModel->getFilesByArticleId($articleId);
         $likes = $this->ArticleDetailModel->getLikesByArticleId($articleId);
@@ -55,34 +55,52 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
+    public function increaseHitCount()
+    {
+        $articleId = $this->input->post('articleId');
+        $article = $this->ArticleDetailModel->getArticleById($articleId);
+        if ($article) {
+            $currentHit = $article->getHit();
+            $article->setHit($currentHit + 1);
+            $this->em->flush();
+
+            echo json_encode(['success' => true, 'newHitCount' => $article->getHit()]);
+        } else {
+            echo json_encode(['success' => false, 'message' => '유효하지 않은 게시물입니다.']);
+        }
+    }
+
+
     public function commentSortAction()
     {
-        $articleId = $this->input->get('articleId');
-        $sortOption = $this->input->get('sortOption') === 'DESC' ? 'DESC' : 'ASC';
-
-        $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId, $sortOption);
-
-        $commentsData = [];
-
-        foreach ($comments as $comment) {
-            $commentData = [
-                'id' => $comment->getId(),
-                'authorName' => $comment->getMember()->getNickName(),
-                'profileImageUrl' => base_url("assets/file/images/memberImgs/") . ($comment->getMember()->getMemberFileName() ?: 'defaultImg/default.png'),
-                'content' => $comment->getContent(),
-                'commentImageUrl' => $comment->getCommentFilePath() ? base_url("assets/file/commentFiles/img/") . $comment->getCommentFileName() : null,
-                'date' => $comment->getCreateDate()->format('Y.m.d H:i'),
-                'isArticleAuthor' => $comment->getMember()->getId() == $articleId,
-                'isCommentAuthor' => $_SESSION['user_data']['user_id'] === $comment->getMember()->getId(),
-                'isRecent' => $comment->getCreateDate()->diff(new DateTime())->i < 1
-            ];
-            $commentsData[] = $commentData;
+        if (isset($_SESSION['user_data'])) {
+            $user = $_SESSION['user_data'];
+        } else {
+            $user = NULL;
         }
+        $sortOrder = $this->input->get('sortOption');
+        $articleId = $this->input->get('articleId');
 
-        // JSON으로 반환
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode(['comments' => $commentsData]));
+        try {
+            $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId, $sortOrder);
+            $article = $this->ArticleDetailModel->getArticleById($articleId);
+            $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");
+            $commentFileUrl = base_url("assets/file/commentFiles/img/");
+
+            $comments_view_data = [
+                'article' => $article,
+                'comments' => $comments,
+                'user' => $user,
+                'memberPrflFileUrl' => $memberPrflFileUrl,
+                'commentFileUrl' => $commentFileUrl,
+            ];
+
+            $html = $this->load->view('article/comments_list', $comments_view_data, TRUE);
+
+            echo json_encode(['success' => true, 'html' => $html]);
+        } catch (Exception $e) {
+            echo json_encode(['success' => false, 'error' => '댓글 목록을 불러오는 데 실패했습니다.']);
+        }
     }
 
     public function createComment()
@@ -91,6 +109,8 @@ class ArticleDetailController extends MY_Controller
             'content' => $this->input->post('content', TRUE),
             'articleId' => $this->input->post('articleId', TRUE),
             'memberId' => $this->input->post('memberId', TRUE),
+            'parentId' => $this->input->post('parentId', TRUE),
+            'depth' => $this->input->post('depth', TRUE),
             'file' => $_FILES['commentImage'] ?? null
         ];
 
@@ -122,6 +142,9 @@ class ArticleDetailController extends MY_Controller
 
     private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle)
     {
+        $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");
+        $commentFileUrl = base_url("assets/file/commentFiles/img/");
+
         $page_view_data = [
             'title' => '글 상세보기',
             'article' => $article,
@@ -129,6 +152,8 @@ class ArticleDetailController extends MY_Controller
             'user' => $user,
             'articleFilesInfo' => $articleFilesInfo,
             'likeCountByArticle' => $likeCountByArticle,
+            'memberPrflFileUrl' => $memberPrflFileUrl,
+            'commentFileUrl' => $commentFileUrl,
         ];
         $this->layout->view('article/article_detail_view', $page_view_data);
     }

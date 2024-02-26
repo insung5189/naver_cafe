@@ -53,7 +53,7 @@ $GLOBALS['pageResources'] = [
                     <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
                     <i class="fa-solid fa-angle-right"></i>
                 </a>
-
+                <div id="article" data-article-id="<?= $article->getId() ?>"></div>
                 <h1 class="article-title">
                     <span class="article-prefix">
                         <?= $article->getPrefix() ? '[' . htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8') . ']' : ''; ?>
@@ -68,7 +68,6 @@ $GLOBALS['pageResources'] = [
                         <div class="prfl-thumb">
                             <!-- 사용자 프로필 이미지 -->
                             <?
-                            $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");
                             $profileImageName = $article->getMember() && $article->getMember()->getMemberFileName() !== 'default.png'
                                 ? $article->getMember()->getMemberFileName()
                                 : 'defaultImg/default.png';
@@ -85,7 +84,9 @@ $GLOBALS['pageResources'] = [
                                 </span>
                                 <span class="article-hit">
                                     조회
-                                    <?= $article->getHit() ? htmlspecialchars($article->getHit(), ENT_QUOTES, 'UTF-8') : '조회수 없음'; ?>
+                                    <span id="hitCount">
+                                        <?= $article->getHit() ? htmlspecialchars($article->getHit(), ENT_QUOTES, 'UTF-8') : '조회수 없음'; ?>
+                                    </span>
                                 </span>
                             </div>
                         </div>
@@ -108,7 +109,7 @@ $GLOBALS['pageResources'] = [
 
                     <div class="article-file-area">
                         <? if (isset($articleFilesInfo) && !empty($articleFilesInfo)) : ?>
-                            <a class="file-array-toggle" href="javascript:void(0);">
+                            <a class="file-array-toggle" href="javascript:void(0);" data-session="<?= isset($user) ? 'true' : 'false' ?>">
                                 <i class="fa-regular fa-folder-open"></i>
                                 첨부파일 모아보기
                                 <span class="file-array-count-num">
@@ -172,7 +173,7 @@ $GLOBALS['pageResources'] = [
 
                         <div class="article-reply-box-right">
                             <div>
-                                공유
+                                <!-- 공유버튼 자리 -->
                             </div>
                         </div>
                     </div>
@@ -204,13 +205,12 @@ $GLOBALS['pageResources'] = [
 
                                 // 차이가 1분 이내인지 확인
                                 if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
-                                    $backgroundColor = 'style="background-color: #ffffe0;"'; // 연노랑색
+                                    $backgroundColor = 'style="background-color: #ffffe0;"';
                                 } else {
                                     $backgroundColor = '';
                                 }
                                 ?>
                                 <li id="comment-<?= $comment->getId(); ?>" <?= $backgroundColor ?>>
-
                                     <div class="comment-author-action-box">
                                         <div class="comment-author-box">
                                             <!-- 사용자 프로필 이미지 -->
@@ -233,9 +233,9 @@ $GLOBALS['pageResources'] = [
                                                 <? endif; ?>
                                             </div>
                                         </div>
-                                        <? if ($user['user_id'] === $comment->getMember()->getId()) : ?>
+                                        <? if (isset($user) && is_array($user) && isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()) : ?>
                                             <div class="comment-edit-delete-btn">
-                                                <a href="javascript:void(0);" id="comment-edit-delete-toggle">
+                                                <a href="javascript:void(0);" class="comment-edit-delete-toggle" data-comment-id="<?= $comment->getId(); ?>">
                                                     <i class="fa-solid fa-xl fa-ellipsis-vertical"></i>
                                                 </a>
                                                 <div class="comment-edit-and-delete-btn-box" style="display:none;" id="comment-edit-delete-toggle-box">
@@ -247,6 +247,8 @@ $GLOBALS['pageResources'] = [
                                                     </a>
                                                 </div>
                                             </div>
+                                        <? else : ?>
+                                            <div class="comment-edit-delete-btn"></div>
                                         <? endif; ?>
                                     </div>
 
@@ -258,7 +260,6 @@ $GLOBALS['pageResources'] = [
                                         </p>
                                         <!-- 댓글 컨텐츠 이미지 -->
                                         <?
-                                        $commentFileUrl = base_url("assets/file/commentFiles/img/");
                                         $commentImageName = $comment->getCommentFileName() ? htmlspecialchars($comment->getCommentFileName(), ENT_QUOTES, 'UTF-8') : '';
                                         ?>
                                         <? if (!empty($commentImageName)) : ?>
@@ -266,34 +267,57 @@ $GLOBALS['pageResources'] = [
                                                 <img src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
                                             </div>
                                         <? endif; ?>
-                                        <div class="comment-info-box">
+                                        <div class="comment-info-box" id="comment-reply-<?= $comment->getId(); ?>">
                                             <span>
                                                 <?= $comment->getModifyDate() ? $comment->getModifyDate()->format('Y.m.d H:i') : $comment->getCreateDate()->format('Y.m.d H:i'); ?>
                                             </span>
                                             <? if (isset($user) && !empty($user)) : ?>
-                                                <a href="/해당댓글_답글쓰기 링크">
+                                                <a href="javascript:void(0);" class="create-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">
                                                     답글쓰기
                                                 </a>
                                                 <div class="session-comment-reply-write-box" id="reply-comment" style="display:none;">
-                                                    <form action="/댓글_작성하는_URL">
+                                                    <form action="/답글_작성하는_URL">
+                                                        <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
+                                                        <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
+                                                        <input type="hidden" name="depth" value="<?= $comment->getDepth() . 1 ?>">
+                                                        <input type="hidden" name="parentId" value="<?= $comment->getId() ?>">
+
                                                         <div class="comment-writer">
+
                                                             <div class="name-and-textarea">
-                                                                <div class="session-comment-reply-author-nickname">
-                                                                    <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+
+                                                                <div class="nickname-and-text-caculate">
+
+                                                                    <div class="session-comment-reply-author-nickname">
+                                                                        <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+                                                                    </div>
+                                                                    <div class="text-caculate-reply" id="text-caculate-reply-<?= $comment->getId(); ?>" style="display:none;">
+                                                                        0 / 3000
+                                                                    </div>
+
                                                                 </div>
-                                                                <textarea class="comment-text-area" name="" id="" cols="30" rows="10" placeholder="답글을 남겨보세요"></textarea>
+
+                                                                <textarea class="comment-text-area-reply" name="content" id="commentReplyTextArea-<?= $comment->getId(); ?>" cols="30" rows="10" placeholder="답글을 남겨보세요" maxlength="3000" data-comment-reply-id="<?= $comment->getId(); ?>"></textarea>
+
+                                                                <div class="comment-img-preview" id="imgPreviewReply">
+                                                                </div>
+
+                                                                <div class="comment-reply-img-file-upload-ico">
+
+                                                                    <label for="commentImageReply" class="upload-ico">
+                                                                        <i class="fa-solid fa-lg fa-camera"></i>
+                                                                    </label>
+
+                                                                    <input type="file" id="commentImageReply" name="commentImageReply" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+
+                                                                    <div class="comment-submit-btn">
+                                                                        <a href="javascript:void(0);" class="cancel-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">취소</a>
+                                                                        <input type="submit" value="등록">
+                                                                    </div>
+                                                                </div>
+
                                                             </div>
-                                                            <div class="comment-reply-img-file-upload-ico">
-                                                                <div class="upload-ico">
-                                                                    <a href="/댓글_사진_첨부하는_URL">
-                                                                        <i class="fa-solid fa-camera"></i>
-                                                                    </a>
-                                                                </div>
-                                                                <div class="comment-submit-btn">
-                                                                    <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
-                                                                    <input type="submit" value="등록">
-                                                                </div>
-                                                            </div>
+
                                                         </div>
                                                     </form>
                                                 </div>
@@ -312,26 +336,33 @@ $GLOBALS['pageResources'] = [
                         <form action="/article/ArticleDetailController/createComment" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                             <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
+                            <input type="hidden" name="depth" value="1">
+                            <input type="hidden" name="parentId" value="NULL">
                             <div class="comment-writer">
                                 <div class="name-and-textarea">
                                     <div class="nickname-and-text-caculate">
+
                                         <div class="session-comment-author-nickname">
                                             <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
                                         </div>
                                         <div class="text-caculate" style="display:none;">
                                             0 / 3000
                                         </div>
+
                                     </div>
                                     <textarea class="comment-text-area" name="content" id="commentTextArea" cols="30" rows="10" placeholder="댓글을 남겨보세요" maxlength="3000"></textarea>
                                     <div class="comment-img-preview" id="imgPreview">
                                     </div>
+
                                     <div class="comment-img-file-upload-ico">
+
                                         <label for="commentImage" class="upload-ico">
                                             <i class="fa-solid fa-lg fa-camera"></i>
                                         </label>
+
                                         <input type="file" id="commentImage" name="commentImage" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+
                                         <div class="comment-submit-btn">
-                                            <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
                                             <input type="submit" value="등록">
                                         </div>
                                     </div>

@@ -38,7 +38,7 @@ class LoginController extends MY_Controller
 
         if ($user['success']) {
             $redirectUrl = $this->getRedirectCookie();
-            if (!empty($redirectUrl)) {
+            if (!empty($redirectUrl) && $redirectUrl !== '/member/logincontroller') {
                 $this->deleteRedirectCookie(); // 쿠키 삭제
                 redirect($redirectUrl); // 원래 페이지로 리다이렉션
             } else {

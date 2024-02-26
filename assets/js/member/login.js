@@ -1,4 +1,16 @@
-$(document).ready(function() {
+$(document).ready(function () {
+    // AJAX 요청을 통해 현재 로그인 상태 확인
+    $.get("/member/logincontroller/checkSession", function (response) {
+        if (response.isLoggedIn) {
+            var loginAnotherAccount = confirm("이미 로그인되어 있습니다. 다른 계정으로 로그인하시겠습니까?");
+            if (loginAnotherAccount) {
+                window.location.href = history.back();
+            } else {
+
+            }
+        }
+    });
+
     $('#userName').on('keyup', validateEmail);
 
     // 이메일 유효성 검사 keyup
