@@ -125,6 +125,50 @@ class ArticleDetailModel extends CI_Model
         }
     }
 
+    public function createReply($formData)
+    {
+        $errorData = ['errors' => []];
+
+        $this->processCommentImage($formData, $errorData);
+
+        if (!empty($errorData['errors'])) {
+            return ['success' => false, 'errors' => $errorData['errors']];
+        }
+
+        try {
+            $uniqueIdentifier = $this->generateUniqueIdentifier($formData['memberId']);
+
+            $reply = new Models\Entities\Comment();
+            $reply->setArticle($this->em->find('Models\Entities\Article', $formData['articleId']));
+            $reply->setMember($this->em->find('Models\Entities\Member', $formData['memberId']));
+            $reply->setContent($formData['content']);
+            $reply->setCreateDate(new \DateTime());
+            $reply->setPublicScope($formData['publicScope']);
+            $reply->setUniqueIdentifier($uniqueIdentifier);
+            $reply->setParent($this->em->find('Models\Entities\Comment', $formData['parentId']));
+            $reply->setDepth($formData['depth']);
+
+            if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
+                $reply->setCommentFilePath($formData['commentFilePath']);
+                $reply->setCommentFileName($formData['commentFileName']);
+            } else {
+                $reply->setCommentFilePath(null);
+                $reply->setCommentFileName(null);
+            }
+
+            $this->em->persist($reply);
+            $this->em->flush();
+
+            // 저장된 답글의 고유 식별 정보를 기반으로 답글 조회
+            $newReply = $this->em->getRepository(Models\Entities\Comment::class)->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
+
+            return ['success' => true, 'commentId' => $newReply->getId()];
+        } catch (\Exception $e) {
+            log_message('error', '답글 등록 실패: ' . $e->getMessage());
+            return ['success' => false, 'errors' => ['general' => '답글 등록 중 오류가 발생했습니다.']];
+        }
+    }
+
     private function processCommentImage(&$formData, &$errorData)
     {
 

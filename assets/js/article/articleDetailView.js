@@ -170,11 +170,7 @@ $(document).ready(function () {
     });
 
 
-
-
-
-
-    // 답글 작성 관련 js
+    // 답글 관련 js
 
     var commentReplyId = $(this).data('comment-reply-id');
 
@@ -203,47 +199,46 @@ $(document).ready(function () {
         $commentRelpytoggleBox.slideUp(100);
     });
 
-    // // 답글 text-area 가변적 높이조절 
-    // $('.comment-text-area').each(function () {
-    //     this.setAttribute('style', 'height:' + (this.scrollHeight) + 'px;');
-    // }).on('input', function () {
-    //     this.style.height = '17px';
-    //     this.style.height = (this.scrollHeight) + 'px';
-    // });
+    // 답글 text-area 가변적 높이조절 
+    $('body').on('input', '.comment-text-area-reply', function () {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
 
     // 답글 텍스트 갯수 제한 및 카운팅
-    $('#commentReplyTextArea-' + commentReplyId).on('input', function () {
-        var currentTextLength = $(this).val().length;
-        if (currentTextLength > 0) {
-            $('#text-caculate-reply-' + commentReplyId).show().text(currentTextLength + ' / 3000');
-        } else {
-            $('#text-caculate-reply-' + commentReplyId).hide();
-        }
+    $('body').on('input', '.comment-text-area-reply', function () {
+        var commentReplyId = $(this).data('comment-reply-id');
+        var currentLength = $(this).val().length;
+        $('[data-text-calculate-reply-id="' + commentReplyId + '"]').text(currentLength + ' / 3000').show();
 
-        if (currentTextLength > 2999) {
+        if (currentLength > 2999) {
             alert("텍스트는 최대 3000자까지 입력 가능합니다.");
-            $(this).val($(this).val().substring(0, 3000));
-            $('.text-caculate-reply').text('3000 / 3000');
+            $(this).val($(this).val().substr(0, 3000));
         }
     });
 
     // 답글 파일등록 미리보기
-    $('#commentImageReply').change(function () {
+    $('body').on('change', '[data-comment-image-reply-id]', function () {
+        var commentReplyId = $(this).data('comment-image-reply-id');
         if (this.files && this.files[0]) {
             var reader = new FileReader();
 
             reader.onload = function (e) {
-                var imgHtml = '<a href="javascript:void(0);" class="img-preview-wrap-reply"><img src="' + e.target.result + '" style="max-width: 54px; max-height: 54px;"></a>';
-                $('#imgPreviewReply').html(imgHtml);
+                var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap-reply"><img src="' + e.target.result + '" style="max-width: 54px; max-height: 54px;"></a>';
+                $('[data-img-preview-reply-id="' + commentReplyId + '"]').html(previewHtml);
             };
-            reader.readAsDataURL(this.files[0]);
+
+            if (this.files[0]) {
+                reader.readAsDataURL(this.files[0]);
+            }
         }
     });
 
     // 답글 첨부이미지 리셋
-    $('#imgPreviewReply').on('click', '.img-preview-wrap-reply', function () {
-        $(this).remove();
-        $('#commentImageReply').val('');
+    $('body').on('click', '[data-img-preview-reply-id]', function () {
+        var commentReplyId = $(this).data('img-preview-reply-id');
+        $(this).empty();
+        $('[data-comment-image-reply-id="' + commentReplyId + '"]').val('');
     });
 
 });

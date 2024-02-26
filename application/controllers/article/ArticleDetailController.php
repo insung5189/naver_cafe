@@ -140,6 +140,43 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
+    public function createReply()
+    {
+
+        $formData = [
+            'content' => $this->input->post('content', TRUE),
+            'articleId' => $this->input->post('articleId', TRUE),
+            'memberId' => $this->input->post('memberId', TRUE),
+            'parentId' => $this->input->post('parentId', TRUE),
+            'depth' => $this->input->post('depth', TRUE),
+            'file' => $_FILES['commentImage'] ?? null
+        ];
+
+        if (empty($formData['content']) && empty($formData['file']['name'])) {
+            $errorMessages = [
+                'content & file' => '댓글 내용이나 파일을 첨부해주세요.'
+            ];
+            $this->session->set_flashdata('error_messages', $errorMessages);
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
+            return;
+        }
+
+        $article = $this->ArticleDetailModel->getArticleById($formData['articleId']);
+        if (!$article) {
+            show_error('게시물을 찾을 수 없습니다.');
+            return;
+        }
+        $formData['publicScope'] = $article->getPublicScope();
+        $result = $this->ArticleDetailModel->createReply($formData);
+
+        if ($result['success']) {
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId'] . '#comment-' . $result['commentId']);
+        } else {
+            $this->session->set_flashdata('error_messages', $result['errors']);
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
+        }
+    }
+
     private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle)
     {
         $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");

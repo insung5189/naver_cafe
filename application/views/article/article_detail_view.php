@@ -276,7 +276,7 @@ $GLOBALS['pageResources'] = [
                                                     답글쓰기
                                                 </a>
                                                 <div class="session-comment-reply-write-box" id="reply-comment" style="display:none;">
-                                                    <form action="/답글_작성하는_URL">
+                                                    <form action="/답글_작성하는_URL" method="POST" enctype="multipart/form-data">
                                                         <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                                                         <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
                                                         <input type="hidden" name="depth" value="<?= $comment->getDepth() . 1 ?>">
@@ -284,31 +284,29 @@ $GLOBALS['pageResources'] = [
 
                                                         <div class="comment-writer">
 
-                                                            <div class="name-and-textarea">
+                                                            <div class="name-and-textarea" id="comment-reply-">
 
                                                                 <div class="nickname-and-text-caculate">
 
                                                                     <div class="session-comment-reply-author-nickname">
                                                                         <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
                                                                     </div>
-                                                                    <div class="text-caculate-reply" id="text-caculate-reply-<?= $comment->getId(); ?>" style="display:none;">
-                                                                        0 / 3000
-                                                                    </div>
+                                                                    <div class="text-caculate-reply" data-text-calculate-reply-id="<?= $comment->getId(); ?>" style="display:none;">0 / 3000</div>
 
                                                                 </div>
 
-                                                                <textarea class="comment-text-area-reply" name="content" id="commentReplyTextArea-<?= $comment->getId(); ?>" cols="30" rows="10" placeholder="답글을 남겨보세요" maxlength="3000" data-comment-reply-id="<?= $comment->getId(); ?>"></textarea>
+                                                                <textarea class="comment-text-area-reply" name="content" placeholder="답글을 남겨보세요" maxlength="3000" data-comment-reply-id="<?= $comment->getId(); ?>"></textarea>
 
-                                                                <div class="comment-img-preview" id="imgPreviewReply">
+                                                                <div class="comment-img-preview" id="imgPreviewReply" data-img-preview-reply-id="<?= $comment->getId(); ?>">
                                                                 </div>
 
                                                                 <div class="comment-reply-img-file-upload-ico">
 
-                                                                    <label for="commentImageReply" class="upload-ico">
+                                                                    <label for="commentImageReply-<?= $comment->getId(); ?>" class="upload-ico">
                                                                         <i class="fa-solid fa-lg fa-camera"></i>
                                                                     </label>
 
-                                                                    <input type="file" id="commentImageReply" name="commentImageReply" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+                                                                    <input type="file" name="commentImageReply" id="commentImageReply-<?= $comment->getId(); ?>" data-comment-image-reply-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
 
                                                                     <div class="comment-submit-btn">
                                                                         <a href="javascript:void(0);" class="cancel-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">취소</a>
