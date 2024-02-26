@@ -142,7 +142,6 @@ class ArticleDetailController extends MY_Controller
 
     public function createReply()
     {
-
         $formData = [
             'content' => $this->input->post('content', TRUE),
             'articleId' => $this->input->post('articleId', TRUE),

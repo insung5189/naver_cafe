@@ -276,7 +276,7 @@ $GLOBALS['pageResources'] = [
                                                     답글쓰기
                                                 </a>
                                                 <div class="session-comment-reply-write-box" id="reply-comment" style="display:none;">
-                                                    <form action="/답글_작성하는_URL" method="POST" enctype="multipart/form-data">
+                                                    <form action="/article/articledetailcontroller/createReply" method="POST" enctype="multipart/form-data">
                                                         <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                                                         <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
                                                         <input type="hidden" name="depth" value="<?= $comment->getDepth() . 1 ?>">
@@ -306,7 +306,7 @@ $GLOBALS['pageResources'] = [
                                                                         <i class="fa-solid fa-lg fa-camera"></i>
                                                                     </label>
 
-                                                                    <input type="file" name="commentImageReply" id="commentImageReply-<?= $comment->getId(); ?>" data-comment-image-reply-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+                                                                    <input type="file" name="commentImage" id="commentImageReply-<?= $comment->getId(); ?>" data-comment-image-reply-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
 
                                                                     <div class="comment-submit-btn">
                                                                         <a href="javascript:void(0);" class="cancel-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">취소</a>
