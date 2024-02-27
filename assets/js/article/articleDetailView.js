@@ -241,4 +241,21 @@ $(document).ready(function () {
         $('[data-comment-image-reply-id="' + commentReplyId + '"]').val('');
     });
 
+    $('.comment-delete-btn').click(function () {
+        var commentId = $(this).data('delete-comment-id');
+        $.ajax({
+            url: '/article/articledetailcontroller/deleteComment/' + commentId,
+            type: 'POST',
+            success: function (response) {
+                var data = JSON.parse(response);
+                if (data.success) {
+                    alert(data.message);
+                    $('#comment-' + commentId).remove();
+                } else {
+                    alert(data.message);
+                }
+            }
+        });
+    });
+
 });

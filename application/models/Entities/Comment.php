@@ -7,7 +7,9 @@ use \DateTime;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="comment")
+ * @ORM\Table(name="comment", indexes={
+ *     @ORM\Index(name="idx_ordergroup_depth_createdate", columns={"orderGroup", "depth", "createDate"})
+ * })
  */
 class Comment
 {
@@ -74,7 +76,6 @@ class Comment
         $this->content = $content;
     }
 
-
     /**
      * @ORM\Column(type="boolean", options={"default":1})
      */
@@ -89,7 +90,6 @@ class Comment
     {
         $this->isActive = $isActive;
     }
-
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -168,7 +168,7 @@ class Comment
 
     /**
      * @ORM\ManyToOne(targetEntity="Member")
-     * @ORM\JoinColumn(name="member_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="member_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $member;
 
@@ -184,7 +184,7 @@ class Comment
 
     /**
      * @ORM\ManyToOne(targetEntity="Article", inversedBy="comments")
-     * @ORM\JoinColumn(name="article_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="article_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $article;
 
@@ -199,8 +199,8 @@ class Comment
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="Comment")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id")
+     * @ORM\ManyToOne(targetEntity="Comment", cascade={"remove"})
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
      */
     private $parent;
 
@@ -212,5 +212,20 @@ class Comment
     public function setParent(?Comment $parent)
     {
         $this->parent = $parent;
+    }
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned":true}, nullable=false)
+     */
+    private $orderGroup;
+
+    public function getOrderGroup()
+    {
+        return $this->orderGroup;
+    }
+
+    public function setOrderGroup($orderGroup)
+    {
+        $this->orderGroup = $orderGroup;
     }
 }

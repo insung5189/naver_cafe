@@ -25,7 +25,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 */
 // $config['base_url'] = 'http://bidcafe.devh.me/';
 // $config['base_url'] = 'http://211.238.132.177/';
-$config['base_url'] = 'http://localhost/';
+$config['base_url'] = '/';
 
 /*
 |--------------------------------------------------------------------------

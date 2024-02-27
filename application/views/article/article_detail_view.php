@@ -242,7 +242,7 @@ $GLOBALS['pageResources'] = [
                                                     <a href="javascript:void(0);" class="comment-edit-btn">
                                                         수정
                                                     </a>
-                                                    <a href="javascript:void(0);" class="comment-delete-btn">
+                                                    <a href="javascript:void(0);" class="comment-delete-btn" data-delete-comment-id="<?= $comment->getId(); ?>">
                                                         삭제
                                                     </a>
                                                 </div>
@@ -334,7 +334,7 @@ $GLOBALS['pageResources'] = [
                         <form action="/article/ArticleDetailController/createComment" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                             <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
-                            <input type="hidden" name="depth" value="1">
+                            <input type="hidden" name="depth" value="0">
                             <input type="hidden" name="parentId" value="NULL">
                             <div class="comment-writer">
                                 <div class="name-and-textarea">

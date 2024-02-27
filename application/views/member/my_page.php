@@ -36,11 +36,22 @@ $GLOBALS['pageResources'] = [
             <? $user = $_SESSION['user_data']; ?>
             <div class="prfl-box">
                 <span class="profile-img">
+
+
                     <?
-                    $fileUrl = base_url("assets/file/images/memberImgs/");
+                    $fileUrl = '/assets/file/images/memberImgs/';
                     $profileImagePath = ($user['memberFileName'] === 'default.png') ? 'defaultImg/default.png' : $user['memberFileName'];
                     ?>
-                    <img src="<? echo $fileUrl . $profileImagePath; ?>" alt="프로필사진">
+                    <img class="my-page-image-preview" src="<?= $fileUrl . $profileImagePath; ?>" alt="프로필사진">
+
+
+                    <div data-member-img-src="<?= $fileUrl . $profileImagePath; ?>"></div>
+                    <form action="">
+                        <label class="prfl-img-edit" for="member-prfl-img-edit">
+                            <input type="file" name="member-prfl-img" id="member-prfl-img-edit" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" hidden>
+                        </label>
+
+                    </form>
                 </span>
                 <span class="nick-and-info">
                     <div class="nick-area">
@@ -62,7 +73,10 @@ $GLOBALS['pageResources'] = [
                     <div class="info-area">
                         <span>방문</span> <em class="count-num"><?= $user['visit']; ?></em> <span class="ml-17">작성글</span> <em class="count-num"><?= $articleCount; ?></em>
                     </div>
+                    <div id="member-prfl-file-info">파일 정보가 여기 나오겠지</div>
+                    <a href="javascript:void(0);" id="member-prfl-file-remove">이미지 삭제</a>
                 </span>
+                
             </div>
 
             <div class="content-box">
@@ -211,8 +225,8 @@ $GLOBALS['pageResources'] = [
                                 <div class="input-box">
                                     <select id="gender" name="gender" class="custom-input">
                                         <option value="">성별 선택</option>
-                                        <option value="male" <?= $user['gender'] == '0' ? 'selected' : '' ?>>남성</option>
-                                        <option value="female" <?= $user['gender'] == '1' ? 'selected' : '' ?>>여성</option>
+                                        <option value="true" <?= $user['gender'] == '0' ? 'selected' : '' ?>>남성</option>
+                                        <option value="false" <?= $user['gender'] == '1' ? 'selected' : '' ?>>여성</option>
                                     </select>
                                     <div class="message-box">
                                         <span class="description pl-5" id="gender-validation-message"></span>

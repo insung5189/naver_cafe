@@ -7,7 +7,9 @@ use \DateTime;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="article")
+ * @ORM\Table(name="article", indexes={
+ *     @ORM\Index(name="idx_ordergroup_depth_createdate", columns={"orderGroup", "depth", "createDate"})
+ * })
  */
 class Article
 {
@@ -178,7 +180,6 @@ class Article
         $this->prefix = $prefix;
     }
 
-    // Foreign key references
     /**
      * @ORM\ManyToOne(targetEntity="ArticleBoard")
      * @ORM\JoinColumn(name="article_board_id", referencedColumnName="id", nullable=true)
@@ -197,7 +198,7 @@ class Article
 
     /**
      * @ORM\ManyToOne(targetEntity="Member")
-     * @ORM\JoinColumn(name="member_id", referencedColumnName="id", nullable=false)
+     * @ORM\JoinColumn(name="member_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $member;
 
@@ -212,8 +213,8 @@ class Article
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="Article")
-     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", nullable=true)
+     * @ORM\ManyToOne(targetEntity="Article", cascade={"remove"})
+     * @ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE", nullable=true)
      */
     private $parent;
 
@@ -232,5 +233,20 @@ class Article
         $this->createDate = new DateTime();
         $this->isActive = true;
         $this->hit = 1;
+    }
+
+    /**
+     * @ORM\Column(type="integer", options={"unsigned":true}, nullable=false)
+     */
+    private $orderGroup;
+
+    public function getOrderGroup()
+    {
+        return $this->orderGroup;
+    }
+
+    public function setOrderGroup($orderGroup)
+    {
+        $this->orderGroup = $orderGroup;
     }
 }

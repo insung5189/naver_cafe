@@ -70,7 +70,6 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
-
     public function commentSortAction()
     {
         if (isset($_SESSION['user_data'])) {
@@ -166,7 +165,8 @@ class ArticleDetailController extends MY_Controller
             return;
         }
         $formData['publicScope'] = $article->getPublicScope();
-        $result = $this->ArticleDetailModel->createReply($formData);
+
+        $result = $this->ArticleDetailModel->processCreateReply($formData);
 
         if ($result['success']) {
             redirect('/article/articledetailcontroller/index/' . $formData['articleId'] . '#comment-' . $result['commentId']);
@@ -201,5 +201,26 @@ class ArticleDetailController extends MY_Controller
             'message' => '접근 권한이 없습니다.',
         ];
         $this->layout->view('errors/error_page', $page_view_data);
+    }
+
+    public function deleteComment($commentId)
+    {
+        if (!isset($_SESSION['user_data'])) {
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            return;
+        }
+
+        $memberId = $_SESSION['user_data']['user_id'];
+        $result = $this->ArticleDetailModel->processDeleteComment($commentId, $memberId);
+
+        if ($result['success']) {
+            if ($result['deletedCount'] > 0) {
+                echo json_encode(['success' => true, 'message' => '댓글이 삭제되었습니다.']);
+            } else {
+                echo json_encode(['success' => false, 'message' => '댓글 삭제 권한이 없거나 댓글이 존재하지 않습니다.']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => '댓글 삭제 중 오류가 발생했습니다.', 'error' => $result['error']]);
+        }
     }
 }

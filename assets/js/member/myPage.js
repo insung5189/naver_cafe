@@ -20,10 +20,14 @@ $(document).ready(function () {
     // 이름, 성 유니코드 정규검사식
     const nameRegex = /^[A-Za-z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u1E00-\u1EFF\u2C00-\u2C7F\u2D00-\u2D2F\u3000-\u303F\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE30-\uFE4F-'\s]+$/;
 
+    // 초기 사용자의 프로필 사진 경로 저장
+    var initialImgSrc = $('.my-page-image-preview').attr('src');
+
     // 이벤트 핸들러 등록
     $('#duplicateNickname').click(duplicateNickname);
-    $('#upload-image').click(function () {
-        $('#file').click();
+    $('#member-prfl-img-edit').change(updateImagePreview);
+    $('#member-prfl-file-remove').click(function () {
+        resetImagePreview(initialImgSrc);
     });
     $('#nickName').on('keyup, focus', validateNickname);
     $('#nickName').on('keyup, focus', resetNicknameValidation);
@@ -34,6 +38,54 @@ $(document).ready(function () {
     $('#birth').on('keyup, focus', validateBirthDate);
     $('#birth').on('blur, focus', validateBirthDate);
     $('form').on('submit', submitFormValidation);
+
+    // 이미지 미리보기 및 파일 정보 표시
+    function updateImagePreview(event) {
+        const file = event.target.files[0];
+        const fileInfo = $('#member-prfl-file-info');
+
+        if (!file) {
+            $('.my-page-image-preview').attr('src', initialImgSrc);
+            $('#member-prfl-img-edit').val("");
+            fileInfo.html(`등록된 파일이 없습니다. 기존 이미지가 적용됩니다.`);
+            return;
+        }
+
+        if (!file.type.match('image.*')) {
+            alert('이미지 파일만 업로드 가능합니다.');
+            $('#member-prfl-img-edit').val("");
+            fileInfo.html(`5mb이하의 이미지 파일만 등록 가능합니다. 다시 등록해주세요.`);
+            return;
+        }
+
+        if (file.size > 52428800) { // 5메가 이하로 조정할 것.
+            alert('파일 크기가 너무 큽니다. 50MB 이하의 파일을 선택해주세요.');
+            $('#member-prfl-img-edit').val("");
+            fileInfo.html(`5mb이하의 이미지 파일만 등록 가능합니다. 다시 등록해주세요.`);
+            return;
+        }
+
+        let fileSize = file.size / 1024; // KB 단위로 변환
+        let fileSizeUnit = 'KB';
+        if (fileSize > 1024) {
+            fileSize = fileSize / 1024; // MB 단위로 변환
+            fileSizeUnit = 'MB';
+        }
+        fileInfo.html(`파일이름 : ${file.name},                    파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $('.my-page-image-preview').attr('src', e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // 이미지 삭제 및 초기화
+    function resetImagePreview(initialImgSrc) {
+        $('.my-page-image-preview').attr('src', initialImgSrc);
+        $('#member-prfl-img-edit').val("");
+        $('#member-prfl-file-info').html(`등록된 파일이 없습니다. 기존 이미지가 적용됩니다.`);
+    }
 
     function duplicateNickname() {
         const nickName = $('#nickName').val();

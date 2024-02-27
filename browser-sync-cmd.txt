@@ -1,0 +1,1 @@
+browser-sync start --proxy "localhost" --files "application/**/*.php, assets/css/**/*.css, assets/js/**/*.js"

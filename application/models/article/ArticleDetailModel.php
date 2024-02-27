@@ -41,7 +41,9 @@ class ArticleDetailModel extends CI_Model
             ->from('Models\Entities\Comment', 'c')
             ->where('c.article = :articleId')
             ->setParameter('articleId', $articleId)
-            ->orderBy('c.createDate', $sortOption);
+            ->orderBy('c.orderGroup', $sortOption)
+            ->addOrderBy('c.depth', 'ASC')
+            ->addOrderBy('c.createDate', 'ASC');
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -116,6 +118,7 @@ class ArticleDetailModel extends CI_Model
             $this->em->flush();
 
             // 저장된 댓글의 고유 식별 정보를 기반으로 댓글 조회
+            // 댓글, 답글 저장 후 해당 위치로 스크롤 하기 위해서 해시값을 추가하려는데 동시에 여러 댓글이 등록될 수 있으니 고유값으로 구분하기 위함.
             $newComment = $this->em->getRepository(Models\Entities\Comment::class)->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
 
             return ['success' => true, 'commentId' => $newComment->getId()];
@@ -125,7 +128,7 @@ class ArticleDetailModel extends CI_Model
         }
     }
 
-    public function createReply($formData)
+    public function processCreateReply($formData)
     {
         $errorData = ['errors' => []];
 
@@ -160,6 +163,7 @@ class ArticleDetailModel extends CI_Model
             $this->em->flush();
 
             // 저장된 답글의 고유 식별 정보를 기반으로 답글 조회
+            // 댓글, 답글 저장 후 해당 위치로 스크롤 하기 위해서 해시값을 추가하려는데 동시에 여러 댓글이 등록될 수 있으니 고유값으로 구분하기 위함.
             $newReply = $this->em->getRepository(Models\Entities\Comment::class)->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
 
             return ['success' => true, 'commentId' => $newReply->getId()];
@@ -203,5 +207,23 @@ class ArticleDetailModel extends CI_Model
         $timestamp = microtime(true);
         $sessionId = session_id();
         return hash('sha256', $memberId . $timestamp . $sessionId);
+    }
+
+    public function processDeleteComment($commentId, $memberId)
+    {
+        try {
+            $queryBuilder = $this->em->createQueryBuilder();
+            $query = $queryBuilder->delete('Models\Entities\Comment', 'c')
+                ->where('c.id = :commentId')
+                ->andWhere('c.member = :memberId')
+                ->setParameter('commentId', $commentId)
+                ->setParameter('memberId', $memberId)
+                ->getQuery();
+
+            $result = $query->execute();
+            return ['success' => true, 'deletedCount' => $result];
+        } catch (\Exception $e) {
+            return ['success' => false, 'error' => $e->getMessage()];
+        }
     }
 }

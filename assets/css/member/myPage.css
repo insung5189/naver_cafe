@@ -46,6 +46,19 @@ h1 {
     border-radius: 50%;
 }
 
+.prfl-img-edit {
+    content: "";
+    position: absolute;
+    top: 160px;
+    left: 290px;
+    display: block;
+    width: 34px;
+    height: 34px;
+    background: url(https://ca-fe.pstatic.net/web-section/static/img/btn_upload_img.svg?9637b72…=) no-repeat;
+    background-size: 34px;
+    cursor: pointer;
+}
+
 .nick-and-info {
     display: flex;
     flex-direction: column;

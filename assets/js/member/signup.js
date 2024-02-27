@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // 중복확인 상태 변수
     var isNicknameDuplicateChecked = false;
 
@@ -8,7 +8,7 @@ $(document).ready(function() {
     // 이벤트 핸들러 등록
     $('#duplicateEmail').click(duplicateEmail);
     $('#duplicateNickname').click(duplicateNickname);
-    $('#upload-image').click(function() {
+    $('#upload-image').click(function () {
         $('#file').click();
     });
     $('#file').change(updateImagePreview);
@@ -22,8 +22,8 @@ $(document).ready(function() {
     $('#firstName').on('keyup', validateFirstName);
     $('#lastName').on('keyup', validateLastName);
     $('#gender').change(validateGenderSelect);
-    $('#birth').on('keyup',validateBirthDate);
-    $('#birth').on('blur',validateBirthDate);
+    $('#birth').on('keyup', validateBirthDate);
+    $('#birth').on('blur', validateBirthDate);
     $('form').on('submit', submitFormValidation);
 
     function duplicateEmail() {
@@ -38,10 +38,10 @@ $(document).ready(function() {
                 type: 'POST',
                 dataType: 'json',
                 data: { userName: userName },
-                success: function(response) {
+                success: function (response) {
                     handleEmailResponse(response);
                 },
-                error: function() {
+                error: function () {
                     alert('이메일 중복 확인 중 오류가 발생했습니다.');
                     return false;
                 }
@@ -81,10 +81,10 @@ $(document).ready(function() {
                 type: 'POST',
                 dataType: 'json',
                 data: { nickName: nickName },
-                success: function(response) {
+                success: function (response) {
                     handleNicknameResponse(response);
                 },
-                error: function() {
+                error: function () {
                     alert('닉네임 중복 확인 중 오류가 발생했습니다.');
                     return false;
                 }
@@ -147,7 +147,7 @@ $(document).ready(function() {
         fileInfo.html(`파일이름 : ${file.name}<br> 파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             $('.image-preview').attr('src', e.target.result);
         };
         reader.readAsDataURL(file);
@@ -237,7 +237,7 @@ $(document).ready(function() {
         const password1 = $('#password1').val();
         const password2 = $('#password2').val();
         const matchMessage = $('#password-match-message');
-    
+
         if (validatePassword()) {
             if (password1 === '' && password2 === '') {
                 matchMessage.text('');
@@ -266,10 +266,10 @@ $(document).ready(function() {
         const phoneInput = $('#phone');
         const message = $('#phone-validation-message');
         const phoneValue = phoneInput.val().replace(/-/g, ''); // 하이픈 제거
-    
+
         // 국제 전화번호 패턴 검사 (한국 포함)
         const phonePattern = /^(\+\d{1,3}-?)?(01[016-9]|02|0[3-6][1-5]?|070)-?([1-9]\d{2,3}-?\d{4})$/;
-    
+
         if (!phonePattern.test(phoneValue)) {
             message.text('❌ 유효하지 않은 전화번호 형식입니다.').css('color', 'red');
             return false;
@@ -305,7 +305,7 @@ $(document).ready(function() {
 
         // 길이 조건
         message += lengthCheck ? '✔️ 2~10글자(필수)<br>' : '❌ 2~10글자(필수)<br>';
-        
+
         // 문자 유형 조건
         if (hasKoreanOrEnglish && !hasInvalidCharacter) {
             message += '✔️ 한글 또는 영문 대소문자(필수)<br>✔️ 숫자(선택)<br>';
@@ -327,7 +327,7 @@ $(document).ready(function() {
     function validateFirstName() {
         const firstName = $('#firstName').val().trim();
         const firstNameMessage = $('#firstname-validation-message');
-    
+
         if (firstName == null || firstName == '') {
             firstNameMessage.text('❌ 이름을 입력해주세요.').css('color', 'red');
             return false;
@@ -346,7 +346,7 @@ $(document).ready(function() {
     function validateLastName() {
         const lastName = $('#lastName').val().trim();
         const lastNameMessage = $('#lastname-validation-message');
-    
+
         if (lastName == null || lastName == '') {
             lastNameMessage.text('❌ 성을 입력해주세요.').css('color', 'red');
             return false;
@@ -397,46 +397,46 @@ $(document).ready(function() {
         const datePattern = /^\d{4}-\d{2}-\d{2}$/;
         const today = new Date();
         today.setHours(0, 0, 0, 0); // 오늘 날짜의 시작으로 설정
-    
+
         // 현재 연도 및 최소/최대 유효 연도 설정
         const currentYear = today.getFullYear();
         const minYear = currentYear - 120; // 지금으로부터 120년 전
         const maxYear = currentYear; // 현재 연도
-    
+
         if (inputDate === '') {
             inputDateError.text('');
             return true; // 입력하지 않은 경우에도 true를 반환
         }
-    
+
         if (!datePattern.test(inputDate)) {
             inputDateError.text('❌ 올바른 날짜 형식을 입력해주세요.').css('color', 'red');
             return false;
         }
-    
+
         const [year, month, day] = inputDate.split('-').map(Number);
         const inputDateObj = new Date(year, month - 1, day);
-    
-        const isDateValid = inputDateObj.getFullYear() === year && 
-                            inputDateObj.getMonth() + 1 === month && 
-                            inputDateObj.getDate() === day;
-    
+
+        const isDateValid = inputDateObj.getFullYear() === year &&
+            inputDateObj.getMonth() + 1 === month &&
+            inputDateObj.getDate() === day;
+
         if (!isDateValid) {
             inputDateError.text('❌ 존재하지 않는 날짜입니다.').css('color', 'red');
             return false;
         }
-    
+
         // 입력된 생년월일이 유효한 연도 범위 내에 있는지 검사
         if (year < minYear || year > maxYear) {
             inputDateError.text(`❌ 년도는 ${minYear}년부터 ${maxYear}년 사이여야 합니다.`).css('color', 'red');
             return false;
         }
-    
+
         // 입력 날짜가 오늘 날짜를 초과하는지 검사
         if (inputDateObj > today) {
             inputDateError.text('❌ 생년월일은 오늘 날짜를 초과할 수 없습니다.').css('color', 'red');
             return false;
         }
-    
+
         // 모든 검사를 통과한 경우
         inputDateError.text('✔️').css('color', 'green');
         return true;
