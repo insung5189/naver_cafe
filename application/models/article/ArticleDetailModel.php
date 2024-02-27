@@ -42,8 +42,8 @@ class ArticleDetailModel extends CI_Model
             ->where('c.article = :articleId')
             ->setParameter('articleId', $articleId)
             ->orderBy('c.orderGroup', $sortOption)
-            ->addOrderBy('c.depth', 'ASC')
-            ->addOrderBy('c.createDate', 'ASC');
+            // ->addOrderBy('c.depth', 'ASC') // 주석 해제하면 뎁스별로 모아서 정렬 가능.
+            ->addOrderBy('c.createDate', 'ASC'); // 네이버카페는 기본적으로 뎁스 구별없이 등록시간순으로 정렬함.
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -107,6 +107,16 @@ class ArticleDetailModel extends CI_Model
             $comment->setParent($this->em->find('Models\Entities\Comment', $formData['parentId']));
             $comment->setDepth($formData['depth']);
 
+            $orderGroup = 0;
+            if (!$formData['parentId']) {
+                $queryBuilder = $this->em->createQueryBuilder();
+                $queryBuilder->select($queryBuilder->expr()->max('c.orderGroup'))
+                    ->from('Models\Entities\Comment', 'c');
+                $maxOrderGroup = $queryBuilder->getQuery()->getSingleScalarResult();
+                $orderGroup = $maxOrderGroup ? $maxOrderGroup + 1 : 1;
+                $comment->setOrderGroup($orderGroup);
+            }
+
             if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
                 $comment->setCommentFilePath($formData['commentFilePath']);
                 $comment->setCommentFileName($formData['commentFileName']);
@@ -150,6 +160,7 @@ class ArticleDetailModel extends CI_Model
             $reply->setUniqueIdentifier($uniqueIdentifier);
             $reply->setParent($this->em->find('Models\Entities\Comment', $formData['parentId']));
             $reply->setDepth($formData['depth']);
+            $reply->setOrderGroup($formData['orderGroup']);
 
             if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
                 $reply->setCommentFilePath($formData['commentFilePath']);

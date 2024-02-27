@@ -36,12 +36,13 @@ class ArticleEditController extends MY_Controller
 
         try {
             $formData = [
-                'boardId' => $this->input->post('board'),
-                'prefix' => $this->input->post('prefix'),
-                'title' => $this->input->post('title'),
-                'content' => $this->input->post('content'),
-                'parentId' => $this->input->post('parent_id'),
-                'publicScope' => $this->input->post('publicScope'),
+                'boardId' => $this->input->post('board', TRUE),
+                'prefix' => $this->input->post('prefix', TRUE),
+                'title' => $this->input->post('title', TRUE),
+                'content' => $this->input->post('content', TRUE),
+                'parentId' => $this->input->post('parent_id', TRUE),
+                'memberId' => $this->input->post('memberId', TRUE),
+                'publicScope' => $this->input->post('publicScope', TRUE),
             ];
 
             $this->ArticleEditModel->createArticle($formData);

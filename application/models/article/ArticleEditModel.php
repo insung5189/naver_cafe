@@ -20,11 +20,19 @@ class ArticleEditModel extends CI_Model
         $parentId = $formData['parentId'];
         $publicScope = $formData['publicScope'];
 
-        $depth = 1;
-        if ($parentId) {
-            $parentArticle = $this->em->getRepository('Models\Entities\Article')->find($parentId);
+        $orderGroup = 0;
+        if (!$parentId) {
+            // 최상위 부모글인 경우, orderGroup을 새로 부여
+            // 쿼리 빌더를 사용하여 최대 orderGroup 값을 찾음
+            $queryBuilder = $this->em->createQueryBuilder();
+            $queryBuilder->select($queryBuilder->expr()->max('a.orderGroup'))
+                ->from('Models\Entities\Article', 'a');
+            $maxOrderGroup = $queryBuilder->getQuery()->getSingleScalarResult();
+            $orderGroup = $maxOrderGroup ? $maxOrderGroup + 1 : 1;
+        } else {
+            // 부모글이 있는 경우, 부모글의 orderGroup을 상속받음
             if ($parentArticle) {
-                $depth = $parentArticle->getDepth() + 1;
+                $orderGroup = $parentArticle->getOrderGroup();
             }
         }
 
@@ -47,8 +55,8 @@ class ArticleEditModel extends CI_Model
             $prefix = NULL;
         }
 
-        $userId = $this->session->userdata('user_data')['user_id'];
-        $member = $this->em->find('Models\Entities\Member', $userId);
+        $memberId = $this->session->userdata('user_data')['user_id'];
+        $member = $this->em->find('Models\Entities\Member', $memberId);
         if (!$member) {
             throw new Exception('작성자 정보를 찾을 수 없습니다.');
         }
@@ -62,6 +70,7 @@ class ArticleEditModel extends CI_Model
         $article->setPublicScope($publicScope);
         $article->setDepth($depth);
         $article->setIp($_SERVER['REMOTE_ADDR']);
+        $article->setOrderGroup($orderGroup);
 
         if ($parentId && $parentArticle) {
             $article->setParent($parentArticle);

@@ -147,6 +147,7 @@ class ArticleDetailController extends MY_Controller
             'memberId' => $this->input->post('memberId', TRUE),
             'parentId' => $this->input->post('parentId', TRUE),
             'depth' => $this->input->post('depth', TRUE),
+            'orderGroup' => $this->input->post('orderGroup', TRUE),
             'file' => $_FILES['commentImage'] ?? null
         ];
 

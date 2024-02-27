@@ -201,16 +201,21 @@ $GLOBALS['pageResources'] = [
                         <? if (isset($comments)) : ?>
                             <? foreach ($comments as $comment) : ?>
                                 <?
+                                $styleAttributes = '';
+
+                                if ($comment->getDepth() > 0) {
+                                    $styleAttributes .= 'padding-left: 50px;';
+                                }
+
                                 $interval = date_diff($comment->getCreateDate(), new DateTime());
 
-                                // 차이가 1분 이내인지 확인
                                 if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
-                                    $backgroundColor = 'style="background-color: #ffffe0;"';
-                                } else {
-                                    $backgroundColor = '';
+                                    $styleAttributes .= ' background-color: #ffffe0;';
                                 }
+
+                                $styleAttribute = !empty($styleAttributes) ? 'style="' . $styleAttributes . '"' : '';
                                 ?>
-                                <li id="comment-<?= $comment->getId(); ?>" <?= $backgroundColor ?>>
+                                <li id="comment-<?= $comment->getId(); ?>" <?= $styleAttribute ?>>
                                     <div class="comment-author-action-box">
                                         <div class="comment-author-box">
                                             <!-- 사용자 프로필 이미지 -->
@@ -279,8 +284,9 @@ $GLOBALS['pageResources'] = [
                                                     <form action="/article/articledetailcontroller/createReply" method="POST" enctype="multipart/form-data">
                                                         <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                                                         <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
-                                                        <input type="hidden" name="depth" value="<?= $comment->getDepth() . 1 ?>">
+                                                        <input type="hidden" name="depth" value="<?= $comment->getDepth() + 1 ?>">
                                                         <input type="hidden" name="parentId" value="<?= $comment->getId() ?>">
+                                                        <input type="hidden" name="orderGroup" value="<?= $comment->getOrderGroup() ?>">
 
                                                         <div class="comment-writer">
 
@@ -335,7 +341,7 @@ $GLOBALS['pageResources'] = [
                             <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                             <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
                             <input type="hidden" name="depth" value="0">
-                            <input type="hidden" name="parentId" value="NULL">
+                            <input type="hidden" name="parentId" value="">
                             <div class="comment-writer">
                                 <div class="name-and-textarea">
                                     <div class="nickname-and-text-caculate">

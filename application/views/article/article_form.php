@@ -16,7 +16,9 @@ $user = $_SESSION['user_data'];
                 <h1 class="title">카페 글쓰기</h1>
                 <input class="form-btn-box btn-box submit-btn" type="submit" value="등록">
             </div>
-            <input hidden type="text" value="<?= $user['user_id'] ?>">
+            <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
+            <input type="hidden" name="depth" value="0">
+            <input type="hidden" name="parentId" value="NULL">
             <div class="editer-box">
                 <div class="select-box">
                     <div class="board-select-box">
