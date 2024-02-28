@@ -78,13 +78,15 @@ class ArticleDetailController extends MY_Controller
             $user = NULL;
         }
         $sortOrder = $this->input->get('sortOption');
+        $depthOrder = $this->input->get('depthOption');
         $articleId = $this->input->get('articleId');
+        $treeOption = $this->input->get('treeOption');
 
         try {
-            $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId, $sortOrder);
+            $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId, $sortOrder, $depthOrder, $treeOption);
             $article = $this->ArticleDetailModel->getArticleById($articleId);
-            $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");
-            $commentFileUrl = base_url("assets/file/commentFiles/img/");
+            $memberPrflFileUrl = "/assets/file/images/memberImgs/";
+            $commentFileUrl = "/assets/file/commentFiles/img/";
 
             $comments_view_data = [
                 'article' => $article,
@@ -179,8 +181,8 @@ class ArticleDetailController extends MY_Controller
 
     private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle)
     {
-        $memberPrflFileUrl = base_url("assets/file/images/memberImgs/");
-        $commentFileUrl = base_url("assets/file/commentFiles/img/");
+        $memberPrflFileUrl = "/assets/file/images/memberImgs/";
+        $commentFileUrl = "/assets/file/commentFiles/img/";
 
         $page_view_data = [
             'title' => '글 상세보기',
@@ -222,6 +224,29 @@ class ArticleDetailController extends MY_Controller
             }
         } else {
             echo json_encode(['success' => false, 'message' => '댓글 삭제 중 오류가 발생했습니다.', 'error' => $result['error']]);
+        }
+    }
+
+    public function editComment($commentId)
+    {
+        $formData = [
+            'content' => $this->input->post('content', TRUE),
+            'memberId' => $this->input->post('memberId', TRUE),
+            'file' => $_FILES['commentImageEdit'] ?? null
+        ];
+
+        if (!isset($_SESSION['user_data'])) {
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            return;
+        }
+
+        // 모델의 댓글 수정 메서드 호출
+        $result = $this->ArticleDetailModel->processEditComment($commentId, $formData);
+
+        if ($result['success']) {
+            echo json_encode(['success' => true, 'message' => '댓글이 수정되었습니다.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => $result['message']]);
         }
     }
 }

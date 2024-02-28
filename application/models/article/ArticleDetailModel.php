@@ -34,18 +34,63 @@ class ArticleDetailModel extends CI_Model
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function getCommentsByArticleId($articleId, $sortOption = 'ASC')
+    public function getCommentsByArticleId($articleId, $sortOption = '', $depthOption = '', $treeOption = '')
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('c')
             ->from('Models\Entities\Comment', 'c')
             ->where('c.article = :articleId')
             ->setParameter('articleId', $articleId)
-            ->orderBy('c.orderGroup', $sortOption)
-            // ->addOrderBy('c.depth', 'ASC') // 주석 해제하면 뎁스별로 모아서 정렬 가능.
-            ->addOrderBy('c.createDate', 'ASC'); // 네이버카페는 기본적으로 뎁스 구별없이 등록시간순으로 정렬함.
+            ->orderBy('c.orderGroup', $sortOption);
 
-        return $queryBuilder->getQuery()->getResult();
+        // 기존 depthOption 처리 로직
+        if ($depthOption === 'ASC') {
+            $queryBuilder->addOrderBy('c.depth', $depthOption)
+                ->addOrderBy('c.createDate', 'ASC');
+        }
+
+        // 모든 댓글 조회
+        $comments = $queryBuilder->getQuery()->getResult();
+
+        // treeOption이 활성화되어 있으면, 트리 구조로 재정렬
+        if ($treeOption === 'enabled') {
+            $comments = $this->reorderCommentsAsTree($comments, $sortOption);
+        } else if ($treeOption === 'disabled') {
+            $comments = $queryBuilder->getQuery()->getResult();
+        }
+
+        return $comments;
+    }
+
+    private function reorderCommentsAsTree($comments, $sortOption)
+    {
+        // 댓글을 parentId를 키로 하는 배열로 재구성
+        $commentsByParentId = [];
+        foreach ($comments as $comment) {
+            $parentId = $comment->getParent() ? $comment->getParent()->getId() : 0;
+            $commentsByParentId[$parentId][] = $comment;
+        }
+
+        // 루트 댓글부터 트리 구조로 재구성하여 1차원 배열로 변환
+        $flattenedComments = [];
+        $this->buildTree($commentsByParentId, 0, $flattenedComments);
+
+        return $flattenedComments;
+    }
+
+    private function buildTree(&$commentsByParentId, $parentId, &$flattenedComments)
+    {
+        if (isset($commentsByParentId[$parentId])) {
+            foreach ($commentsByParentId[$parentId] as $comment) {
+                // 현재 댓글을 1차원 배열에 추가
+                $flattenedComments[] = $comment;
+
+                // 현재 댓글의 자식 댓글이 있다면 재귀적으로 처리
+                if (isset($commentsByParentId[$comment->getId()])) {
+                    $this->buildTree($commentsByParentId, $comment->getId(), $flattenedComments);
+                }
+            }
+        }
     }
 
     public function getFilesByArticleId($articleId)
@@ -68,7 +113,7 @@ class ArticleDetailModel extends CI_Model
         } else {
             $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR;
         }
-        return base_url($basePath . $file->getCombinedName());
+        return $basePath . $file->getCombinedName();
     }
 
     public function getLikesByArticleId($articleId)
@@ -218,6 +263,34 @@ class ArticleDetailModel extends CI_Model
         $timestamp = microtime(true);
         $sessionId = session_id();
         return hash('sha256', $memberId . $timestamp . $sessionId);
+    }
+
+    public function processEditComment($commentId, $formData)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+
+        $query = $queryBuilder->update('Models\Entities\Comment', 'c')
+            ->set('c.content', ':content')
+            ->set('c.modifyDate', ':modifyDate')
+            ->where('c.id = :commentId')
+            ->andWhere('c.member = :memberId')
+            ->setParameter('content', $formData['content'])
+            ->setParameter('modifyDate', new \DateTime())
+            ->setParameter('commentId', $commentId)
+            ->setParameter('memberId', $formData['memberId'])
+            ->getQuery();
+
+        try {
+            $result = $query->execute();
+
+            if ($result > 0) {
+                return ['success' => true, 'message' => '댓글이 성공적으로 수정되었습니다.'];
+            } else {
+                return ['success' => false, 'message' => '댓글 수정 권한이 없거나 댓글이 존재하지 않습니다.'];
+            }
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => '댓글 수정 중 오류가 발생했습니다.', 'error' => $e->getMessage()];
+        }
     }
 
     public function processDeleteComment($commentId, $memberId)

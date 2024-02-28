@@ -290,16 +290,18 @@ h1 {
 }
 
 .create-date-asc-btn,
-.create-date-desc-btn {
+.create-date-desc-btn,
+.depth-option-checkbox,
+.tree-option-checkbox {
     line-height: 24px;
 }
 
-.create-date-asc-btn {
+.sort-btn-active {
     font-weight: 700;
     color: #000;
 }
 
-.create-date-desc-btn {
+.sort-btn-deactivate {
     font-weight: 400;
     color: #b7b7b7;
 }
@@ -413,7 +415,14 @@ h1 {
     margin-right: 8px;
 }
 
-.session-comment-reply-write-box {
+.text-end {
+    text-align: end;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.session-comment-reply-write-box,
+.comment-edited-form-box {
     margin: 12px 0;
     padding: 16px 10px 10px 18px;
     border: 2px solid rgba(0, 0, 0, 0.1);
@@ -455,7 +464,8 @@ h1 {
 }
 
 .comment-text-area,
-.comment-text-area-reply {
+.comment-text-area-reply,
+.comment-text-area-edit {
     border: 0;
     width: 100%;
     height: 17px;
@@ -470,10 +480,18 @@ h1 {
     font-size: 13px;
 }
 
-.comment-img-preview {
+.comment-img-preview,
+.comment-edit-img-preview {
+    position: relative;
     margin-top: 8px;
     width: 100%;
     height: 100%;
+}
+
+.x-btn-position {
+    position: absolute;
+    left: 7%;
+    top: 10%;
 }
 
 .comment-img-preview img {
@@ -484,7 +502,8 @@ h1 {
 }
 
 .comment-reply-img-file-upload-ico,
-.comment-img-file-upload-ico {
+.comment-img-file-upload-ico,
+.comment-edit-img-file-upload-ico {
     display: flex;
     justify-content: space-between;
     align-items: center;

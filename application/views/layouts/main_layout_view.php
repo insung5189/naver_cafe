@@ -159,7 +159,7 @@
                                                     <div class="profile-thumb">
                                                         <!-- 사용자 프로필 이미지 -->
                                                         <?
-                                                        $fileUrl = base_url("assets/file/images/memberImgs/");
+                                                        $fileUrl = "/assets/file/images/memberImgs/";
                                                         $profileImagePath = ($user['memberFileName'] === 'default.png') ? 'defaultImg/default.png' : $user['memberFileName'];
                                                         ?>
                                                         <img src="<?= $fileUrl . $profileImagePath; ?>" width="58" height="58" alt="<?= htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?>">

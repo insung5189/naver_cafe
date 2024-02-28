@@ -183,24 +183,31 @@ $GLOBALS['pageResources'] = [
                     <div class="article-commment-box">
                         <div class="comment-sort-box">
                             <h3 class="comment-subject">댓글</h3>
-                            <a href="#" class="comment-sort-option" data-sort="ASC" data-article-id="<?= $article->getId() ?>">
+                            <a href="#" id="sort-asc-btn" class="sort-btn-active" data-sort="ASC" data-article-id="<?= $article->getId() ?>">
                                 <div class="create-date-asc-btn">
                                     등록순
                                 </div>
                             </a>
-                            <a href="#" class="comment-sort-option" data-sort="DESC" data-article-id="<?= $article->getId() ?>">
+                            <a href="#" id="sort-desc-btn" class="sort-btn-deactivate" data-sort="DESC" data-article-id="<?= $article->getId() ?>">
                                 <div class="create-date-desc-btn">
                                     최신순
                                 </div>
                             </a>
+                            <label class="depth-option-checkbox">
+                                <input type="checkbox" id="depthOptionCheckbox" data-article-id="<?= $article->getId() ?>"> depth별 정렬
+                            </label>
+                            <label class="tree-option-checkbox">
+                                <input type="checkbox" id="treeOptionCheckbox" data-article-id="<?= $article->getId() ?>"> 트리구조 정렬
+                            </label>
                         </div>
                     </div>
                 </div>
                 <div class="comment-foreach-box">
                     <ul>
-                        <? if (isset($comments)) : ?>
+                        <? if (isset($comments) && !empty($comments)) : ?>
                             <? foreach ($comments as $comment) : ?>
                                 <?
+                                $commentImageName = $comment->getCommentFileName() ? htmlspecialchars($comment->getCommentFileName(), ENT_QUOTES, 'UTF-8') : '';
                                 $styleAttributes = '';
 
                                 if ($comment->getDepth() > 0) {
@@ -244,7 +251,7 @@ $GLOBALS['pageResources'] = [
                                                     <i class="fa-solid fa-xl fa-ellipsis-vertical"></i>
                                                 </a>
                                                 <div class="comment-edit-and-delete-btn-box" style="display:none;" id="comment-edit-delete-toggle-box">
-                                                    <a href="javascript:void(0);" class="comment-edit-btn">
+                                                    <a href="javascript:void(0);" class="comment-edit-btn" data-comment-image-url="<?= $commentFileUrl . $commentImageName; ?>" data-edited-comment-id="<?= $comment->getId(); ?>" data-comment-content="<?= htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8'); ?>">
                                                         수정
                                                     </a>
                                                     <a href="javascript:void(0);" class="comment-delete-btn" data-delete-comment-id="<?= $comment->getId(); ?>">
@@ -264,12 +271,9 @@ $GLOBALS['pageResources'] = [
                                             </span>
                                         </p>
                                         <!-- 댓글 컨텐츠 이미지 -->
-                                        <?
-                                        $commentImageName = $comment->getCommentFileName() ? htmlspecialchars($comment->getCommentFileName(), ENT_QUOTES, 'UTF-8') : '';
-                                        ?>
                                         <? if (!empty($commentImageName)) : ?>
                                             <div>
-                                                <img src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
+                                                <img id="uploadedImage" src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
                                             </div>
                                         <? endif; ?>
                                         <div class="comment-info-box" id="comment-reply-<?= $comment->getId(); ?>">
@@ -280,6 +284,7 @@ $GLOBALS['pageResources'] = [
                                                 <a href="javascript:void(0);" class="create-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">
                                                     답글쓰기
                                                 </a>
+                                                <span class="text-end">depth : <?= $comment->getDepth() ?></span>
                                                 <div class="session-comment-reply-write-box" id="reply-comment" style="display:none;">
                                                     <form action="/article/articledetailcontroller/createReply" method="POST" enctype="multipart/form-data">
                                                         <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
@@ -290,7 +295,7 @@ $GLOBALS['pageResources'] = [
 
                                                         <div class="comment-writer">
 
-                                                            <div class="name-and-textarea" id="comment-reply-">
+                                                            <div class="name-and-textarea">
 
                                                                 <div class="nickname-and-text-caculate">
 
@@ -306,7 +311,7 @@ $GLOBALS['pageResources'] = [
                                                                 <div class="comment-img-preview" id="imgPreviewReply" data-img-preview-reply-id="<?= $comment->getId(); ?>">
                                                                 </div>
 
-                                                                <div class="comment-reply-img-file-upload-ico">
+                                                                <div class="comment-edit-img-file-upload-ico">
 
                                                                     <label for="commentImageReply-<?= $comment->getId(); ?>" class="upload-ico">
                                                                         <i class="fa-solid fa-lg fa-camera"></i>
@@ -329,6 +334,52 @@ $GLOBALS['pageResources'] = [
                                         </div>
                                     </div>
                                     <hr class="comment-hr-line">
+                                    <? if (isset($user) && $user['user_id'] === $comment->getMember()->getId()) : ?>
+                                        <div class="comment-edited-form-box" style="display: none;">
+                                            <form action="/article/articledetailcontroller/editComment/<?= $comment->getId(); ?>" method="POST" enctype="multipart/form-data">
+                                                <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
+                                                <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
+
+                                                <div class="comment-writer">
+
+                                                    <div class="name-and-textarea">
+
+                                                        <div class="nickname-and-text-caculate">
+
+                                                            <div class="session-comment-reply-author-nickname">
+                                                                <?= isset($user['nickName']) ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+                                                            </div>
+                                                            <div class="text-caculate-reply" data-text-calculate-reply-id="<?= $comment->getId(); ?>" style="display:none;">0 / 3000</div>
+
+                                                        </div>
+
+                                                        <textarea class="comment-text-area-edit" name="commentEditContent" maxlength="3000" data-comment-reply-id="<?= $comment->getId(); ?>"><?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
+
+                                                        <div class="comment-edit-img-preview" id="imgPreviewEdit" data-img-preview-edit-id="<?= $comment->getId(); ?>">
+                                                        </div>
+
+                                                        <div class="comment-edit-img-file-upload-ico">
+
+                                                            <label for="commentImageEdit-<?= $comment->getId(); ?>" class="upload-ico">
+                                                                <i class="fa-solid fa-lg fa-camera"></i>
+                                                            </label>
+
+                                                            <input type="file" name="commentImageEdit" id="commentImageEdit-<?= $comment->getId(); ?>" data-comment-image-edit-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+
+                                                            <div class="comment-submit-btn">
+                                                                <a href="javascript:void(0);" class="cancel-comment-edit-btn" data-comment-edited-cancel-id="<?= $comment->getId(); ?>">취소</a>
+                                                                <input type="submit" value="등록">
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </form>
+                                        </div>
+                                    <? else : ?>
+                                        <div></div>
+                                    <? endif; ?>
                                 </li>
                             <? endforeach; ?>
                         <? endif; ?>

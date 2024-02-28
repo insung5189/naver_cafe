@@ -1,18 +1,35 @@
+<?
+$GLOBALS['pageResources'] = [
+    'css' => ['/assets/css/article/articleDetailView.css'],
+    'js' => ['/assets/js/article/articleDetailView.js']
+];
+?>
+
 <? if (isset($article)) : ?>
     <? if (isset($comments) && !empty($comments)) : ?>
+
+
+
+
+
+
         <? foreach ($comments as $comment) : ?>
             <?
+            $styleAttributes = '';
+
+            if ($comment->getDepth() > 0) {
+                $styleAttributes .= 'padding-left: 50px;';
+            }
+
             $interval = date_diff($comment->getCreateDate(), new DateTime());
 
-            // 차이가 1분 이내인지 확인
             if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
-                $backgroundColor = 'style="background-color: #ffffe0;"';
-            } else {
-                $backgroundColor = '';
+                $styleAttributes .= ' background-color: #ffffe0;';
             }
-            ?>
-            <li id="comment-<?= $comment->getId(); ?>" <?= $backgroundColor ?>>
 
+            $styleAttribute = !empty($styleAttributes) ? 'style="' . $styleAttributes . '"' : '';
+            ?>
+            <li id="comment-<?= $comment->getId(); ?>" <?= $styleAttribute ?>>
                 <div class="comment-author-action-box">
                     <div class="comment-author-box">
                         <!-- 사용자 프로필 이미지 -->
@@ -44,7 +61,7 @@
                                 <a href="javascript:void(0);" class="comment-edit-btn">
                                     수정
                                 </a>
-                                <a href="javascript:void(0);" class="comment-delete-btn">
+                                <a href="javascript:void(0);" class="comment-delete-btn" data-delete-comment-id="<?= $comment->getId(); ?>">
                                     삭제
                                 </a>
                             </div>
@@ -69,34 +86,57 @@
                             <img src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
                         </div>
                     <? endif; ?>
-                    <div class="comment-info-box">
+                    <div class="comment-info-box" id="comment-reply-<?= $comment->getId(); ?>">
                         <span>
                             <?= $comment->getModifyDate() ? $comment->getModifyDate()->format('Y.m.d H:i') : $comment->getCreateDate()->format('Y.m.d H:i'); ?>
                         </span>
                         <? if (isset($user) && !empty($user)) : ?>
-                            <a href="/해당댓글_답글쓰기 링크">
+                            <a href="javascript:void(0);" class="create-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">
                                 답글쓰기
                             </a>
+                            <span class="text-end">depth : <?=$comment->getDepth()?></span>
                             <div class="session-comment-reply-write-box" id="reply-comment" style="display:none;">
-                                <form action="/댓글_작성하는_URL">
+                                <form action="/article/articledetailcontroller/createReply" method="POST" enctype="multipart/form-data">
+                                    <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
+                                    <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
+                                    <input type="hidden" name="depth" value="<?= $comment->getDepth() + 1 ?>">
+                                    <input type="hidden" name="parentId" value="<?= $comment->getId() ?>">
+                                    <input type="hidden" name="orderGroup" value="<?= $comment->getOrderGroup() ?>">
+
                                     <div class="comment-writer">
-                                        <div class="name-and-textarea">
-                                            <div class="session-comment-reply-author-nickname">
-                                                <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+
+                                        <div class="name-and-textarea" id="comment-reply-">
+
+                                            <div class="nickname-and-text-caculate">
+
+                                                <div class="session-comment-reply-author-nickname">
+                                                    <?= $user['nickName'] ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
+                                                </div>
+                                                <div class="text-caculate-reply" data-text-calculate-reply-id="<?= $comment->getId(); ?>" style="display:none;">0 / 3000</div>
+
                                             </div>
-                                            <textarea class="comment-text-area" name="" id="" cols="30" rows="10" placeholder="답글을 남겨보세요"></textarea>
+
+                                            <textarea class="comment-text-area-reply" name="content" placeholder="답글을 남겨보세요" maxlength="3000" data-comment-reply-id="<?= $comment->getId(); ?>"></textarea>
+
+                                            <div class="comment-img-preview" id="imgPreviewReply" data-img-preview-reply-id="<?= $comment->getId(); ?>">
+                                            </div>
+
+                                            <div class="comment-reply-img-file-upload-ico">
+
+                                                <label for="commentImageReply-<?= $comment->getId(); ?>" class="upload-ico">
+                                                    <i class="fa-solid fa-lg fa-camera"></i>
+                                                </label>
+
+                                                <input type="file" name="commentImage" id="commentImageReply-<?= $comment->getId(); ?>" data-comment-image-reply-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+
+                                                <div class="comment-submit-btn">
+                                                    <a href="javascript:void(0);" class="cancel-comment-reply-btn" data-comment-reply-id="<?= $comment->getId(); ?>">취소</a>
+                                                    <input type="submit" value="등록">
+                                                </div>
+                                            </div>
+
                                         </div>
-                                        <div class="comment-reply-img-file-upload-ico">
-                                            <div class="upload-ico">
-                                                <a href="/댓글_사진_첨부하는_URL">
-                                                    <i class="fa-solid fa-camera"></i>
-                                                </a>
-                                            </div>
-                                            <div class="comment-submit-btn">
-                                                <a href="/댓글에_답글_작성_취소하는_URL">취소</a>
-                                                <input type="submit" value="등록">
-                                            </div>
-                                        </div>
+
                                     </div>
                                 </form>
                             </div>
@@ -106,6 +146,10 @@
                 <hr class="comment-hr-line">
             </li>
         <? endforeach; ?>
+
+
+
+
     <? elseif (!isset($comments)) : ?>
         <p>댓글 정보를 불러오는데 실패했습니다.</p>
     <? elseif (!isset($user)) : ?>
