@@ -271,35 +271,32 @@ $(document).ready(function () {
         var commentId = $(this).data('edited-comment-id');
         var existingImageUrl = $(this).data('comment-image-url');
 
-        // 이미지 URL이 존재하면, 미리보기 영역에 이미지를 표시
-        if (existingImageUrl === "/assets/file/commentFiles/img/") {
-            var previewHtml = '';
-            $('[data-img-preview-edit-id="' + commentId + '"]').html(previewHtml);
-        } else if (existingImageUrl !== "/assets/file/commentFiles/img/") {
+        if (!existingImageUrl || existingImageUrl === "/assets/file/commentFiles/img/") {
+            $('[data-img-preview-edit-id="' + commentId + '"]').empty();
+        } else {
             var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + existingImageUrl + '" style="max-width: 54px; max-height: 54px;"></a>';
             $('[data-img-preview-edit-id="' + commentId + '"]').html(previewHtml);
-        } else {
-            var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="" style="max-width: 54px; max-height: 54px;"></a>';
-            $('[data-img-preview-edit-id="' + commentId + '"]').html(previewHtml);
         }
-        $('#comment-' + commentId + ' .comment-author-action-box').hide(); // 기존 내용 숨기기
-        $('#comment-' + commentId + ' .comment-content-area').hide(); // 기존 내용 숨기기
-        $('#comment-' + commentId + ' .comment-edited-form-box').show(); // 수정 폼 표시
+
+        $('#comment-' + commentId + ' .comment-author-action-box').hide();
+        $('#comment-' + commentId + ' .comment-content-area').hide();
+        $('#comment-' + commentId + ' .comment-edited-form-box').show();
     });
 
     $('body').on('click', '[data-comment-edited-cancel-id]', function () {
         var commentId = $(this).data('comment-edited-cancel-id');
-        $('#comment-' + commentId + ' .comment-author-action-box').show(); // 기존 내용 숨기기
-        $('#comment-' + commentId + ' .comment-content-area').show(); // 기존 내용 숨기기
-        $('#comment-' + commentId + ' .comment-edited-form-box').hide(); // 수정 폼 표시
+        $('#comment-' + commentId + ' .comment-author-action-box').show();
+        $('#comment-' + commentId + ' .comment-content-area').show();
+        $('#comment-' + commentId + ' .comment-edited-form-box').hide();
     });
 
     // 댓글/답글 수정
-    $('.comment-edit-form form').on('submit', function (e) {
+    $('.comment-edited-form-box form').on('submit', function (e) {
         e.preventDefault();
 
-        var formData = new FormData(this); // 폼 데이터 수집
-        var commentId = $(this).data('edited-comment-id');
+        var form = $(this);
+        var formData = new FormData(this);
+        var commentId = form.data('update-comment-id');
 
         $.ajax({
             url: `/article/articledetailcontroller/editComment/` + commentId,
@@ -308,7 +305,30 @@ $(document).ready(function () {
             contentType: false,
             processData: false,
             success: function (response) {
-                alert('댓글이 성공적으로 수정되었습니다.');
+                var data = JSON.parse(response);
+                if (data.success) {
+                    // 댓글 내용 업데이트
+                    $('#comment-content-' + commentId).text(data.content || form.find('[name="commentEditContent"]').val());
+
+                    // 첨부 이미지가 있다면 이미지 업데이트
+                    if (data.commentFileName) {
+                        var imagePath = '/assets/file/commentFiles/img/' + data.commentFileName;
+                        $('#uploadedImage-' + commentId).attr('src', imagePath);
+                    } else {
+                        $(' #uploadedImage-' + commentId).remove();
+                        $('[data-img-preview-edit-id="' + commentId + '"] a').remove();
+                    }
+
+                    // 수정 폼 숨기기 및 기타 UI 요소 표시
+                    $('#comment-' + commentId + ' .comment-edited-form-box').hide();
+                    $('#comment-' + commentId + ' .comment-author-action-box').show();
+                    $('#comment-' + commentId + ' .comment-content-area').show();
+
+                    $('#comment-' + commentId + ' .comment-edit-btn').data('comment-image-url', imagePath);
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
             },
             error: function () {
                 alert('댓글 수정에 실패했습니다.');
@@ -316,38 +336,64 @@ $(document).ready(function () {
         });
     });
 
-
-
-
-
+    
     // 수정할 댓/답글 파일등록 미리보기
+    // $('body').on('change', '[data-comment-image-edit-id]', function () {
+    //     var commentEditId = $(this).data('comment-image-edit-id');
+    //     var commentUploadedImg = $(this).data('comment-uploaded-image');
+    //     if (this.files && this.files[0]) {
+    //         var reader = new FileReader();
+
+    //         reader.onload = function (e) {
+    //             if (!e.target.result) {
+    //                 var editImgSrc = "";
+    //             } else {
+    //                 var editImgSrc = e.target.result;
+    //             }
+    //             var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap-edit"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + editImgSrc + '" style="max-width: 54px; max-height: 54px;"></a>';
+    //             $('[data-img-preview-edit-id="' + commentEditId + '"]').html(previewHtml);
+    //         };
+
+    //         if (this.files[0]) {
+    //             reader.readAsDataURL(this.files[0]);
+    //         }
+    //     }
+    // });
+
+    // 이미지 첨부 input 변경 시 미리보기 생성
     $('body').on('change', '[data-comment-image-edit-id]', function () {
+        var reader = new FileReader();
         var commentEditId = $(this).data('comment-image-edit-id');
-        var commentUploadedImg = $(this).data('comment-uploaded-image');
+        var previewContainer = $('[data-img-preview-edit-id="' + commentEditId + '"]');
+
         if (this.files && this.files[0]) {
-            var reader = new FileReader();
-
             reader.onload = function (e) {
-                if (!e.target.result) {
-                    var editImgSrc = "";
-                } else {
-                    var editImgSrc = e.target.result;
-                }
-                var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap-edit"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + editImgSrc + '" style="max-width: 54px; max-height: 54px;"></a>';
-                $('[data-img-preview-edit-id="' + commentEditId + '"]').html(previewHtml);
+                var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap-edit"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + e.target.result + '" style="max-width: 54px; max-height: 54px;"></a>';
+                previewContainer.html(previewHtml);
             };
-
-            if (this.files[0]) {
-                reader.readAsDataURL(this.files[0]);
-            }
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            // 파일이 선택되지 않았을 경우 미리보기 컨테이너를 비웁니다.
+            previewContainer.empty();
         }
     });
 
+
+    // 수정할 댓/답글 첨부이미지 리셋
+    // $('body').on('click', '[data-img-preview-edit-id]', function () {
+    //     var commentEditId = $(this).data('img-preview-edit-id');
+    //     $(this).empty();
+    //     var fileInput = $('#commentImageEdit' + commentEditId);
+    //     fileInput.replaceWith(fileInput.val('').clone(true));
+    // });
+
     // 수정할 댓/답글 첨부이미지 리셋
     $('body').on('click', '[data-img-preview-edit-id]', function () {
-        var commentEditId = $(this).data('img-preview-edit-id');
-        $(this).empty();
-        $('[data-comment-image-edit-id="' + commentEditId + '"]').val('');
+        var commentEditId = $(this).parent().data('img-preview-edit-id');
+        // 첨부파일 input 선택자 수정
+        var fileInput = $('[data-comment-image-edit-id="' + commentEditId + '"]');
+        fileInput.replaceWith(fileInput.val('').clone(true));
+        $(this).remove(); // 미리보기 이미지 삭제
     });
 
     // 댓글/답글 삭제

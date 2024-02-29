@@ -393,6 +393,14 @@ h1 {
 .comment-content-area {
     margin-left: 66px;
     margin-top: -20px;
+    width: 85%;
+}
+
+.comment-content-box {
+    overflow: auto;
+    word-break: break-all;
+    word-wrap: break-word;
+    vertical-align: top;
 }
 
 .comment-content-area img {

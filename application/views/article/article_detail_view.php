@@ -266,14 +266,14 @@ $GLOBALS['pageResources'] = [
 
                                     <div class="comment-content-area">
                                         <p>
-                                            <span>
+                                            <span id="comment-content-<?= $comment->getId() ?>" class="comment-content-box">
                                                 <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                             </span>
                                         </p>
                                         <!-- 댓글 컨텐츠 이미지 -->
                                         <? if (!empty($commentImageName)) : ?>
-                                            <div>
-                                                <img id="uploadedImage" src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
+                                            <div id="comment-content-<?= $comment->getId(); ?>">
+                                                <img id="uploadedImage-<?= $comment->getId(); ?>" src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
                                             </div>
                                         <? endif; ?>
                                         <div class="comment-info-box" id="comment-reply-<?= $comment->getId(); ?>">
@@ -333,10 +333,10 @@ $GLOBALS['pageResources'] = [
                                             <? endif; ?>
                                         </div>
                                     </div>
-                                    <hr class="comment-hr-line">
+
                                     <? if (isset($user) && $user['user_id'] === $comment->getMember()->getId()) : ?>
                                         <div class="comment-edited-form-box" style="display: none;">
-                                            <form action="/article/articledetailcontroller/editComment/<?= $comment->getId(); ?>" method="POST" enctype="multipart/form-data">
+                                            <form action="/article/articledetailcontroller/editComment/<?= $comment->getId(); ?>" method="POST" enctype="multipart/form-data" data-update-comment-id="<?= $comment->getId(); ?>">
                                                 <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                                                 <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
 
@@ -364,7 +364,7 @@ $GLOBALS['pageResources'] = [
                                                                 <i class="fa-solid fa-lg fa-camera"></i>
                                                             </label>
 
-                                                            <input type="file" name="commentImageEdit" id="commentImageEdit-<?= $comment->getId(); ?>" data-comment-image-edit-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
+                                                            <input type="file" name="commentImage" id="commentImageEdit-<?= $comment->getId(); ?>" data-comment-image-edit-id="<?= $comment->getId(); ?>" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" style="display: none;">
 
                                                             <div class="comment-submit-btn">
                                                                 <a href="javascript:void(0);" class="cancel-comment-edit-btn" data-comment-edited-cancel-id="<?= $comment->getId(); ?>">취소</a>
@@ -380,6 +380,7 @@ $GLOBALS['pageResources'] = [
                                     <? else : ?>
                                         <div></div>
                                     <? endif; ?>
+                                    <hr class="comment-hr-line">
                                 </li>
                             <? endforeach; ?>
                         <? endif; ?>

@@ -372,7 +372,7 @@
                                 </ul>
 
                                 <!-- 최근댓,답글 페이지네이션 페이지 컨트롤러 -->
-                                <div class="pagination">
+                                <div class="latest-article-pagination">
                                     <span class="pagination-prev">⏪이전</span>
                                     <span class="pagination-separator">ㅣ</span>
                                     <span class="pagination-next">다음⏩</span>

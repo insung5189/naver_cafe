@@ -267,24 +267,51 @@ class ArticleDetailModel extends CI_Model
 
     public function processEditComment($commentId, $formData)
     {
-        $queryBuilder = $this->em->createQueryBuilder();
+        $errorData = ['errors' => []];
 
+        $this->processCommentImage($formData, $errorData);
+
+        if (!empty($errorData['errors'])) {
+            return ['success' => false, 'errors' => $errorData['errors']];
+        }
+
+        $queryBuilder = $this->em->createQueryBuilder();
         $query = $queryBuilder->update('Models\Entities\Comment', 'c')
             ->set('c.content', ':content')
             ->set('c.modifyDate', ':modifyDate')
             ->where('c.id = :commentId')
             ->andWhere('c.member = :memberId')
+            ->andWhere('c.article = :articleId')
             ->setParameter('content', $formData['content'])
             ->setParameter('modifyDate', new \DateTime())
             ->setParameter('commentId', $commentId)
             ->setParameter('memberId', $formData['memberId'])
-            ->getQuery();
+            ->setParameter('articleId', $formData['articleId']);
+
+        if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
+            $query->set('c.commentFilePath', ':commentFilePath')
+                ->set('c.commentFileName', ':commentFileName')
+                ->setParameter('commentFilePath', $formData['commentFilePath'])
+                ->setParameter('commentFileName', $formData['commentFileName']);
+        } else {
+            $query->set('c.commentFilePath', ':commentFilePath')
+                ->set('c.commentFileName', ':commentFileName')
+                ->setParameter('commentFilePath', NULL)
+                ->setParameter('commentFileName', NULL);
+        }
 
         try {
-            $result = $query->execute();
+            $result = $query->getQuery()->execute();
 
             if ($result > 0) {
-                return ['success' => true, 'message' => '댓글이 성공적으로 수정되었습니다.'];
+                $response = ['success' => true, 'message' => '댓글이 수정되었습니다.'];
+
+                if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
+                    $response['commentFilePath'] = $formData['commentFilePath'];
+                    $response['commentFileName'] = $formData['commentFileName'];
+                }
+                $response['content'] = $formData['content'];
+                return $response;
             } else {
                 return ['success' => false, 'message' => '댓글 수정 권한이 없거나 댓글이 존재하지 않습니다.'];
             }
@@ -295,16 +322,17 @@ class ArticleDetailModel extends CI_Model
 
     public function processDeleteComment($commentId, $memberId)
     {
-        try {
-            $queryBuilder = $this->em->createQueryBuilder();
-            $query = $queryBuilder->delete('Models\Entities\Comment', 'c')
-                ->where('c.id = :commentId')
-                ->andWhere('c.member = :memberId')
-                ->setParameter('commentId', $commentId)
-                ->setParameter('memberId', $memberId)
-                ->getQuery();
+        $queryBuilder = $this->em->createQueryBuilder();
+        $query = $queryBuilder->delete('Models\Entities\Comment', 'c')
+            ->where('c.id = :commentId')
+            ->andWhere('c.member = :memberId')
+            ->setParameter('commentId', $commentId)
+            ->setParameter('memberId', $memberId)
+            ->getQuery();
 
+        try {
             $result = $query->execute();
+
             return ['success' => true, 'deletedCount' => $result];
         } catch (\Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];

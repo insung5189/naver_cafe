@@ -55,6 +55,33 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
+    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle)
+    {
+        $memberPrflFileUrl = "/assets/file/images/memberImgs/";
+        $commentFileUrl = "/assets/file/commentFiles/img/";
+
+        $page_view_data = [
+            'title' => '글 상세보기',
+            'article' => $article,
+            'comments' => $comments,
+            'user' => $user,
+            'articleFilesInfo' => $articleFilesInfo,
+            'likeCountByArticle' => $likeCountByArticle,
+            'memberPrflFileUrl' => $memberPrflFileUrl,
+            'commentFileUrl' => $commentFileUrl,
+        ];
+        $this->layout->view('article/article_detail_view', $page_view_data);
+    }
+
+    private function loadErrorView()
+    {
+        $page_view_data = [
+            'title' => '오류 발생',
+            'message' => '접근 권한이 없습니다.',
+        ];
+        $this->layout->view('errors/error_page', $page_view_data);
+    }
+
     public function increaseHitCount()
     {
         $articleId = $this->input->post('articleId');
@@ -179,31 +206,33 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
-    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle)
+    public function editComment($commentId)
     {
-        $memberPrflFileUrl = "/assets/file/images/memberImgs/";
-        $commentFileUrl = "/assets/file/commentFiles/img/";
-
-        $page_view_data = [
-            'title' => '글 상세보기',
-            'article' => $article,
-            'comments' => $comments,
-            'user' => $user,
-            'articleFilesInfo' => $articleFilesInfo,
-            'likeCountByArticle' => $likeCountByArticle,
-            'memberPrflFileUrl' => $memberPrflFileUrl,
-            'commentFileUrl' => $commentFileUrl,
+        $formData = [
+            'content' => $this->input->post('commentEditContent', TRUE),
+            'articleId' => $this->input->post('articleId', TRUE),
+            'memberId' => $this->input->post('memberId', TRUE),
+            'file' => $_FILES['commentImage'] ?? null
         ];
-        $this->layout->view('article/article_detail_view', $page_view_data);
-    }
 
-    private function loadErrorView()
-    {
-        $page_view_data = [
-            'title' => '오류 발생',
-            'message' => '접근 권한이 없습니다.',
-        ];
-        $this->layout->view('errors/error_page', $page_view_data);
+        if (!isset($_SESSION['user_data'])) {
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            return;
+        }
+
+        if (empty($formData['content']) && empty($formData['file']['name'])) {
+            echo json_encode(['success' => false, 'message' => '댓글 내용이나 파일을 첨부해주세요.']);
+            return;
+        }
+
+        // 모델의 댓글 수정 메서드 호출
+        $result = $this->ArticleDetailModel->processEditComment($commentId, $formData);
+
+        if ($result['success']) {
+            echo json_encode($result);
+        } else {
+            echo json_encode(['success' => false, 'message' => $result['message']]);
+        }
     }
 
     public function deleteComment($commentId)
@@ -224,29 +253,6 @@ class ArticleDetailController extends MY_Controller
             }
         } else {
             echo json_encode(['success' => false, 'message' => '댓글 삭제 중 오류가 발생했습니다.', 'error' => $result['error']]);
-        }
-    }
-
-    public function editComment($commentId)
-    {
-        $formData = [
-            'content' => $this->input->post('content', TRUE),
-            'memberId' => $this->input->post('memberId', TRUE),
-            'file' => $_FILES['commentImageEdit'] ?? null
-        ];
-
-        if (!isset($_SESSION['user_data'])) {
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-            return;
-        }
-
-        // 모델의 댓글 수정 메서드 호출
-        $result = $this->ArticleDetailModel->processEditComment($commentId, $formData);
-
-        if ($result['success']) {
-            echo json_encode(['success' => true, 'message' => '댓글이 수정되었습니다.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => $result['message']]);
         }
     }
 }
