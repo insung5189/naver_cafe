@@ -266,7 +266,6 @@ $(document).ready(function () {
     // 댓/답글 수정 js
 
     // 댓/답글 수정 폼 토글
-    // $('.comment-edit-toggle').on('click', function () {
     $('body').on('click', '[data-edited-comment-id]', function () {
         var commentId = $(this).data('edited-comment-id');
         var existingImageUrl = $(this).data('comment-image-url');
@@ -313,9 +312,12 @@ $(document).ready(function () {
                     // 첨부 이미지가 있다면 이미지 업데이트
                     if (data.commentFileName) {
                         var imagePath = '/assets/file/commentFiles/img/' + data.commentFileName;
-                        $('#uploadedImage-' + commentId).attr('src', imagePath);
+                        var previewHtml = '<img id="uploadedImage-' + commentId + '" src="' + imagePath + '" alt="댓글 첨부사진">';
+                        $('#comment-content-img-' + commentId).html(previewHtml);
+                        $('#comment-' + commentId + ' .comment-edit-btn').data('comment-image-url', imagePath);
                     } else {
-                        $(' #uploadedImage-' + commentId).remove();
+                        $('#comment-' + commentId + ' .comment-edit-btn').data('comment-image-url', '');
+                        $('#uploadedImage-' + commentId).remove();
                         $('[data-img-preview-edit-id="' + commentId + '"] a').remove();
                     }
 
@@ -324,7 +326,6 @@ $(document).ready(function () {
                     $('#comment-' + commentId + ' .comment-author-action-box').show();
                     $('#comment-' + commentId + ' .comment-content-area').show();
 
-                    $('#comment-' + commentId + ' .comment-edit-btn').data('comment-image-url', imagePath);
                     alert(data.message);
                 } else {
                     alert(data.message);
@@ -336,7 +337,7 @@ $(document).ready(function () {
         });
     });
 
-    
+
     // 수정할 댓/답글 파일등록 미리보기
     // $('body').on('change', '[data-comment-image-edit-id]', function () {
     //     var commentEditId = $(this).data('comment-image-edit-id');
@@ -368,7 +369,7 @@ $(document).ready(function () {
 
         if (this.files && this.files[0]) {
             reader.onload = function (e) {
-                var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap-edit"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + e.target.result + '" style="max-width: 54px; max-height: 54px;"></a>';
+                var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + e.target.result + '" style="max-width: 54px; max-height: 54px;"></a>';
                 previewContainer.html(previewHtml);
             };
             reader.readAsDataURL(this.files[0]);
@@ -377,7 +378,6 @@ $(document).ready(function () {
             previewContainer.empty();
         }
     });
-
 
     // 수정할 댓/답글 첨부이미지 리셋
     // $('body').on('click', '[data-img-preview-edit-id]', function () {
@@ -389,11 +389,11 @@ $(document).ready(function () {
 
     // 수정할 댓/답글 첨부이미지 리셋
     $('body').on('click', '[data-img-preview-edit-id]', function () {
-        var commentEditId = $(this).parent().data('img-preview-edit-id');
+        var commentEditId = $(this).data('img-preview-edit-id');
         // 첨부파일 input 선택자 수정
         var fileInput = $('[data-comment-image-edit-id="' + commentEditId + '"]');
         fileInput.replaceWith(fileInput.val('').clone(true));
-        $(this).remove(); // 미리보기 이미지 삭제
+        $('.img-preview-wrap').remove(); // 미리보기 이미지 삭제
     });
 
     // 댓글/답글 삭제

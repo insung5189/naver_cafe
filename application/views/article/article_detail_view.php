@@ -272,8 +272,8 @@ $GLOBALS['pageResources'] = [
                                         </p>
                                         <!-- 댓글 컨텐츠 이미지 -->
                                         <? if (!empty($commentImageName)) : ?>
-                                            <div id="comment-content-<?= $comment->getId(); ?>">
-                                                <img id="uploadedImage-<?= $comment->getId(); ?>" src="<?= $commentFileUrl . $commentImageName; ?>" alt="<?= '댓글 첨부사진' ?>">
+                                            <div id="comment-content-img-<?= $comment->getId(); ?>">
+                                                <img id="uploadedImage-<?= $comment->getId(); ?>" src="<?= $commentFileUrl . $commentImageName; ?>" alt="댓글 첨부사진">
                                             </div>
                                         <? endif; ?>
                                         <div class="comment-info-box" id="comment-reply-<?= $comment->getId(); ?>">
