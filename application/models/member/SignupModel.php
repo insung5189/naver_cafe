@@ -61,7 +61,7 @@ class SignupModel extends CI_Model
             return ['success' => true, 'errors' => []];
         } catch (\Exception $e) {
             log_message('error', '회원 가입 실패: ' . $e->getMessage());
-            return ['success' => false, 'errors' => ['general' => '회원 가입 중 오류가 발생했습니다.']];
+            return ['success' => false, 'errors' => ['message' => '회원 가입 중 오류가 발생했습니다.']];
         }
     }
 

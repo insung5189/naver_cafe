@@ -41,6 +41,12 @@ class FindAccountController extends MY_Controller
         $this->layout->view('member/find_email_result', $page_view_data);
     }
 
+    public function modifyPassword()
+    {
+        $page_view_data['title'] = '비밀번호 변경';
+        $this->layout->view('member/modify_password', $page_view_data);
+    }
+
     public function processFindPassword()
     {
         $formData = [
@@ -58,10 +64,30 @@ class FindAccountController extends MY_Controller
                 'resetMemberEmail' => $user->getUserName(),
                 'resetMemberCreateDate' => $user->getCreateDate()->format('Y-m-d')
             ]);
-            redirect('/member/mypagecontroller/modifypassword');
+            redirect('/member/findaccountcontroller/modifypassword');
         } else {
             $this->session->set_flashdata('error', '일치하는 회원이 없습니다.');
             redirect('/member/findaccountcontroller');
+        }
+    }
+
+    public function processModifyPassword()
+    {
+        $userData = [
+            'userId' => $this->session->userdata('resetMemberId'),
+            'newPassword' => $this->input->post('newpassword'),
+            'newPasswordConfirm' => $this->input->post('newpasswordcf'),
+        ];
+
+        $result = $this->FindAccountModel->updatePassword($userData);
+        if ($result['success']) {
+            $this->session->unset_userdata(['resetMemberId', 'resetMemberEmail', 'resetMemberCreateDate']);
+            $this->session->set_userdata('passwordChanged', true);
+            redirect('/member/findaccountcontroller/modifyPasswordDone');
+        } else {
+            $page_view_data['title'] = '비밀번호 변경';
+            $page_view_data['errors'] = $result['errors'];
+            $this->layout->view('member/modify_password', $page_view_data);
         }
     }
 
@@ -84,7 +110,7 @@ class FindAccountController extends MY_Controller
             }
 
             echo json_encode(['success' => true]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }

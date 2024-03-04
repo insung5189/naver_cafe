@@ -48,7 +48,7 @@ class ArticleEditController extends MY_Controller
             $this->ArticleEditModel->createArticle($formData);
 
             redirect('/');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $errorMessage = $e->getMessage();
             log_message('error', $errorMessage);
             show_error($errorMessage);

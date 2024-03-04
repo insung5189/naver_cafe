@@ -11,25 +11,39 @@ class MypageModel extends CI_Model
         $this->em = $this->doctrine->em;
     }
 
-    public function updatePassword($userId, $oldPassword, $newPassword)
+    public function updatePassword($userData)
     {
         try {
-            $user = $this->em->getRepository('Models\Entities\Member')->find($userId);
+            $user = $this->em->getRepository('Models\Entities\Member')->find($userData['userId']);
             if (!$user) {
-                throw new Exception('사용자를 찾을 수 없습니다.');
+                return ['success' => false, 'errors' => ['notFound' => '사용자를 찾을 수 없습니다.']];
             }
 
-            if (!password_verify($oldPassword, $user->getPassword())) {
-                throw new Exception('기존 비밀번호가 일치하지 않습니다.');
+            if (!password_verify($userData['oldPassword'], $user->getPassword())) {
+                return ['success' => false, 'errors' => ['valid' => '기존 비밀번호가 일치하지 않습니다.']];
             }
 
-            $user->setPassword(password_hash($newPassword, PASSWORD_DEFAULT));
+            $regex = '/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).{8,}$/';
+
+            if (!preg_match($regex, $userData['newPassword'])) {
+                return ['success' => false, 'errors' => ['valid' => '신규 비밀번호는 영문, 숫자, 특수문자를 포함한 8글자 이상이어야 합니다.']];
+            }
+
+            if (password_verify($userData['oldPassword'], $user->getPassword())) {
+                return ['success' => false, 'errors' => ['valid' => '기존에 사용하던 비밀번호는 사용하실 수 없습니다.']];
+            }
+
+            if ($userData['newPassword'] !== $userData['newPasswordConfirm']) {
+                return ['success' => false, 'errors' => ['valid' => '신규 비밀번호와 비밀번호 확인이 일치하지 않습니다.']];
+            }
+
+            $user->setPassword(password_hash($userData['newPassword'], PASSWORD_DEFAULT));
             $this->em->flush();
 
-            return true;
-        } catch (Exception $e) {
+            return ['success' => true, 'errors' => []];
+        } catch (\Exception $e) {
             log_message('error', '비밀번호 변경 오류: ' . $e->getMessage());
-            return false;
+            return ['success' => false, 'errors' => ['message' => '비밀번호 변경 중 오류가 발생했습니다.']];
         }
     }
 }

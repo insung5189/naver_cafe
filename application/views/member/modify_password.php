@@ -36,10 +36,6 @@ $GLOBALS['pageResources'] = [
                 </div>
             <? endif; ?>
 
-
-            <? if (!empty($this->session->flashdata('error'))) : ?>
-                <div class="error-message center"><? echo $this->session->flashdata('error'); ?></div>
-            <? endif; ?>
             <div class="account-count">
                 <span>귀하의 가입된 계정 내역입니다.</span>
             </div>
@@ -63,33 +59,8 @@ $GLOBALS['pageResources'] = [
 
             <div class="inline">
                 <!-- FindEmailForm -->
-                <form method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword" class="modify-password-form">
+                <form method="POST" action="/member/FindAccountController/processModifyPassword" id="modifyPassword" class="modify-password-form">
                     <div class="form-box">
-                        <div class="field-box">
-                            <div class="label-box">
-                                <label class="label-section" for="oldpassword">
-                                    <span class="label-text">기존 비밀번호</span>
-                                </label>
-                            </div>
-
-                            <div class="input-box">
-                                <input autofocus class="custom-input" maxlength="50" name="oldpassword" id="oldpassword" placeholder="기존 비밀번호를 입력해주세요." type="password" autocomplete="off" required>
-                            </div>
-                        </div>
-
-                        <div class="caption-box">
-                            <div class="label-box">
-                                <div class="label-section">
-                                </div>
-                            </div>
-
-                            <div class="input-box position">
-                                <span class="description" id="oldpassword-validation-message"></span>
-                            </div>
-
-                        </div>
-
-                        <hr>
 
                         <div class="field-box">
                             <div class="label-box">

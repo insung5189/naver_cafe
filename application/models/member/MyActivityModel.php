@@ -12,24 +12,24 @@ class MyActivityModel extends CI_Model
     }
 
     public function getArticleCount($userId) {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('count(a.id)')
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('count(a.id)')
            ->from('Models\Entities\Article', 'a')
            ->where('a.member = :userId')
            ->setParameter('userId', $userId);
         
-        $query = $qb->getQuery();
+        $query = $queryBuilder->getQuery();
         return $query->getSingleScalarResult();
     }
 
     public function getCommentCount($userId) {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('count(c.id)')
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('count(c.id)')
            ->from('Models\Entities\Comment', 'c')
            ->where('c.member = :userId')
            ->setParameter('userId', $userId);
         
-        $query = $qb->getQuery();
+        $query = $queryBuilder->getQuery();
         return $query->getSingleScalarResult();
     }
 

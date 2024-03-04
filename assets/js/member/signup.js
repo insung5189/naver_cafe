@@ -444,7 +444,17 @@ $(document).ready(function () {
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitFormValidation(event) {
-        if (!validateEmail() || !checkPasswordMatch() || !validatePassword() || !validatePhone() || !validateNickname() || !validateFirstName() || !validateLastName() || !validateGenderSelect() || !validateBirthDate() || $('#isUserNameChecked').val() !== 'true' || $('#isNickNameChecked').val() !== 'true') {
+        if (!validateEmail()
+            || !checkPasswordMatch()
+            || !validatePassword()
+            || !validatePhone()
+            || !validateNickname()
+            || !validateFirstName()
+            || !validateLastName()
+            || !validateGenderSelect()
+            || !validateBirthDate()
+            || $('#isUserNameChecked').val() !== 'true'
+            || $('#isNickNameChecked').val() !== 'true') {
             event.preventDefault();
             if (!validateEmail()) {
                 scrollError('userName');

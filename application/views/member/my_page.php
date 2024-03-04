@@ -23,15 +23,6 @@ $GLOBALS['pageResources'] = [
             <p class="page-guide">비밀번호를 변경합니다. 영문, 숫자, 특수문자 포함 8자리 이상으로 구성해주세요.</p>
         </div>
 
-        <? if (!empty($errors)) : ?>
-            <div class="error-messages">
-                <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
-                <? foreach ($errors as $field => $error) : ?>
-                    <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
-                <? endforeach; ?>
-            </div>
-        <? endif; ?>
-
         <? if (isset($_SESSION['user_data'])) : ?>
             <? $user = $_SESSION['user_data']; ?>
             <div class="prfl-box">
@@ -46,11 +37,10 @@ $GLOBALS['pageResources'] = [
 
 
                     <div data-member-img-src="<?= $fileUrl . $profileImagePath; ?>"></div>
-                    <form action="">
+                    <form id="prfl-img-form" action="">
                         <label class="prfl-img-edit" for="member-prfl-img-edit">
                             <input type="file" name="member-prfl-img" id="member-prfl-img-edit" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" hidden>
                         </label>
-
                     </form>
                 </span>
                 <span class="nick-and-info">
@@ -76,19 +66,28 @@ $GLOBALS['pageResources'] = [
                     <div id="member-prfl-file-info">파일 정보가 여기 나오겠지</div>
                     <a href="javascript:void(0);" id="member-prfl-file-remove">이미지 삭제</a>
                 </span>
-                
+
             </div>
+
+            <? if (!empty($errors)) : ?>
+                <div class="error-messages mb-0">
+                    <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                    <? foreach ($errors as $field => $error) : ?>
+                        <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                    <? endforeach; ?>
+                </div>
+            <? endif; ?>
 
             <div class="content-box">
                 <div class="list-style">
                     <div class="sort_area">
-                        <a href="javascript:void(0);" class="link_sort on underline"><span>내 정보 조회 / 수정</span></a>
-                        <a href="javascript:void(0);" class="link_sort"><span>비밀번호 변경</span></a>
+                        <a href="javascript:void(0);" class="link_sort on underline" id="linkToProfileInfo"><span>내 정보 조회 / 수정</span></a>
+                        <a href="javascript:void(0);" class="link_sort" id="linkToChangePassword"><span>비밀번호 변경</span></a>
                     </div>
                 </div>
                 <!-- 내 정보 조회 / 수정 탭 내용 -->
                 <div class="my-profile-info">
-                    <form method="POST" action="/" enctype="multipart/form-data" class="my-page-form">
+                    <form id="prfl-info-form" method="POST" action="/" enctype="multipart/form-data" class="my-page-form">
                         <div class="form-box">
                             <!-- 카페 설명 -->
                             <div class="field-box">
@@ -370,7 +369,8 @@ $GLOBALS['pageResources'] = [
 
                 <div class="inline">
                     <!-- FindEmailForm -->
-                    <form method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword" class="my-page-form">
+                    <form id="prfl-password-form" method="POST" action="/member/MypageController/processModifyPassword" id="modifyPassword" class="my-page-form">
+                        <input type="hidden" name="memberId" id="modifiedPasswordMemberId" value="<?= $user['user_id']; ?>">
                         <div class="form-box">
                             <div class="pw-field-box">
                                 <div class="label-box">

@@ -8,6 +8,10 @@
     font-size: 0.9rem;
 }
 
+.mb-0 {
+    margin-bottom: 0;
+}
+
 .error-messages p {
     margin: 0;
     padding: 5px 0;

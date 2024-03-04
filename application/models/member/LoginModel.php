@@ -13,9 +13,9 @@ class LoginModel extends CI_Model
 
     public function authenticate($formData)
     {
-
         $errorData = ['errors' => []];
 
+        // 중복 세션 체크
         $this->duplicateSession($formData, $errorData);
         if (!empty($errorData['errors'])) {
             return ['success' => false, 'errors' => $errorData['errors']];
@@ -25,86 +25,92 @@ class LoginModel extends CI_Model
             $userRepo = $this->em->getRepository('Models\Entities\Member');
             $user = $userRepo->findOneBy(['userName' => $formData['userName']]);
 
+            // 사용자 존재 여부 체크
             if (!$user) {
-                // 사용자가 존재하지 않는 경우
                 return ['success' => false, 'errors' => ['username' => '존재하지 않는 사용자입니다.']];
             }
 
             // 계정 상태 체크
-            $activeCheck = $this->isActiveCheck($user);
-            $blacklistCheck = $this->blacklistCheck($user);
+            $statusCheck = $this->accountStatusCheck($user);
+            if ($statusCheck) {
+                return $statusCheck;
+            }
 
+            // 비밀번호 검증
             if (!password_verify($formData['password'], $user->getPassword())) {
-                // 비밀번호 검증 실패 시
-                if ($activeCheck) {
-                    return $activeCheck;
-                } else if ($blacklistCheck) {
-                    return $blacklistCheck;
-                }
-
                 $this->incrementLoginAttempt($user->getId());
                 $attemptCount = $this->getLoginAttemptCount($user->getId());
 
                 if ($attemptCount >= 5) {
-                    // 실패 횟수가 5회 이상인 경우 사용자 계정 비활성화
                     $user->setIsActive(false);
                     $this->em->flush();
                     return ['success' => false, 'errors' => ['login' => '비밀번호를 5회 이상 잘못 입력하여 계정이 비활성화 되었습니다.']];
-                } else {
-                    // 실패 횟수가 5회 미만인 경우 경고 메시지
-                    return ['success' => false, 'errors' => ['login' => '비밀번호가 잘못되었습니다. ' . (5 - $attemptCount) . '회 더 시도할 수 있습니다.']];
-                }
-            } else {
-                if ($activeCheck) {
-                    return $activeCheck;
-                } else if ($blacklistCheck) {
-                    return $blacklistCheck;
                 }
 
-                $this->resetLoginAttempts($user->getId());
-                if (!$user->getIsActive() || $user->getBlacklist()) {
-                    $user->setIsActive(true);
-                    $user->setBlacklist(false);
-                }
-                $user->setVisit($user->getVisit() + 1);
-                $this->em->flush();
-                // 회원의 모든 정보를 배열로 준비
-                $userSessData = [
-                    'user_id'        => $user->getId(),
-                    'create_date'    => $user->getCreateDate() ? $user->getCreateDate()->format('Y-m-d') : null,
-                    'modify_date'    => $user->getModifyDate() ? $user->getModifyDate()->format('Y-m-d') : null,
-                    'userName'       => trim($user->getUserName()),
-                    'nickName'       => trim($user->getNickName()),
-                    'firstName'      => trim($user->getFirstName()),
-                    'lastName'       => trim($user->getLastName()),
-                    'birth'          => $user->getBirth() ? $user->getBirth()->format('Y-m-d') : null,
-                    'detailAddress'  => trim($user->getDetailAddress()),
-                    'extraAddress'   => trim($user->getExtraAddress()),
-                    'jibunAddress'   => trim($user->getJibunAddress()),
-                    'roadAddress'    => trim($user->getRoadAddress()),
-                    'postalNum'      => trim($user->getPostalNum()),
-                    'gender'         => $user->getGender(),
-                    'isActive'       => $user->getIsActive(),
-                    'blacklist'      => $user->getBlacklist(),
-                    'lastLogin'      => $user->getLastLogin() ? $user->getLastLogin()->format('Y-m-d H:i:s') : null,
-                    'phone'          => trim($user->getPhone()),
-                    'role'           => trim($user->getRole()),
-                    'tmpPassword'    => trim($user->getTmpPassword()),
-                    'visit'          => $user->getVisit(),
-                    'introduce'      => trim($user->getIntroduce()),
-                    'memberFilePath' => trim($user->getMemberFilePath()),
-                    'memberFileName' => trim($user->getMemberFileName()),
-                ];
-
-                // 세션에 회원 정보 배열 저장
-                $this->session->set_userdata('user_data', $userSessData);
-                $this->session->set_flashdata('welcome_message', $userSessData['nickName'] . '님 반갑습니다.');
-                return ['success' => true, 'errors' => []];
+                return ['success' => false, 'errors' => ['login' => '비밀번호가 잘못되었습니다. ' . (5 - $attemptCount) . '회 더 시도할 수 있습니다.']];
             }
+
+            // 로그인 성공 처리
+            $this->handleSuccessfulLogin($user);
+
+            // 세션에 회원 정보 배열 저장
+            $this->session->set_userdata('user_data', $this->prepareUserSessionData($user));
+            $this->session->set_flashdata('welcome_message', $user->getNickName() . '님 반갑습니다.');
+            return ['success' => true, 'errors' => []];
         } catch (\Exception $e) {
             log_message('error', '로그인 실패: ' . $e->getMessage());
             return ['success' => false, 'errors' => ['general' => '로그인 과정 중 오류가 발생했습니다.']];
         }
+    }
+
+    private function accountStatusCheck($user)
+    {
+        $activeCheck = $this->isActiveCheck($user);
+        $blacklistCheck = $this->blacklistCheck($user);
+
+        return $activeCheck ?: $blacklistCheck;
+    }
+
+    private function handleSuccessfulLogin($user)
+    {
+        $this->resetLoginAttempts($user->getId());
+
+        if (!$user->getIsActive() || $user->getBlacklist()) {
+            $user->setIsActive(true);
+            $user->setBlacklist(false);
+        }
+        $user->setVisit($user->getVisit() + 1);
+        $this->em->flush();
+    }
+
+    private function prepareUserSessionData($user)
+    {
+        return [
+            'user_id'        => $user->getId(),
+            'create_date'    => $user->getCreateDate() ? $user->getCreateDate()->format('Y-m-d') : null,
+            'modify_date'    => $user->getModifyDate() ? $user->getModifyDate()->format('Y-m-d') : null,
+            'userName'       => trim($user->getUserName()),
+            'nickName'       => trim($user->getNickName()),
+            'firstName'      => trim($user->getFirstName()),
+            'lastName'       => trim($user->getLastName()),
+            'birth'          => $user->getBirth() ? $user->getBirth()->format('Y-m-d') : null,
+            'detailAddress'  => trim($user->getDetailAddress()),
+            'extraAddress'   => trim($user->getExtraAddress()),
+            'jibunAddress'   => trim($user->getJibunAddress()),
+            'roadAddress'    => trim($user->getRoadAddress()),
+            'postalNum'      => trim($user->getPostalNum()),
+            'gender'         => $user->getGender(),
+            'isActive'       => $user->getIsActive(),
+            'blacklist'      => $user->getBlacklist(),
+            'lastLogin'      => $user->getLastLogin() ? $user->getLastLogin()->format('Y-m-d H:i:s') : null,
+            'phone'          => trim($user->getPhone()),
+            'role'           => trim($user->getRole()),
+            'tmpPassword'    => trim($user->getTmpPassword()),
+            'visit'          => $user->getVisit(),
+            'introduce'      => trim($user->getIntroduce()),
+            'memberFilePath' => trim($user->getMemberFilePath()),
+            'memberFileName' => trim($user->getMemberFileName()),
+        ];
     }
 
     private function duplicateSession($formData, &$errorData)

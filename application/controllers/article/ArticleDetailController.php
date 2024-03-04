@@ -126,7 +126,7 @@ class ArticleDetailController extends MY_Controller
             $html = $this->load->view('article/comments_list', $comments_view_data, TRUE);
 
             echo json_encode(['success' => true, 'html' => $html]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             echo json_encode(['success' => false, 'error' => '댓글 목록을 불러오는 데 실패했습니다.']);
         }
     }
