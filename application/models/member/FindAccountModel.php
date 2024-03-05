@@ -65,7 +65,7 @@ class FindAccountModel extends CI_Model
             $user = $query->getOneOrNullResult();
 
             if ($user !== null) {
-                return ['success' => true, 'errors' => []];
+                return $user;
             } else {
                 return ['success' => false, 'errors' => ['message' => '사용자를 찾을 수 없습니다.']];
             }

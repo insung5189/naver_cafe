@@ -1,12 +1,27 @@
 $(document).ready(function () {
     // AJAX 요청을 통해 현재 로그인 상태 확인
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+        if (parts.length == 2) return parts.pop().split(";").shift();
+        else return null;
+    }
+    // AJAX 요청을 통해 현재 로그인 상태 확인
     $.get("/member/logincontroller/checkSession", function (response) {
         if (response.isLoggedIn) {
             var loginAnotherAccount = confirm("이미 로그인되어 있습니다. 다른 계정으로 로그인하시겠습니까?");
             if (loginAnotherAccount) {
-                window.location.href = history.back();
+                window.location.href = '/member/logincontroller/processLogoutAndRedirectLoginPage';
             } else {
-
+                // 쿠키에서 리다이렉션 URL 읽기
+                var redirectUrl = getCookie('redirect_url');
+                if (redirectUrl && redirectUrl !== '/member/logincontroller') {
+                    // 리다이렉션 URL이 로그인 페이지가 아닌 경우 이전 페이지로 돌아가기
+                    history.back();
+                } else {
+                    // 리다이렉션 URL이 로그인 페이지이거나 설정되지 않은 경우 루트 경로로 리다이렉션
+                    window.location.href = '/';
+                }
             }
         }
     });

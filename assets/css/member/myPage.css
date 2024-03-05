@@ -175,7 +175,7 @@ h1 {
 .pw-field-box {
     display: flex;
     align-items: center;
-    padding: 16px 0px 30px 10px;
+    padding: 16px 0px 20px 10px;
 }
 
 .introduce {
@@ -186,6 +186,15 @@ h1 {
 
 .intro-label {
     margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    width: 100% !important;
+    font-size: 13px;
+}
+
+.text-caculate-intro {
+    color: #b7b7b7;
+    font-weight: 400;
 }
 
 .intro-text-box {
@@ -198,6 +207,7 @@ h1 {
     box-sizing: border-box;
     font-size: 13px;
     line-height: 1.5;
+    resize: none;
 }
 
 .caption-box {
@@ -223,8 +233,30 @@ h1 {
     width: 90%;
 }
 
+.absolute {
+    position: absolute;
+    top: 40%;
+    left: 71%;
+}
+
+.absolute-match {
+    position: absolute;
+    top: 49%;
+    left: 71%;
+}
+
+.input-width {
+    width: 10%;
+}
+
+.enter {
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
+}
+
 .custom-input {
-    width: 50%;
+    width: 300px;
     height: 35px;
     padding: 0.5rem 0.75rem;
     border: 1px solid #d1d5db;

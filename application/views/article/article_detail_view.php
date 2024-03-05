@@ -271,11 +271,13 @@ $GLOBALS['pageResources'] = [
                                             </span>
                                         </p>
                                         <!-- 댓글 컨텐츠 이미지 -->
-                                        <? if (!empty($commentImageName)) : ?>
-                                            <div id="comment-content-img-<?= $comment->getId(); ?>">
+
+                                        <div id="comment-content-img-<?= $comment->getId(); ?>">
+                                            <? if (!empty($commentImageName)) : ?>
                                                 <img id="uploadedImage-<?= $comment->getId(); ?>" src="<?= $commentFileUrl . $commentImageName; ?>" alt="댓글 첨부사진">
-                                            </div>
-                                        <? endif; ?>
+                                            <? endif; ?>
+                                        </div>
+
                                         <div class="comment-info-box" id="comment-reply-<?= $comment->getId(); ?>">
                                             <span>
                                                 <?= $comment->getModifyDate() ? $comment->getModifyDate()->format('Y.m.d H:i') : $comment->getCreateDate()->format('Y.m.d H:i'); ?>

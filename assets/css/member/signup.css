@@ -97,6 +97,12 @@ h1 {
     width: 90%;
 }
 
+.enter {
+    display: flex;
+    flex-direction: column;
+    margin-top: 4px;
+}
+
 .custom-input {
     width: 50%;
     height: 35px;

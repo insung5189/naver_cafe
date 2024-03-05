@@ -22,7 +22,8 @@ class MY_Controller extends CI_Controller
             'name'   => 'redirect_url',
             'value'  => $path,
             'expire' => '3600', // 단위 : 초
-            'secure' => FALSE // HTTPS를 사용하지 않는 경우
+            'secure' => FALSE, // HTTPS를 사용하지 않는 경우
+            'httponly' => FALSE // JavaScript에서 접근 가능하게 설정
         ];
         $this->input->set_cookie($cookie);
     }

@@ -3,12 +3,14 @@ defined('BASEPATH') or exit('직접적인 스크립트 접근은 허용되지 �
 
 class SignupModel extends CI_Model
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         $this->load->library('doctrine');
     }
 
-    public function processSignup($formData) {
+    public function processSignup($formData)
+    {
 
         $errorData = ['errors' => []];
 
@@ -30,7 +32,8 @@ class SignupModel extends CI_Model
             $member->setUserName($formData['userName']);
             $member->setPassword(password_hash($formData['password'], PASSWORD_DEFAULT));
             $member->setNickName($formData['nickName']);
-            $member->setPhone($formData['phone']);
+            $formattedPhone = str_replace('-', '', $formData['phone']);
+            $member->setPhone($formattedPhone);
             $member->setFirstName($formData['firstName']);
             $member->setLastName($formData['lastName']);
             $member->setGender($formData['gender'] === 'true' ? 1 : 0);
@@ -54,9 +57,8 @@ class SignupModel extends CI_Model
             }
 
             // EntityManager로 데이터베이스에 저장
-            $em = $this->doctrine->em;
-            $em->persist($member);
-            $em->flush();
+            $this->em->persist($member);
+            $this->em->flush();
             $this->session->set_flashdata('welcome_message', $formData['nickName'] . '님 환영합니다.\n가입하신 계정으로 로그인해주세요.');
             return ['success' => true, 'errors' => []];
         } catch (\Exception $e) {
@@ -65,7 +67,8 @@ class SignupModel extends CI_Model
         }
     }
 
-    private function validateEmail($formData, &$errorData) {
+    private function validateEmail($formData, &$errorData)
+    {
         // Email 유효성검사
         $userEmailName = $this->doctrine->em->getRepository('Models\Entities\Member')->findOneBy(['userName' => $formData['userName']]); // 중복확인을 위해 DB 접근후 결과값 저장
         if (!empty($formData['userName'])) {
@@ -74,7 +77,7 @@ class SignupModel extends CI_Model
             }
             if ($formData['isUserNameChecked'] !== 'true') {
                 $errorData['errors']['email'] = '이메일 중복 확인이 필요합니다. 스크립트 사용을 허용해주세요.';
-            } else if ($userEmailName) { 
+            } else if ($userEmailName) {
                 $errorData['errors']['email'] = '이미 사용 중인 이메일입니다.';
             }
         } else {
@@ -82,7 +85,8 @@ class SignupModel extends CI_Model
         }
     }
 
-    private function validatePassword($formData, &$errorData) {
+    private function validatePassword($formData, &$errorData)
+    {
         // 비밀번호 유효성검사
         if (!empty($formData['password']) && !empty($formData['password2'])) {
             if (!preg_match('/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/', $formData['password'])) {
@@ -97,21 +101,26 @@ class SignupModel extends CI_Model
         }
     }
 
-    private function validatePhone($formData, &$errorData) {
+    private function validatePhone($formData, &$errorData)
+    {
+        $phonePattern = '/^(?:(\+1|\+33|\+44|\+49|\+82|\+39|\+34|\+81|\+61|\+55|\+52|\+46|\+47|\+45|\+358|\+90|\+48|\+32|\+36|\+31|\+43|\+41|\+64)([1-9]\d{6,14}))|((02|0[3-9][0-9]?|070)([1-9]\d{6,7})|(01[016789])([1-9]\d{6,7}))$/';
         // 연락처 유효성검사
         if (!empty($formData['phone'])) {
-            // 전화번호에서 하이픈('-') 제거
-            $phoneWithoutHyphens = preg_replace('/-/', '', $formData['phone']);
-    
-            if (!preg_match('/^(\+\d{1,3})?(01[016-9]|02|0[3-6][1-5]?|070)([1-9]\d{2,3}\d{4})$/', $phoneWithoutHyphens)) {
-                $errorData['errors']['phone'] = '유효하지 않은 전화번호 형식입니다.';
+            // 하이픈이 포함된 경우 바로 예외 처리
+            if (strpos($formData['phone'], '-') !== false) {
+                $errorData['errors']['phone'] = '전화번호 형식이 유효하지 않습니다. 하이픈(-) 없이 숫자만 입력해주세요.';
+                return;
+            }
+            if (!preg_match($phonePattern, $formData['phone'])) {
+                $errorData['errors']['phone'] = '전화번호 형식이 유효하지 않습니다. 올바른 형식으로 입력해주세요.';
             }
         } else {
             $errorData['errors']['phone'] = '연락처 입력값이 없습니다. 연락처를 입력해주세요.';
         }
     }
 
-    private function validateNickname($formData, &$errorData) {
+    private function validateNickname($formData, &$errorData)
+    {
         // 닉네임 유효성검사
         $userNickName = $this->doctrine->em->getRepository('Models\Entities\Member')->findOneBy(['nickName' => $formData['nickName']]); // 중복확인을 위해 DB 접근후 결과값 저장
         if (!empty($formData['nickName'])) {
@@ -129,7 +138,8 @@ class SignupModel extends CI_Model
         }
     }
 
-    private function validateName($formData, &$errorData) {
+    private function validateName($formData, &$errorData)
+    {
 
         // 동,서양 문화권의 이름패턴을 종합한 유니코드
         $namePattern = '/^[A-Za-z\x{00C0}-\x{00FF}\x{0100}-\x{017F}\x{0180}-\x{024F}\x{0370}-\x{03FF}\x{0400}-\x{04FF}\x{1E00}-\x{1EFF}\x{2C00}-\x{2C7F}\x{2D00}-\x{2D2F}\x{3000}-\x{303F}\x{3400}-\x{4DBF}\x{4E00}-\x{9FFF}\x{A000}-\x{A48F}\x{A490}-\x{A4CF}\x{AC00}-\x{D7AF}\x{F900}-\x{FAFF}\x{FE30}-\x{FE4F}\-\'\s]+$/u';
@@ -153,7 +163,8 @@ class SignupModel extends CI_Model
         }
     }
 
-    private function validateGender($formData, &$errorData) {
+    private function validateGender($formData, &$errorData)
+    {
         // 성별 유효성검사
         if (!empty($formData['gender'])) {
             if ($formData['gender'] !== 'true' && $formData['gender'] !== 'false') {
@@ -164,7 +175,8 @@ class SignupModel extends CI_Model
         }
     }
 
-    private function validateBirthDate($formData, &$errorData) {
+    private function validateBirthDate($formData, &$errorData)
+    {
         $datePattern = '/^\d{4}-\d{2}-\d{2}$/';
         $currentYear = date('Y');
         $minYear = $currentYear - 120; // 지금으로부터 120년 전
@@ -202,7 +214,8 @@ class SignupModel extends CI_Model
         return true;
     }
 
-    private function processProfileImage(&$formData, &$errorData) {
+    private function processProfileImage(&$formData, &$errorData)
+    {
         $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'memberImgs' . DIRECTORY_SEPARATOR;
         $config['allowed_types'] = 'jpg|jpeg|png|bmp';
         $config['max_size'] = '51200';

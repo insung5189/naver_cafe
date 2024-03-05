@@ -25,7 +25,6 @@ $(document).ready(function () {
     //     }
     // }
 
-
     let validationResults = {
         isValid: true,
         fieldId: '',
@@ -45,21 +44,21 @@ $(document).ready(function () {
             if (validationResult.tabToShow === '#linkToProfileInfo') {
                 $('#modifyPasswordTitle, #modifyPasswordGuide, #modifyPasswordSection').hide();
                 $('#myPageTitle, #myPageGuide, .my-profile-info').show();
+
+                // 해당 필드로 스크롤 및 포커스
+                $('html, body').animate({
+                    scrollTop: $(validationResult.fieldId).offset().top - 100
+                }, 500, function () {
+                    $(validationResult.fieldId).focus();
+                });
             } else if (validationResult.tabToShow === '#linkToChangePassword') {
                 $('#myPageTitle, #myPageGuide, .my-profile-info').hide();
                 $('#modifyPasswordTitle, #modifyPasswordGuide, #modifyPasswordSection').show();
-            }
 
-            // 해당 필드로 스크롤
-            $('html, body').animate({
-                scrollTop: $(validationResult.fieldId).offset().top - 100
-            }, 500, function () {
-                // 해당 필드에 포커스
                 $(validationResult.fieldId).focus();
-            });
+            }
         }
     }
-
 
 
 
@@ -148,8 +147,24 @@ $(document).ready(function () {
     // 이름, 성 유니코드 정규검사식
     const nameRegex = /^[A-Za-z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u1E00-\u1EFF\u2C00-\u2C7F\u2D00-\u2D2F\u3000-\u303F\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE30-\uFE4F-'\s]+$/;
 
+    var originalNickName = $('#nickName').val();
+
     $('#duplicateNickname').click(duplicateNickname);
-    $('#nickName').on('keyup, focus, input', validateNickname);
+    // $('#nickName').on('keyup, focus, input', validateNickname);
+
+    $('#nickName').on('keyup, focus, input', function () {
+        validateNickname();
+        var currentNickName = $(this).val();
+
+        if (originalNickName === currentNickName) {
+            $('#isNickNameChecked').val('true');
+            $('#duplicateNickname').hide();
+            $('#nickname-duplication-check-message').text('✔️ 기존에 사용하던 닉네임입니다.').css('color', 'green');
+        } else {
+            $('#isNickNameChecked').val('false');
+            $('#duplicateNickname').show();
+        }
+    });
     $('#nickName').on('keyup, click', resetNicknameValidation);
     $('#phone').on('keyup, input', validatePhone);
     $('#firstName').on('keyup, focus, input', validateFirstName);
@@ -159,11 +174,42 @@ $(document).ready(function () {
     $('#birth').on('keyup, focus, input', validateBirthDate);
     $('#prfl-info-form').on('submit', submitPrflInfoFormValidation);
 
+    // 페이지 로드와 함께 실행될 코드
+    var textMaxLength = 500; // 최대 길이 설정
+
+    // '.intro-text-box'의 현재 길이를 계산하고 초기 상태를 설정
+    var currentLength = $('.intro-text-box').val().length;
+    if (currentLength > 0) {
+        $('.text-caculate-intro').show().text(currentLength + ' / ' + textMaxLength);
+    } else {
+        $('.text-caculate-intro').hide();
+    }
+
+    // 자기소개 텍스트 카운팅
+    $('body').on('input', '.intro-text-box', function () {
+        var currentLength = $(this).val().length;
+        const textMaxLength = 500;
+        if (currentLength > 0) {
+            $('.text-caculate-intro').show().text(currentLength + ' / ' + textMaxLength);
+        } else {
+            $('.text-caculate-intro').hide();
+        }
+
+        if (currentLength > textMaxLength - 1) {
+            alert("텍스트는 최대 " + textMaxLength + "자까지 입력 가능합니다.");
+            $(this).val($(this).val().substr(0, textMaxLength));
+        }
+    });
+
     // 닉네임 중복확인 ajax
     function duplicateNickname() {
         const nickName = $('#nickName').val();
         if (!nickName) {
             alert('닉네임을 입력해주세요.');
+            return;
+        }
+        if (originalNickName === nickName) {
+            handleNicknameResponse(false);
             return;
         }
         if (validateNickname().isValid) {
@@ -192,7 +238,7 @@ $(document).ready(function () {
             alert('이미 사용 중인 닉네임입니다.');
             $('#nickname-duplication-check-message').text('❌ 이미 사용 중인 닉네임입니다.').css('color', 'red');
             return false;
-        } else {
+        } else if (!response.isDuplicate) {
             if (confirm('사용 가능한 닉네임입니다.\n확인 버튼을 누르시면 해당 닉네임을 사용하며 \n수정이 불가능합니다.')) {
                 $('#nickname-duplication-check-message').text('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
                 $('#duplicateNickname').val('중복확인 완료');
@@ -210,13 +256,17 @@ $(document).ready(function () {
         validationResults.tabToShow = '#linkToProfileInfo';
         const phoneInput = $('#phone');
         const message = $('#phone-validation-message');
-        const phoneValue = phoneInput.val().replace(/-/g, '');
+        const phoneValue = phoneInput.val();
 
+        // 국제 전화번호 패턴 검사 (한국 포함, 하이픈(-) 제거)
+        const phonePattern = /^(?:(\+1|\+33|\+44|\+49|\+82|\+39|\+34|\+81|\+61|\+55|\+52|\+46|\+47|\+45|\+358|\+90|\+48|\+32|\+36|\+31|\+43|\+41|\+64)([1-9]\d{6,14}))$|^((02|0[3-9][0-9]?|070)([1-9]\d{6,7})|(01[016789])([1-9]\d{6,7}))$/;
 
-        // 국제 전화번호 패턴 검사 (한국 포함)
-        const phonePattern = /^(\+\d{1,3}-?)?(01[016-9]|02|0[3-6][1-5]?|070)-?([1-9]\d{2,3}-?\d{4})$/;
-
-        if (!phonePattern.test(phoneValue)) {
+        if (phoneValue.includes('-')) {
+            validationResults.isValid = false;
+            validationResults.validErrorMsg = '하이픈(-)을 제거하고 숫자만 입력해주세요.';
+            message.text('❌ 하이픈(-)을 제거하고 숫자만 입력해주세요.').css('color', 'red');
+            return validationResults;
+        } else if (!phonePattern.test(phoneValue)) {
             validationResults.isValid = false;
             validationResults.validErrorMsg = '유효하지 않은 전화번호 형식입니다.';
             message.text('❌ 유효하지 않은 전화번호 형식입니다.').css('color', 'red');
@@ -236,7 +286,9 @@ $(document).ready(function () {
             $('#duplicateNickname').val('중복확인');
             $('#nickName').attr('readonly', false);
             $('#duplicateNickname').attr('disabled', false);
-            alert('⚠ 입력값 수정을 시도하셨습니다.\n닉네임 입력 후 꼭 중복확인 시도해주세요.');
+            alert('⚠ 입력값 수정을 시도하셨습니다.\n기존에 사용하던 닉네임이 아닐 경우\n입력 후 꼭 중복확인 시도해주세요.');
+        } else if ($('#nickName').attr('readonly', false)) {
+
         }
     }
 
@@ -267,7 +319,7 @@ $(document).ready(function () {
         if (/[^가-힣a-zA-Z0-9]/.test(nicknameInput)) {
             validationResults.isValid = false;
             validationResults.validErrorMsg = '닉네임에 유효하지 않은 문자가 포함되어 있습니다.';
-            nicknameValidationMessage.html('❌ 유효하지 않은 문자가 포함되어 있습니다.').css('color', 'red');
+            nicknameValidationMessage.html('❌ 유효하지 않은 문자가 있습니다.').css('color', 'red');
             return validationResults;
         } else {
             validationResults.isValid = true;
@@ -435,6 +487,7 @@ $(document).ready(function () {
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitPrflInfoFormValidation(event) {
+        event.preventDefault();
         if (!validatePhone().isValid
             || !validateNickname().isValid
             || !validateFirstName().isValid
@@ -453,6 +506,31 @@ $(document).ready(function () {
                 showErrorAndScrollToField(validationResults);
             }
         }
+
+        // 폼 데이터 수집
+        var formData = new FormData(this);
+
+        // AJAX 요청
+        $.ajax({
+            url: '/member/MypageController/processUpdateProfile',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function (response) {
+                if (response.success) {
+                    alert(response.message);
+                    window.location.reload();
+                } else {
+                    var errorMessages = Object.values(response.errors).join('\n');
+                    alert(errorMessages);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('회원정보 수정에 실패했습니다. 다시 시도해주세요.');
+            }
+        });
     }
 
 
@@ -468,39 +546,48 @@ $(document).ready(function () {
 
     // 인증된 사용자 비밀번호 변경 ajax
     function processModifyPassword(event) {
+        event.preventDefault(); // 폼 기본 제출 방지
+
         var memberId = $('#modifiedPasswordMemberId').val();
         const oldpassword = $('#oldpassword').val();
         const newpassword = $('#newpassword').val();
         const newpasswordcf = $('#newpasswordcf').val();
+
+        // 유효성 검사
         if (!validatePassword().isValid || !checkPasswordMatch().isValid) {
-            event.preventDefault();
             showErrorAndScrollToField(validationResults);
-        } else if (!oldpassword || !newpassword || !newpasswordcf) {
-            alert('입력되지 않은 값이 있습니다.');
-        } else if (validatePassword().isValid && checkPasswordMatch().isValid && oldpassword && newpassword && newpasswordcf) {
-            $.ajax({
-                url: '/member/MypageController/processModifyPassword',
-                type: 'POST',
-                dataType: 'json',
-                data: {
-                    memberId: memberId,
-                    oldpassword: oldpassword,
-                    newpassword: newpassword,
-                    newpasswordcf: newpasswordcf
-                },
-                success: function (response) {
-                    if (response.success) {
-                        alert('비밀번호가 성공적으로 변경되었습니다.');
-                        window.location.href = '/member/MypageController/modifyPasswordDone';
-                    } else {
-                        alert('비밀번호 변경에 실패했습니다: ' + response.errors.message);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    alert('비밀번호 변경 처리 중 오류가 발생했습니다: ' + error);
-                }
-            });
+            return; // 유효성 검사 실패 시 함수 종료
         }
+
+        if (!oldpassword || !newpassword || !newpasswordcf) {
+            alert('입력되지 않은 값이 있습니다.');
+            return; // 입력 누락 시 함수 종료
+        }
+
+        // Ajax 요청
+        $.ajax({
+            url: '/member/MypageController/processModifyPassword',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                memberId: memberId,
+                oldpassword: oldpassword,
+                newpassword: newpassword,
+                newpasswordcf: newpasswordcf
+            },
+            success: function (response) {
+                if (response.success) {
+                    alert('비밀번호가 성공적으로 변경되었습니다.');
+                    window.location.href = '/member/MypageController/modifyPasswordDone'; // 성공 페이지로 리디렉션
+                } else {
+                    var errorMessages = Object.values(response.errors).join('\n');
+                    alert('비밀번호 변경에 실패했습니다: \n' + errorMessages);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('비밀번호 변경 처리 중 오류가 발생했습니다: ' + error);
+            }
+        });
     }
 
     // 비밀번호 유효성 검사 및 일치 확인
@@ -515,6 +602,7 @@ $(document).ready(function () {
         validationResults.tabToShow = '#linkToChangePassword';
         const newpassword = $('#newpassword').val();
         const newpasswordValidationMessage = $('#newpassword-validation-message');
+        const newpasswordSpaceValidationMessage = $('#newpassword-space-validation-message');
 
         // 조건 검사
         const hasLetter = /[a-zA-Z]/.test(newpassword);
@@ -525,16 +613,18 @@ $(document).ready(function () {
 
         // 상세한 조건 불충족 메시지 초기화
         let message = '';
+        let spaceMessage = '';
 
         // 조건별 메시지 추가
         message += hasLetter ? '✔️ 영문, ' : '❌ 영문, ';
         message += hasDigit ? '✔️ 숫자, ' : '❌ 숫자, ';
         message += hasSpecialChar ? '✔️ 특수문자, ' : '❌ 특수문자, ';
         message += isLongEnough ? '✔️ 8자 이상 ' : '❌ 8자 이상 ';
-        message += !hasInvalidChar ? '' : '<br>❌ 유효하지 않은 문자 포함(공백, 허용되지 않는 특수문자 등)';
+        spaceMessage += !hasInvalidChar ? '' : '❌ 유효하지 않은 문자 포함<br>(공백, 허용되지 않는 특수문자 등)';
 
         message = message.trim().replace(/, $/, '');
-        newpasswordValidationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar ? 'green' : 'red');
+        newpasswordValidationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough ? 'green' : 'red');
+        newpasswordSpaceValidationMessage.html(spaceMessage).css('color',!hasInvalidChar ? 'green' : 'red');
 
         if (hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar) {
             validationResults.isValid = true;
@@ -570,6 +660,7 @@ $(document).ready(function () {
         const newpasswordcfValidationMessage = $('#newpasswordcf-validation-message');
 
         if (validatePassword()) {
+            validationResults.fieldId = '#newpasswordcf';
             if (newpassword === '' && newpasswordcf === '') {
                 validationResults.isValid = true;
                 validationResults.validErrorMsg = '';

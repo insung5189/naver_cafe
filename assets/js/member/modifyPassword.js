@@ -27,7 +27,7 @@ $(document).ready(function () {
         message += hasDigit ? '✔️ 숫자, ' : '❌ 숫자, ';
         message += hasSpecialChar ? '✔️ 특수문자, ' : '❌ 특수문자, ';
         message += isLongEnough ? '✔️ 8자 이상 ' : '❌ 8자 이상 ';
-        message += !hasInvalidChar ? '' : '<br>❌ 유효하지 않은 문자 포함(공백, 허용되지 않는 특수문자 등)';
+        message += !hasInvalidChar ? '' : '<br>❌ 유효하지 않은 문자 포함<br>(공백, 허용되지 않는 특수문자 등)';
 
         message = message.trim().replace(/, $/, '');
         validationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar ? 'green' : 'red');

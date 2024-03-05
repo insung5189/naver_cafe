@@ -151,6 +151,20 @@ $GLOBALS['pageResources'] = [
                     </div>
 
                 </div>
+
+                <div class="caption-box">
+
+                    <div class="label-box">
+                        <div class="label-section">
+                        </div>
+                    </div>
+
+                    <div class="input-box enter">
+                        <span class="description pl-5 caption">* 하이픈(-)을 제거하고 입력해주세요(해외연락처 예시 : +821012345678)</span>
+                        <span class="description pl-5 caption">* For international numbers, include the country code (e.g., +821012345678)</span>
+                    </div>
+
+                </div>
                 <hr>
                 <!-- 닉네임 -->
                 <div class="field-box">

@@ -56,12 +56,15 @@ $(document).ready(function () {
     function validatePhoneM() {
         const phoneInput = $('#phoneM');
         const message = $('#m-phone-validation-message');
-        const phoneValue = phoneInput.val().replace(/-/g, ''); // 하이픈 제거
+        const phoneValue = phoneInput.val();
 
-        // 국제 전화번호 패턴 검사 (한국 포함)
-        const phonePattern = /^(\+\d{1,3}-?)?(01[016-9]|02|0[3-6][1-5]?|070)-?([1-9]\d{2,3}-?\d{4})$/;
+        // 국제 전화번호 패턴 검사 (한국 포함, 하이픈(-) 제거)
+        const phonePattern = /^(?:(\+1|\+33|\+44|\+49|\+82|\+39|\+34|\+81|\+61|\+55|\+52|\+46|\+47|\+45|\+358|\+90|\+48|\+32|\+36|\+31|\+43|\+41|\+64)([1-9]\d{6,14}))$|^((02|0[3-9][0-9]?|070)([1-9]\d{6,7})|(01[016789])([1-9]\d{6,7}))$/;
 
-        if (!phonePattern.test(phoneValue)) {
+        if (phoneValue.includes('-')) {
+            message.text('❌ 하이픈(-)을 제거하고 숫자만 입력해주세요.').css('color', 'red');
+            return false;
+        } else if (!phonePattern.test(phoneValue)) {
             message.text('❌ 유효하지 않은 전화번호 형식입니다.').css('color', 'red');
             return false;
         } else {
@@ -136,12 +139,15 @@ $(document).ready(function () {
     function validatePhoneP() {
         const phoneInput = $('#phoneP');
         const message = $('#p-phone-validation-message');
-        const phoneValue = phoneInput.val().replace(/-/g, ''); // 하이픈 제거
+        const phoneValue = phoneInput.val();
 
-        // 국제 전화번호 패턴 검사 (한국 포함)
-        const phonePattern = /^(\+\d{1,3}-?)?(01[016-9]|02|0[3-6][1-5]?|070)-?([1-9]\d{2,3}-?\d{4})$/;
+        // 국제 전화번호 패턴 검사 (한국 포함, 하이픈(-) 제거)
+        const phonePattern = /^(?:(\+1|\+33|\+44|\+49|\+82|\+39|\+34|\+81|\+61|\+55|\+52|\+46|\+47|\+45|\+358|\+90|\+48|\+32|\+36|\+31|\+43|\+41|\+64)([1-9]\d{6,14}))$|^((02|0[3-9][0-9]?|070)([1-9]\d{6,7})|(01[016789])([1-9]\d{6,7}))$/;
 
-        if (!phonePattern.test(phoneValue)) {
+        if (phoneValue.includes('-')) {
+            message.text('❌ 하이픈(-)을 제거하고 숫자만 입력해주세요.').css('color', 'red');
+            return false;
+        } else if (!phonePattern.test(phoneValue)) {
             message.text('❌ 유효하지 않은 전화번호 형식입니다.').css('color', 'red');
             return false;
         } else {

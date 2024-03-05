@@ -156,18 +156,17 @@ $(document).ready(function () {
     });
 
     // 댓글 텍스트 갯수 제한 및 카운팅
-    $('#commentTextArea').on('input', function () {
-        var currentTextLength = $(this).val().length;
-        if (currentTextLength > 0) {
-            $('.text-caculate').show().text(currentTextLength + ' / 3000');
+    $('body').on('input', '.comment-text-area', function () {
+        var currentLength = $(this).val().length;
+        const textMaxLength = 3000;
+        if (currentLength > 0) {
+            $('.text-caculate').text(currentLength + ' / ' + textMaxLength).show();
         } else {
             $('.text-caculate').hide();
         }
-
-        if (currentTextLength > 2999) {
-            alert("텍스트는 최대 3000자까지 입력 가능합니다.");
-            $(this).val($(this).val().substring(0, 3000));
-            $('.text-caculate').text('3000 / 3000');
+        if (currentLength > textMaxLength - 1) {
+            alert("텍스트는 최대 " + textMaxLength + "자까지 입력 가능합니다.");
+            $(this).val($(this).val().substr(0, textMaxLength));
         }
     });
 
@@ -230,11 +229,15 @@ $(document).ready(function () {
     $('body').on('input', '.comment-text-area-reply', function () {
         var commentReplyId = $(this).data('comment-reply-id');
         var currentLength = $(this).val().length;
-        $('[data-text-calculate-reply-id="' + commentReplyId + '"]').text(currentLength + ' / 3000').show();
-
-        if (currentLength > 2999) {
-            alert("텍스트는 최대 3000자까지 입력 가능합니다.");
-            $(this).val($(this).val().substr(0, 3000));
+        const textMaxLength = 3000;
+        if (currentLength > 0) {
+            $('[data-text-calculate-reply-id="' + commentReplyId + '"]').text(currentLength + ' / ' + textMaxLength).show();
+        } else {
+            $('[data-text-calculate-reply-id="' + commentReplyId + '"]').hide();
+        }
+        if (currentLength > textMaxLength - 1) {
+            alert("텍스트는 최대 " + textMaxLength + "자까지 입력 가능합니다.");
+            $(this).val($(this).val().substr(0, textMaxLength));
         }
     });
 
@@ -337,30 +340,6 @@ $(document).ready(function () {
         });
     });
 
-
-    // 수정할 댓/답글 파일등록 미리보기
-    // $('body').on('change', '[data-comment-image-edit-id]', function () {
-    //     var commentEditId = $(this).data('comment-image-edit-id');
-    //     var commentUploadedImg = $(this).data('comment-uploaded-image');
-    //     if (this.files && this.files[0]) {
-    //         var reader = new FileReader();
-
-    //         reader.onload = function (e) {
-    //             if (!e.target.result) {
-    //                 var editImgSrc = "";
-    //             } else {
-    //                 var editImgSrc = e.target.result;
-    //             }
-    //             var previewHtml = '<a href="javascript:void(0);" class="img-preview-wrap-edit"><i class="fa-solid fa-circle-xmark fa-xl x-btn-position"></i><img src="' + editImgSrc + '" style="max-width: 54px; max-height: 54px;"></a>';
-    //             $('[data-img-preview-edit-id="' + commentEditId + '"]').html(previewHtml);
-    //         };
-
-    //         if (this.files[0]) {
-    //             reader.readAsDataURL(this.files[0]);
-    //         }
-    //     }
-    // });
-
     // 이미지 첨부 input 변경 시 미리보기 생성
     $('body').on('change', '[data-comment-image-edit-id]', function () {
         var reader = new FileReader();
@@ -380,14 +359,6 @@ $(document).ready(function () {
     });
 
     // 수정할 댓/답글 첨부이미지 리셋
-    // $('body').on('click', '[data-img-preview-edit-id]', function () {
-    //     var commentEditId = $(this).data('img-preview-edit-id');
-    //     $(this).empty();
-    //     var fileInput = $('#commentImageEdit' + commentEditId);
-    //     fileInput.replaceWith(fileInput.val('').clone(true));
-    // });
-
-    // 수정할 댓/답글 첨부이미지 리셋
     $('body').on('click', '[data-img-preview-edit-id]', function () {
         var commentEditId = $(this).data('img-preview-edit-id');
         // 첨부파일 input 선택자 수정
@@ -399,24 +370,26 @@ $(document).ready(function () {
     // 댓글/답글 삭제
     $('body').on('click', '[data-delete-comment-id]', function () {
         var deleteCommentId = $(this).data('delete-comment-id');
-        $.ajax({
-            url: '/article/articledetailcontroller/deleteComment/' + deleteCommentId,
-            type: 'POST',
-            data: {
-                deleteCommentId: deleteCommentId
-            },
-            success: function (response) {
-                var data = JSON.parse(response);
-                if (data.success) {
-                    alert(data.message);
-                    $('#comment-' + deleteCommentId).remove();
-                } else {
-                    alert(data.message);
+        if (confirm('댓글을 삭제하시겠습니까?')) {
+            $.ajax({
+                url: '/article/articledetailcontroller/deleteComment/' + deleteCommentId,
+                type: 'POST',
+                data: {
+                    deleteCommentId: deleteCommentId
+                },
+                success: function (response) {
+                    var data = JSON.parse(response);
+                    if (data.success) {
+                        alert(data.message);
+                        $('#comment-' + deleteCommentId).remove();
+                    } else {
+                        alert(data.message);
+                    }
+                }, error: function () {
+                    alert('댓글 삭제 중 오류 발생');
                 }
-            }, error: function () {
-                alert('댓글 삭제 중 오류 발생');
-            }
-        });
+            });
+        }
     });
 
 });
