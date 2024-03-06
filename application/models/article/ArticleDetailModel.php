@@ -13,22 +13,17 @@ class ArticleDetailModel extends MY_Model
 
     public function getArticleById($articleId)
     {
-        $article = $this->doctrine->em->find('Models\Entities\Article', $articleId);
-        if (!$article) {
-            return null;
-        }
-        return $article;
-    }
-
-    public function getAuthorByArticle($articleId)
-    {
-        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder = $this->doctrine->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
-            ->where('m.article = :articleId')
+            ->where('a.id = :articleId')
+            ->andwhere('a.isActive = 1')
             ->setParameter('articleId', $articleId);
 
-        return $queryBuilder->getQuery()->getResult();
+        $query = $queryBuilder->getQuery();
+        $article = $query->getOneOrNullResult();
+
+        return $article;
     }
 
     public function getCommentsByArticleId($articleId, $sortOption = '', $depthOption = '', $treeOption = '')
@@ -37,6 +32,7 @@ class ArticleDetailModel extends MY_Model
         $queryBuilder->select('c')
             ->from('Models\Entities\Comment', 'c')
             ->where('c.article = :articleId')
+            ->andwhere('c.isActive = 1')
             ->setParameter('articleId', $articleId)
             ->orderBy('c.orderGroup', $sortOption);
 
@@ -320,9 +316,12 @@ class ArticleDetailModel extends MY_Model
     public function processDeleteComment($commentId, $memberId)
     {
         $queryBuilder = $this->em->createQueryBuilder();
-        $query = $queryBuilder->delete('Models\Entities\Comment', 'c')
+        $query = $queryBuilder
+            ->update('Models\Entities\Comment', 'c')
+            ->set('c.isActive', ':isActive')
             ->where('c.id = :commentId')
             ->andWhere('c.member = :memberId')
+            ->setParameter('isActive', 0)
             ->setParameter('commentId', $commentId)
             ->setParameter('memberId', $memberId)
             ->getQuery();
@@ -330,7 +329,7 @@ class ArticleDetailModel extends MY_Model
         try {
             $result = $query->execute();
 
-            return ['success' => true, 'deletedCount' => $result];
+            return ['success' => true, 'updatedCount' => $result];
         } catch (\Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }

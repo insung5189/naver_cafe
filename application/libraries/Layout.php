@@ -33,21 +33,47 @@ class Layout
 
 	protected function getMasterAdminNickName()
 	{
-		$masterAdmin = $this->obj->doctrine->em->getRepository('Models\Entities\Member')->findOneBy(['role' => 'ROLE_MASTER']);
-		return $masterAdmin ? $masterAdmin->getNickName() : '마스터 계정 없음';
+		$queryBuilder = $this->obj->doctrine->em->createQueryBuilder();
+		$queryBuilder->select('m.nickName')
+			->from('Models\Entities\Member', 'm')
+			->where('m.role = :role')
+			->andwhere('m.isActive = 1')
+			->andwhere('m.blacklist = 0')
+			->setParameter('role', 'ROLE_MASTER')
+			->setMaxResults(1);
+
+		$query = $queryBuilder->getQuery();
+		$result = $query->getOneOrNullResult();
+
+		return $result ? $result['nickName'] : '마스터 계정 없음';
 	}
 
 	protected function getTotalMemberCount()
-    {
-        $totalMemberCount = $this->obj->doctrine->em->getRepository('Models\Entities\Member')->count([]);
-        return $totalMemberCount;
-    }
+	{
+		$queryBuilder = $this->obj->doctrine->em->createQueryBuilder();
+		$queryBuilder->select('COUNT(m.id)')
+			->from('Models\Entities\Member', 'm')
+			->where('m.isActive = 1')
+			->andwhere('m.blacklist = 0');
+	
+		$query = $queryBuilder->getQuery();
+		$totalMemberCount = $query->getSingleScalarResult();
+	
+		return $totalMemberCount;
+	}
 
 	protected function getTotalArticleCount()
-    {
-        $totalArticleCount = $this->obj->doctrine->em->getRepository('Models\Entities\Article')->count([]);
-        return $totalArticleCount;
-    }
+	{
+		$queryBuilder = $this->obj->doctrine->em->createQueryBuilder();
+		$queryBuilder->select('COUNT(a.id)')
+			->from('Models\Entities\Article', 'a')
+			->where('a.isActive = 1');
+	
+		$query = $queryBuilder->getQuery();
+		$totalArticleCount = $query->getSingleScalarResult();
+	
+		return $totalArticleCount;
+	}
 
 	protected function getUserActivityInfo($memberId)
 	{

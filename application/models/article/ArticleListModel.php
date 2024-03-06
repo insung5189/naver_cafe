@@ -12,7 +12,8 @@ class ArticleListModel extends MY_Model
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('count(a.id)')
-            ->from('Models\Entities\Article', 'a');
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1');
 
         $query = $queryBuilder->getQuery();
         return $query->getSingleScalarResult();
@@ -23,6 +24,7 @@ class ArticleListModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1')
             ->orderBy('a.createDate', 'DESC')
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage);
@@ -37,7 +39,9 @@ class ArticleListModel extends MY_Model
             return ['errors' => $errors];
         }
         $queryBuilder = $this->em->createQueryBuilder();
-        $queryBuilder->select('a')->from('Models\Entities\Article', 'a');
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1');
 
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {
@@ -55,10 +59,19 @@ class ArticleListModel extends MY_Model
                         $subQuery = $this->em->createQueryBuilder()
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
+                            ->leftJoin('c.member', 'm')
                             ->where('c.content LIKE :keyword')
+                            ->andWhere('c.isActive = 1')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
                         $queryBuilder->orWhere($queryBuilder->expr()->in('a.id', $subQuery));
+
+                        // 게시글 작성자에 대한 조건 추가
+                        $queryBuilder->leftJoin('a.member', 'am')
+                            ->andWhere('am.isActive = 1')
+                            ->andWhere('am.blacklist = 0');
 
                         $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
                         break;
@@ -67,16 +80,24 @@ class ArticleListModel extends MY_Model
                         break;
                     case 'author':
                         $queryBuilder->join('a.member', 'm')
-                            ->andWhere('m.nickName LIKE :keyword');
+                            ->andWhere('m.nickName LIKE :keyword')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0');
                         break;
                     case 'comment':
                         $queryBuilder->join('Models\Entities\Comment', 'c', 'WITH', 'c.article = a.id')
-                            ->andWhere('c.content LIKE :keyword');
+                            ->andWhere('c.content LIKE :keyword')
+                            ->andWhere('c.isActive = 1')
+                            ->join('c.member', 'm2')
+                            ->andWhere('m2.isActive = 1')
+                            ->andWhere('m2.blacklist = 0');
                         break;
                     case 'commentAuthor':
                         $queryBuilder->join('Models\Entities\Comment', 'c', 'WITH', 'c.article = a.id')
-                            ->join('Models\Entities\Member', 'm', 'WITH', 'c.member = m.id')
-                            ->andWhere('m.userName LIKE :keyword');
+                            ->join('c.member', 'm', 'WITH', 'm.id = c.member')
+                            ->andWhere('m.nickName LIKE :keyword')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0');
                         break;
                 }
                 $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
@@ -143,13 +164,16 @@ class ArticleListModel extends MY_Model
 
     public function getTotalArticleCountWithSearch($keyword, $element, $period, $startDate = null, $endDate = null)
     {
+        // 검색 결과는 게시글의 갯수만 카운트 함.
 
         $errors = $this->validateInputs($keyword, $element, $period, $startDate, $endDate);
         if (!empty($errors)) {
             return ['errors' => $errors];
         }
         $queryBuilder = $this->em->createQueryBuilder();
-        $queryBuilder->select('COUNT(a.id)')->from('Models\Entities\Article', 'a');
+        $queryBuilder->select('COUNT(DISTINCT a.id)') // 댓글 검색 조건이 포함된 경우에도, 그 결과가 속한 게시글의 개수만을 카운트함.
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1');
 
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {
@@ -167,28 +191,48 @@ class ArticleListModel extends MY_Model
                         $subQuery = $this->em->createQueryBuilder()
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
+                            ->leftJoin('c.member', 'm')
                             ->where('c.content LIKE :keyword')
+                            ->andWhere('c.isActive = 1')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
                         $queryBuilder->orWhere($queryBuilder->expr()->in('a.id', $subQuery));
 
+                        // 게시글 작성자에 대한 조건 추가
+                        $queryBuilder->leftJoin('a.member', 'am')
+                            ->andWhere('am.isActive = 1')
+                            ->andWhere('am.blacklist = 0');
+
                         $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
                         break;
                     case 'title':
-                        $queryBuilder->andWhere('a.title LIKE :keyword');
+                        $queryBuilder->leftJoin('a.member', 'am')
+                            ->andWhere('a.title LIKE :keyword')
+                            ->andWhere('am.isActive = 1')
+                            ->andWhere('am.blacklist = 0');
                         break;
                     case 'author':
                         $queryBuilder->join('a.member', 'm')
-                            ->andWhere('m.nickName LIKE :keyword');
+                            ->andWhere('m.nickName LIKE :keyword')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0');
                         break;
                     case 'comment':
                         $queryBuilder->join('Models\Entities\Comment', 'c', 'WITH', 'c.article = a.id')
-                            ->andWhere('c.content LIKE :keyword');
+                            ->andWhere('c.content LIKE :keyword')
+                            ->andWhere('c.isActive = 1')
+                            ->join('c.member', 'm2')
+                            ->andWhere('m2.isActive = 1')
+                            ->andWhere('m2.blacklist = 0');
                         break;
                     case 'commentAuthor':
                         $queryBuilder->join('Models\Entities\Comment', 'c', 'WITH', 'c.article = a.id')
-                            ->join('Models\Entities\Member', 'm', 'WITH', 'c.member = m.id')
-                            ->andWhere('m.userName LIKE :keyword');
+                            ->join('c.member', 'm', 'WITH', 'm.id = c.member')
+                            ->andWhere('m.nickName LIKE :keyword')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0');
                         break;
                 }
                 $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
