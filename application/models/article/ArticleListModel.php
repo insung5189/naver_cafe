@@ -1,19 +1,20 @@
 <?
-defined('BASEPATH') or exit('직접적인 스크립트 접근은 허용되지 않습니다.');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class ArticleListModel extends CI_Model
+class ArticleListModel extends MY_Model
 {
     public function __construct()
     {
         parent::__construct();
-        $this->load->library('doctrine');
-        $this->load->library('session');
-        $this->em = $this->doctrine->em;
     }
 
     public function getTotalArticleCount()
     {
-        $query = $this->em->createQuery('SELECT COUNT(a.id) FROM Models\Entities\Article a');
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('count(a.id)')
+            ->from('Models\Entities\Article', 'a');
+
+        $query = $queryBuilder->getQuery();
         return $query->getSingleScalarResult();
     }
 

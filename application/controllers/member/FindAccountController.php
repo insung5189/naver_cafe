@@ -7,7 +7,6 @@ class FindAccountController extends MY_Controller
     {
         parent::__construct();
         $this->load->model('member/FindAccountModel', 'FindAccountModel');
-        $this->em = $this->doctrine->em;
     }
 
     public function index()

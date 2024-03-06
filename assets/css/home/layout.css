@@ -273,6 +273,10 @@ button {
     text-overflow: ellipsis;
 }
 
+.member-nick-name:hover {
+    text-decoration: underline;
+}
+
 .ico-manager {
     display: inline-block;
     padding: 1px 2px 1px;
@@ -364,6 +368,10 @@ button {
 
 .membership-date {
     font-size: 12px;
+}
+
+.edit-thumb:hover {
+    text-decoration: underline;
 }
 
 .activity-details {

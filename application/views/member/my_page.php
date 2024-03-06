@@ -28,7 +28,6 @@ $GLOBALS['pageResources'] = [
             <div class="prfl-box">
                 <span class="profile-img">
 
-
                     <?
                     $fileUrl = '/assets/file/images/memberImgs/';
                     $profileImagePath = ($member->getMemberFileName() === 'default.png') ? 'defaultImg/default.png' : $member->getMemberFileName();
@@ -112,6 +111,7 @@ $GLOBALS['pageResources'] = [
                                     <label class="label-section" for="nickName">
                                         <span class="label-text">닉네임</span>
                                         <span class="description">(NickName)</span>
+                                        <span class="required-field">*</span>
                                     </label>
                                 </div>
 
@@ -165,6 +165,7 @@ $GLOBALS['pageResources'] = [
                                     <label class="label-section" for="phone">
                                         <span class="label-text">연락처</span>
                                         <span class="description">(Phone)</span>
+                                        <span class="required-field">*</span>
                                     </label>
                                 </div>
 
@@ -197,6 +198,7 @@ $GLOBALS['pageResources'] = [
                                     <label class="label-section" for="firstName">
                                         <span class="label-text">이름</span>
                                         <span class="description">(First name / Given name)</span>
+                                        <span class="required-field">*</span>
                                     </label>
                                 </div>
 
@@ -216,6 +218,7 @@ $GLOBALS['pageResources'] = [
                                     <label class="label-section" for="lastName">
                                         <span class="label-text">성</span>
                                         <span class="description">(Last name / Family name)</span>
+                                        <span class="required-field">*</span>
                                     </label>
                                 </div>
 
@@ -431,7 +434,7 @@ $GLOBALS['pageResources'] = [
                                     <input autofocus class="custom-input" maxlength="50" name="newpasswordcf" id="newpasswordcf" placeholder="신규 비밀번호를 한 번 더 입력해주세요." type="password" autocomplete="off" required>
                                 </div>
                                 <div class="absolute-match">
-                                <span class="description" id="newpasswordcf-validation-message"></span>
+                                    <span class="description" id="newpasswordcf-validation-message"></span>
                                 </div>
                             </div>
 

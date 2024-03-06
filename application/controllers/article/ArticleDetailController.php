@@ -6,7 +6,7 @@ class ArticleDetailController extends MY_Controller
     {
         parent::__construct();
         $this->load->model('article/ArticleDetailModel', 'ArticleDetailModel');
-        $this->em = $this->doctrine->em;
+        // $this->em = $this->doctrine->em;
     }
     public function index($articleId)
     {

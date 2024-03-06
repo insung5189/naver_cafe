@@ -6,8 +6,6 @@ class MypageController extends MY_Controller
     {
         parent::__construct();
         $this->load->model('member/MypageModel', 'MypageModel');
-        $this->load->library('doctrine');
-        $this->em = $this->doctrine->em;
     }
 
     public function index()

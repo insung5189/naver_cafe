@@ -10,10 +10,22 @@ class Doctrine {
     public $em = null;
 
     public function __construct() {
-        // Doctrine 설정 파일 로드
-        require_once APPPATH . 'config/doctrine.php';
+        $isDevMode = true;
+        $entitiesPath = [APPPATH . 'models/Entities'];
+        $proxyDir = APPPATH . 'cache/proxies';
+        $cache = null;
+        $useSimpleAnnotationReader = false;
+        $config = Setup::createAnnotationMetadataConfiguration($entitiesPath, $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
         
-        // 설정 파일에서 EntityManager 인스턴스를 가져옴
-        $this->em = $GLOBALS['entityManager'];
+        // 데이터베이스 설정
+        $conn = [
+            'driver' => 'pdo_mysql', 
+            'user' => 'root',
+            'password' => '',
+            'dbname' => 'cafe',
+        ];
+        
+        // EntityManager 생성
+        $this->em = EntityManager::create($conn, $config);
     }
 }

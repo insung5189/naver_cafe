@@ -90,7 +90,7 @@ h1 {
 }
 
 .list-style {
-    padding: 29px 0 18px;
+    padding: 29px 0 10px;
     height: 25px;
     border-bottom: 2px solid;
     margin-bottom: 10px;
@@ -126,7 +126,7 @@ h1 {
 .underline span::after {
     content: "";
     position: absolute;
-    bottom: -5px;
+    bottom: -2px;
     left: 0;
     width: 100%;
     height: 2px;

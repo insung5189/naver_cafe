@@ -166,7 +166,7 @@
                                                     </div>
                                                     <div class="activity-info">
                                                         <!-- 사용자 닉네임 -->
-                                                        <a href="/내_카페_활동내용" class="member-nick-name"><?= htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                                        <a href="/member/myactivitycontroller" class="member-nick-name"><?= htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?></a>
                                                     </div>
                                                 </li>
                                                 <li class="membership-date">

@@ -165,17 +165,17 @@ $(document).ready(function () {
             $('#duplicateNickname').show();
         }
     });
-    $('#nickName').on('keyup, click', resetNicknameValidation);
-    $('#phone').on('keyup, input', validatePhone);
-    $('#firstName').on('keyup, focus, input', validateFirstName);
-    $('#lastName').on('keyup, focus, input', validateLastName);
-    $('#gender').on('keyup, focus, input', validateGenderSelect);
+    $('#nickName').on('keyup click', resetNicknameValidation);
+    $('#phone').on('keyup input click', validatePhone);
+    $('#firstName').on('keyup focus input click', validateFirstName);
+    $('#lastName').on('keyup focus input click', validateLastName);
+    $('#gender').on('keyup focus input click', validateGenderSelect);
     $('#gender').change(validateGenderSelect);
-    $('#birth').on('keyup, focus, input', validateBirthDate);
+    $('#birth').on('keyup focus input click', validateBirthDate);
     $('#prfl-info-form').on('submit', submitPrflInfoFormValidation);
 
-    // 페이지 로드와 함께 실행될 코드
-    var textMaxLength = 500; // 최대 길이 설정
+    // textarea 최대 허용길이 설정
+    var textMaxLength = 500;
 
     // '.intro-text-box'의 현재 길이를 계산하고 초기 상태를 설정
     var currentLength = $('.intro-text-box').val().length;
@@ -184,6 +184,13 @@ $(document).ready(function () {
     } else {
         $('.text-caculate-intro').hide();
     }
+
+    validateNickname();
+    validatePhone();
+    validateFirstName();
+    validateLastName();
+    validateGenderSelect();
+    validateBirthDate();
 
     // 자기소개 텍스트 카운팅
     $('body').on('input', '.intro-text-box', function () {

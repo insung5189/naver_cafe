@@ -6,9 +6,7 @@ class MY_Controller extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->library('doctrine');
-        $this->load->library('layout');
-        $this->load->library('session');
+        $this->em = $this->doctrine->em;
         // AJAX 요청이 아닐 때만 프로파일러를 활성화
         if (!$this->input->is_ajax_request()) {
             $this->output->enable_profiler(TRUE);
@@ -21,7 +19,7 @@ class MY_Controller extends CI_Controller
         $cookie = [
             'name'   => 'redirect_url',
             'value'  => $path,
-            'expire' => '3600', // 단위 : 초
+            'expire' => '3600', // 단위 : 초 = 1시간
             'secure' => FALSE, // HTTPS를 사용하지 않는 경우
             'httponly' => FALSE // JavaScript에서 접근 가능하게 설정
         ];

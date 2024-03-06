@@ -15,8 +15,8 @@ class Layout
 		$page_view_data['totalMemberCount'] = $this->getTotalMemberCount();
 		$page_view_data['totalArticleCount'] = $this->getTotalArticleCount();
 
-		if ($userId = $this->obj->session->userdata('user_data')['user_id'] ?? null) {
-			$activityInfo = $this->getUserActivityInfo($userId);
+		if ($memberId = $this->obj->session->userdata('user_data')['user_id'] ?? null) {
+			$activityInfo = $this->getUserActivityInfo($memberId);
 			$page_view_data = array_merge($page_view_data, $activityInfo);
 		}
 
@@ -49,10 +49,10 @@ class Layout
         return $totalArticleCount;
     }
 
-	protected function getUserActivityInfo($userId)
+	protected function getUserActivityInfo($memberId)
 	{
-		$articleCount = $this->obj->MyActivityModel->getArticleCount($userId);
-		$commentCount = $this->obj->MyActivityModel->getCommentCount($userId);
+		$articleCount = $this->obj->MyActivityModel->getArticleCountByMemberId($memberId);
+		$commentCount = $this->obj->MyActivityModel->getCommentCountByMemberId($memberId);
 
 		return [
 			'articleCount' => $articleCount,
