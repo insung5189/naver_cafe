@@ -438,7 +438,7 @@ $GLOBALS['pageResources'] = [
 
             <div class="article-bottom-btn-box">
                 <div class="article-bottom-btn-left-box">
-                    <a href="/article/articleeditcontroller" class="article-write">
+                    <a href="/article/articleeditcontroller" target="_blank" class="article-write">
                         <i class="fa-solid fa-pen-clip fa-sm"></i>
                         글쓰기
                     </a>

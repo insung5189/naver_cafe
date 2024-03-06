@@ -137,7 +137,8 @@ $GLOBALS['pageResources'] = [
                         </label>
                     </div>
                     <div class="my-articles-delete-and-write-btn">
-                        삭제, 글쓰기 버튼
+                        <a href="javascript:void(0);" class="my-articles-delete-btn">삭제</a>
+                        <a href="/article/articleEditController" target="_blank" class="my-articles-write-btn">글쓰기</a>
                     </div>
                 </div>
                 <div class="pagination-box">

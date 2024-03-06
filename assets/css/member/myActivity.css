@@ -219,19 +219,38 @@ table {
     justify-content: space-between;
     margin-top: 10px;
     margin-bottom: 20px;
+    align-items: center;
 }
-
-.all-check-box-btn {}
 
 .input-checked-all {
     margin: 0 0 0 11px;
+    vertical-align: middle;
 }
 
 .input-checked-all-label {
     padding-left: 5px;
+    vertical-align: middle;
 }
 
-.my-articles-delete-and-write-btn {}
+.my-articles-delete-and-write-btn a:last-child {
+    margin-left: 10px;
+}
+
+.my-articles-delete-btn, 
+.my-articles-write-btn {
+    min-width: 46px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 36px;
+    color: #000;
+    background-color: #eff0f2;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: top;
+}
 
 /* 작성글 페이지네이션 CSS 시작 */
 

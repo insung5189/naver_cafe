@@ -43,4 +43,21 @@ class MyActivityController extends MY_Controller
         ];
         $this->layout->view('member/my_activity', $page_view_data);
     }
+
+    public function myActivityArticlesSoftDelete()
+    {
+        $articleIds = $this->input->post('articles');
+
+        if (!empty($articleIds) && is_array($articleIds)) {
+            $result = $this->MyActivityModel->softDeleteArticles($articleIds);
+
+            if ($result) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => '게시글 삭제 실패']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => '선택된 게시글이 없습니다.']);
+        }
+    }
 }
