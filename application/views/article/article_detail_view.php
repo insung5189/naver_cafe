@@ -13,7 +13,7 @@ $GLOBALS['pageResources'] = [
             <a href="/수정_링크" class="list-article-btn">
                 수정
             </a>
-            <a href="/삭제_링크" class="list-article-btn">
+            <a href="javascript:void(0);" class="list-article-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">
                 삭제
             </a>
         </div>
@@ -336,6 +336,7 @@ $GLOBALS['pageResources'] = [
                                         </div>
                                     </div>
 
+                                    <!-- 댓글 수정 폼 -->
                                     <? if (isset($user) && $user['user_id'] === $comment->getMember()->getId()) : ?>
                                         <div class="comment-edited-form-box" style="display: none;">
                                             <form action="/article/articledetailcontroller/editComment/<?= $comment->getId(); ?>" method="POST" enctype="multipart/form-data" data-update-comment-id="<?= $comment->getId(); ?>">
@@ -351,11 +352,11 @@ $GLOBALS['pageResources'] = [
                                                             <div class="session-comment-reply-author-nickname">
                                                                 <?= isset($user['nickName']) ? htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8') : ''; ?>
                                                             </div>
-                                                            <div class="text-caculate-reply" data-text-calculate-reply-id="<?= $comment->getId(); ?>" style="display:none;">0 / 3000</div>
+                                                            <div class="text-caculate-edit" data-text-calculate-edit-id="<?= $comment->getId(); ?>" style="display:none;">0 / 3000</div>
 
                                                         </div>
 
-                                                        <textarea class="comment-text-area-edit" name="commentEditContent" maxlength="3000" data-comment-reply-id="<?= $comment->getId(); ?>"><?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
+                                                        <textarea class="comment-text-area-edit" name="commentEditContent" maxlength="3000" data-comment-edit-id="<?= $comment->getId(); ?>"><?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?></textarea>
 
                                                         <div class="comment-edit-img-preview" id="imgPreviewEdit" data-img-preview-edit-id="<?= $comment->getId(); ?>">
                                                         </div>
@@ -444,7 +445,7 @@ $GLOBALS['pageResources'] = [
                     </a>
                     <a href="/해당_게시물에_답글쓰기_URL" class="article-base-btn">답글</a>
                     <a href="/해당_게시물_수정하기_URL" class="article-base-btn">수정</a>
-                    <a href="/해당_게시물_삭제하기_URL" class="article-base-btn">삭제</a>
+                    <a href="javascript:void(0);" class="article-base-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">삭제</a>
                 </div>
                 <div class="article-bottom-btn-right-box">
                     <a href="/진입했던_게시판_목록보기" class="article-base-btn">목록</a>

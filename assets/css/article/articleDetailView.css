@@ -466,7 +466,8 @@ h1 {
 }
 
 .text-caculate,
-.text-caculate-reply {
+.text-caculate-reply,
+.text-caculate-edit {
     color: #b7b7b7;
     font-weight: 400;
 }

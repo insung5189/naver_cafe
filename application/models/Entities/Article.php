@@ -132,6 +132,22 @@ class Article
     }
 
     /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $deletedDate;
+
+    public function getDeletedDate(): ?DateTime
+    {
+        return $this->deletedDate;
+    }
+
+    public function setDeletedDate(?DateTime $deletedDate): self
+    {
+        $this->deletedDate = $deletedDate;
+        return $this;
+    }
+
+    /**
      * @ORM\Column(type="string", length=255)
      */
     private $publicScope;

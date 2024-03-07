@@ -150,19 +150,26 @@ table {
     width: 100%;
 }
 
-.prefix {
+.prefix,
+.deleted-article-prefix {
     color: #959595;
     font-weight: bold;
     margin-right: 2px;
 }
 
-#myArticlesThead th {
+#myArticlesThead th,
+#myArticlesDeletedThead th,
+#myCommentsThead th,
+#myCommentedArticleThead th {
     display: table-cell;
     border-bottom: 1px solid #f2f2f2;
     padding-bottom: 13px;
 }
 
-#myarticles-tbody td {
+#myarticles-tbody td,
+#myarticles-deleted-tbody td,
+#mycomments-tbody td,
+#mycommented-article-tbody td {
     height: 28px;
     padding: 4px 7px;
     border-bottom: 1px solid #f2f2f2;
@@ -170,7 +177,9 @@ table {
 
 .check-box-cell,
 .article-num-cell,
-.title-list {
+.title-list,
+.deleted-title-list,
+.comment-content-list {
     display: table-cell;
     padding: 0 7px 0 0;
     vertical-align: middle;
@@ -182,12 +191,52 @@ table {
     width: 16px;
 }
 
+.check-box-comment-cell {
+    vertical-align: top;
+}
+
+.td-comment-img {
+    vertical-align: top;
+}
+
+.link-to-commented-article {
+    display: block;
+    overflow: hidden;
+    width: 72px;
+    height: 72px;
+    border: 0.5px solid rgba(0, 0, 0, .06);
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.link-to-commented-article-contents:hover {
+    text-decoration: underline;
+}
+
+.comment-create-date,
+.article-title-for-comment {
+    margin-top: 6px;
+    color: #878787;
+}
+
+.articles-comment-count {
+    color: #ff2f3b;
+    margin: 0 2px 0 2px;
+    font-weight: 400;
+}
+
+.article-title-for-comment {
+    margin-top: 6px;
+}
+
 .article-num-cell {
     text-align: center;
     width: 70px;
 }
 
-.inner-title-name {
+.inner-title-name,
+.inner-deleted-title-name,
+.inner-content-detail {
     display: table;
     width: 100%;
     table-layout: fixed;
@@ -196,7 +245,8 @@ table {
     word-break: break-word;
 }
 
-.article-title-link {
+.article-title-link,
+.deleted-article-title-link {
     display: block;
     max-width: 100%;
     overflow: hidden;
@@ -210,13 +260,24 @@ table {
 }
 
 .td-create-date,
-.td-hit {
+.td-deleted-date,
+.td-hit,
+.td-author {
     text-align: center;
 }
 
-.my-articles-control-box {
+.my-articles-control-box,
+.my-comments-control-box {
     display: flex;
     justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.my-commented-articles-control-box {
+    display: flex;
+    justify-content: flex-end;
     margin-top: 10px;
     margin-bottom: 20px;
     align-items: center;
@@ -232,11 +293,14 @@ table {
     vertical-align: middle;
 }
 
-.my-articles-delete-and-write-btn a:last-child {
+.my-articles-delete-and-write-btn a:last-child,
+.my-comments-delete-and-write-btn a:last-child,
+.my-commented-articles-delete-and-write-btn a:last-child {
     margin-left: 10px;
 }
 
-.my-articles-delete-btn, 
+.my-articles-delete-btn,
+.my-comments-delete-btn,
 .my-articles-write-btn {
     min-width: 46px;
     padding: 10px 12px;

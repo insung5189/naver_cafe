@@ -319,9 +319,11 @@ class ArticleDetailModel extends MY_Model
         $query = $queryBuilder
             ->update('Models\Entities\Comment', 'c')
             ->set('c.isActive', ':isActive')
+            ->set('c.deletedDate', ':deleteTime')
             ->where('c.id = :commentId')
             ->andWhere('c.member = :memberId')
             ->setParameter('isActive', 0)
+            ->setParameter('deleteTime', new \DateTime())
             ->setParameter('commentId', $commentId)
             ->setParameter('memberId', $memberId)
             ->getQuery();
@@ -333,5 +335,21 @@ class ArticleDetailModel extends MY_Model
         } catch (\Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
+    }
+
+    public function processDeleteArticle($articleId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $query = $queryBuilder
+            ->update('Models\Entities\Article', 'a')
+            ->set('a.isActive', ':isActive')
+            ->set('a.deletedDate', ':deleteTime')
+            ->where('a.id = :articleId')
+            ->setParameter('isActive', 0)
+            ->setParameter('deleteTime', new \DateTime())
+            ->setParameter('articleId', $articleId)
+            ->getQuery();
+
+        return $query->execute();
     }
 }

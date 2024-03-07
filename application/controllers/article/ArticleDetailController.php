@@ -6,7 +6,6 @@ class ArticleDetailController extends MY_Controller
     {
         parent::__construct();
         $this->load->model('article/ArticleDetailModel', 'ArticleDetailModel');
-        // $this->em = $this->doctrine->em;
     }
     public function index($articleId)
     {
@@ -161,7 +160,7 @@ class ArticleDetailController extends MY_Controller
         $result = $this->ArticleDetailModel->processCreateComment($formData);
 
         if ($result['success']) {
-            redirect('/article/articledetailcontroller/index/' . $formData['articleId'] . '#comment-' . $result['commentId']);
+            redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
         } else {
             $this->session->set_flashdata('error_messages', $result['errors']);
             redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
@@ -253,6 +252,23 @@ class ArticleDetailController extends MY_Controller
             }
         } else {
             echo json_encode(['success' => false, 'message' => '댓글 삭제 중 오류가 발생했습니다.', 'error' => $result['error']]);
+        }
+    }
+
+    public function deleteArticle()
+    {
+        $articleId = $this->input->post('articleId');
+
+        if (!empty($articleId)) {
+            $result = $this->ArticleDetailModel->processDeleteArticle($articleId);
+
+            if ($result) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => '게시글 삭제 실패']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => '']);
         }
     }
 }

@@ -18,24 +18,32 @@ class MyActivityController extends MY_Controller
         if ($memberId) {
             $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
             $articles = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
+            $comments = $this->MyActivityModel->getCommentsByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
+            $commentCountByArticle = $this->MyActivityModel->getCommentCountByMemberArticles($memberId);
+            $commentedArticlesByMemberId = $this->MyActivityModel->getArticlesCommentedByMember($memberId);
+            $deletedArticles = $this->MyActivityModel->getDeletedArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
             $totalArticleCount = $this->MyActivityModel->getArticleCountByMemberId($memberId);
             $totalPages = ceil($totalArticleCount / $articlesPerPage);
-            $this->loadMyActivityArticlesList($member, $articles, $totalArticleCount, $currentPage, $totalPages, $articlesPerPage);
+            $this->loadMyActivityArticlesList($member, $articles, $comments, $commentCountByArticle, $commentedArticlesByMemberId, $deletedArticles, $totalArticleCount, $currentPage, $totalPages, $articlesPerPage);
         } else {
             $page_view_data['title'] = '오류 발생';
             $this->layout->view('errors/error_page', $page_view_data);
         }
     }
 
-    private function loadMyActivityArticlesList($member, $articles, $totalArticleCount, $currentPage, $totalPages, $articlesPerPage)
+    private function loadMyActivityArticlesList($member, $articles, $comments, $commentCountByArticle, $commentedArticlesByMemberId, $deletedArticles, $totalArticleCount, $currentPage, $totalPages, $articlesPerPage)
     {
-        $memberPrflFileUrl = "/assets/file/images/memberImgs/";
         $commentFileUrl = "/assets/file/commentFiles/img/";
 
         $page_view_data = [
             'title' => '나의 활동',
+            'commentFileUrl' => $commentFileUrl,
             'member' => $member,
             'articles' => $articles,
+            'comments' => $comments,
+            'commentCountByArticle' => $commentCountByArticle,
+            'commentedArticlesByMemberId' => $commentedArticlesByMemberId,
+            'deletedArticles' => $deletedArticles,
             'totalArticleCountAll' => $totalArticleCount,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
