@@ -152,6 +152,12 @@ table {
     text-overflow: ellipsis;
 }
 
+.articles-comment-count {
+    color: #ff2f3b;
+    margin: 0 2px 0 2px;
+    font-weight: 700;
+}
+
 .author-name {
     width: 106px;
 }

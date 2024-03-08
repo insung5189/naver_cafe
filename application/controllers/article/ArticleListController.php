@@ -24,7 +24,6 @@ class ArticleListController extends MY_Controller
 
             if (isset($result['errors'])) {
                 $errors = $result['errors'];
-
                 $articles = $this->ArticleListModel->getArticlesByPage($currentPage, $articlesPerPage);
                 $totalArticleCount = $this->ArticleListModel->getTotalArticleCount();
             } else {
@@ -36,11 +35,20 @@ class ArticleListController extends MY_Controller
             $totalArticleCount = $this->ArticleListModel->getTotalArticleCount();
         }
 
+        // 게시글 ID 배열 생성
+        $articleIds = array_map(function ($article) {
+            return $article->getId();
+        }, $articles);
+
+        // 게시글별 댓글 개수 조회
+        $commentCounts = $this->ArticleListModel->getCommentCountForArticles($articleIds);
+
         $totalPages = ceil($totalArticleCount / $articlesPerPage);
 
         $page_view_data = [
             'title' => !empty($keyword) ? '검색 결과' : '전체글보기',
             'articles' => $articles,
+            'commentCounts' => $commentCounts,
             'totalArticleCountAll' => $totalArticleCount,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,

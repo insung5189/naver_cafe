@@ -1,27 +1,70 @@
 $(document).ready(function () {
 
     // 나의 활동 공통 이벤트 핸들러 및 함수
-    $('.my-activity-list-style a').click(function () {
+    // $('.my-activity-list-style a').click(function () {
+    //     $('.my-activity-list-style a').removeClass('on underline');
+    //     $(this).addClass('on underline');
+
+    //     if ($(this).text().trim() === "작성글") {
+    //         $('#myCommentsArea, #myCommentedArticlesArea, #myLikedArticlesArea, #myDeletedArticlesArea').hide();
+    //         $('#myArticlesArea').show();
+    //     } else if ($(this).text().trim() === "작성댓글") {
+    //         $('#myArticlesArea, #myCommentedArticlesArea, #myLikedArticlesArea, #myDeletedArticlesArea').hide();
+    //         $('#myCommentsArea').show();
+    //     } else if ($(this).text().trim() === "댓글단 글") {
+    //         $('#myArticlesArea, #myCommentsArea, #myLikedArticlesArea, #myDeletedArticlesArea').hide();
+    //         $('#myCommentedArticlesArea').show();
+    //     } else if ($(this).text().trim() === "좋아요한 글") {
+    //         $('#myArticlesArea, #myCommentsArea, #myCommentedArticlesArea, #myDeletedArticlesArea').hide();
+    //         $('#myLikedArticlesArea').show();
+    //     }
+    //     else if ($(this).text().trim() === "삭제한 게시글") {
+    //         $('#myArticlesArea, #myCommentsArea, #myCommentedArticlesArea, #myLikedArticlesArea').hide();
+    //         $('#myDeletedArticlesArea').show();
+    //     }
+    // });
+
+
+    // 탭 처리 클릭이벤트
+    $('.link_sort').click(function () {
         $('.my-activity-list-style a').removeClass('on underline');
         $(this).addClass('on underline');
+        var tabId = $(this).attr('id');
+        var tabMethod;
 
-        if ($(this).text().trim() === "작성글") {
-            $('#myCommentsArea, #myCommentedArticlesArea, #myLikedArticlesArea, #myDeletedArticlesArea').hide();
-            $('#myArticlesArea').show();
-        } else if ($(this).text().trim() === "작성댓글") {
-            $('#myArticlesArea, #myCommentedArticlesArea, #myLikedArticlesArea, #myDeletedArticlesArea').hide();
-            $('#myCommentsArea').show();
-        } else if ($(this).text().trim() === "댓글단 글") {
-            $('#myArticlesArea, #myCommentsArea, #myLikedArticlesArea, #myDeletedArticlesArea').hide();
-            $('#myCommentedArticlesArea').show();
-        } else if ($(this).text().trim() === "좋아요한 글") {
-            $('#myArticlesArea, #myCommentsArea, #myCommentedArticlesArea, #myDeletedArticlesArea').hide();
-            $('#myLikedArticlesArea').show();
+        switch (tabId) {
+            case 'my_activity_my_articles_area':
+                tabMethod = 'loadMyArticles';
+                break;
+            case 'my_activity_my_comments_area':
+                tabMethod = 'loadMyComments';
+                break;
+            case 'my_activity_my_commented_articles_area':
+                tabMethod = 'loadMyCommentedArticles';
+                break;
+            case 'my_activity_my_liked_articles_area':
+                tabMethod = 'loadMyLikedArticles';
+                break;
+            case 'my_activity_my_deleted_articles_area':
+                tabMethod = 'loadMyDeletedArticles';
+                break;
+            default:
+                console.log('Unknown tab');
+                return;
         }
-        else if ($(this).text().trim() === "삭제한 게시글") {
-            $('#myArticlesArea, #myCommentsArea, #myCommentedArticlesArea, #myLikedArticlesArea').hide();
-            $('#myDeletedArticlesArea').show();
-        }
+
+        $.ajax({
+            url: '/member/myactivitycontroller/' + tabMethod,
+            type: 'GET',
+            dataType: 'json', // HTML 형식으로 응답을 받음
+            success: function (response) {
+                // 응답받은 HTML을 #tabContentArea에 삽입
+                $('#tabContentArea').html(response.html);
+            },
+            error: function (xhr, status, error) {
+                console.error("An error occurred: " + status + ", " + error);
+            }
+        });
     });
 
     $('.my-articles-delete-btn').on('click', function () {
@@ -105,4 +148,27 @@ $(document).ready(function () {
     $('#check-comment-all-this-page').change(function () {
         $('input.input_check_comment').prop('checked', $(this).prop('checked'));
     });
+
+    // 페이지네이션 링크 클릭 이벤트
+    $('.pagination a').on('click', function (e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+        fetchPageData(page); // AJAX 요청 함수 호출
+    });
+
+    function fetchPageData(page) {
+        $.ajax({
+            url: '/member/MyActivityController/fetchArticles',
+            type: 'GET',
+            data: { page: page },
+            dataType: 'json',
+            success: function (response) {
+                // 성공 시 페이지 콘텐츠 업데이트
+                $('#myArticlesArea').html(response.html);
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
 });

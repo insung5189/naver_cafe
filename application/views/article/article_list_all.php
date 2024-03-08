@@ -156,7 +156,12 @@ $GLOBALS['pageResources'] = [
                                                 <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>
                                             <?= $article->getTitle() ? htmlspecialchars($article->getTitle(), ENT_QUOTES, 'UTF-8') : '제목을 찾을 수 없음'; ?>
-                                            <?=?>
+                                            <? $commentCount = $commentCounts[$article->getId()] ?? 0; ?>
+                                            <? if ($commentCount !== 0) : ?>
+                                                <span class="articles-comment-count">
+                                                    <?= '[' . $commentCount . ']' ?>
+                                                </span>
+                                            <? endif; ?>
                                         </a>
                                     </div>
                                 </div>

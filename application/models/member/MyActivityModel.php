@@ -47,6 +47,19 @@ class MyActivityModel extends MY_Model
         return $query->getResult();
     }
 
+    public function getCommentsByMemberId($memberId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('c')
+            ->from('Models\Entities\Comment', 'c')
+            ->where('c.member = :memberId')
+            ->andWhere('c.isActive = 1')
+            ->setParameter('memberId', $memberId);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getResult();
+    }
+
     public function getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage)
     {
         $queryBuilder = $this->em->createQueryBuilder();
@@ -61,6 +74,15 @@ class MyActivityModel extends MY_Model
 
         return $queryBuilder->getQuery()->getResult();
     }
+
+    /*
+    위 getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage) 메서드를 SQL로 변경하면 아래와 같은 형태임
+    SELECT a.* FROM article a
+    WHERE a.member_id = 1
+    AND a.is_active = 1
+    ORDER BY a.create_date DESC
+    LIMIT (최대값) OFFSET (현재세팅값)
+     */
 
     public function getCommentsByMemberIdByPage($memberId, $currentPage, $articlesPerPage)
     {
@@ -78,23 +100,23 @@ class MyActivityModel extends MY_Model
     }
 
     /**
-     * 내가 남긴 댓글을 가지고있는 게시물의 댓글 수를 파악함.
+     * 내가 남긴 댓글을 가지고있는 게시물의 댓글 수를 파악함.(게시글은 내가 작성한것일수도, 내가 작성한 것이 아닐 수도 있음.)
      */
-    public function getCommentCountByMemberArticles($memberId)
+    public function getCommentCountByMemberArticles($commentIds)
     {
         $queryBuilder = $this->em->createQueryBuilder();
 
-        // 사용자가 작성한 게시글에 대한 댓글 수를 조회
-        $queryBuilder->select('a.id AS articleId, COUNT(c.id) AS commentCount')
-            ->from('Models\Entities\Article', 'a')
-            ->leftJoin('Models\Entities\Comment', 'c', 'WITH', 'a.id = c.article AND c.isActive = 1')
-            ->where('a.member = :memberId')
-            ->groupBy('a.id') // 각 게시글별로 그룹화
-            ->setParameter('memberId', $memberId);
+        // 댓글 ID 배열을 기반으로 해당 댓글이 속한 게시글의 ID와, 해당 게시글에 대한 총 댓글 수를 조회
+        $queryBuilder->select('IDENTITY(c.article) as articleId, COUNT(c.id) as commentCount')
+            ->from('Models\Entities\Comment', 'c')
+            ->where($queryBuilder->expr()->in('c.id', ':commentIds')) // c.id가 $commentIds 배열에 속하는 경우
+            ->andWhere('c.isActive = 1') // 활성 상태인 댓글만 고려
+            ->groupBy('c.article') // 댓글이 속한 게시글 기준으로 그룹화
+            ->setParameter('commentIds', $commentIds);
 
         $results = $queryBuilder->getQuery()->getResult();
 
-        // 결과를 게시글 ID를 키로 하고, 댓글 수를 값으로 하는 배열로 변환
+        // 결과를 게시글 ID를 키로 하고, 해당 게시글의 총 댓글 수를 값으로 하는 배열로 변환
         $commentCountByArticle = [];
         foreach ($results as $result) {
             $commentCountByArticle[$result['articleId']] = $result['commentCount'];
