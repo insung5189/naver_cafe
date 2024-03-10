@@ -153,9 +153,8 @@ $GLOBALS['pageResources'] = [
                     <div class="article-reply-box">
                         <div class="article-reply-box-left">
                             <div class="like-ico">
-                                <a href="#">
-                                    <i class="fa-regular fa-lg fa-heart" style="color: #f53535;"></i>
-                                    <i class="fa-solid fa-lg fa-heart" style="color: #f53535; display:none;"></i>
+                                <a id="articleLikeBtn" href="javascript:void(0);">
+                                    <i class="<?= $userLikedArticle ? 'fa-solid' : 'fa-regular' ?> fa-lg fa-heart" style="color: #f53535;"></i>
                                     <span>좋아요</span>
                                     <span class="like-count-num">
                                         <?= $likeCountByArticle ? htmlspecialchars($likeCountByArticle, ENT_QUOTES, 'UTF-8') : '0'; ?>

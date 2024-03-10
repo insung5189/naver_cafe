@@ -72,13 +72,5 @@ $GLOBALS['pageResources'] = [
                 <?= $initialTabContent ?>
             </div>
         </div>
-        <div class="pagination">
-            <?php
-            for ($page = 1; $page <= $totalPages; $page++) {
-                echo '<a href="javascript:void(0);" data-page="' . $page . '">' . $page . '</a>';
-            }
-            ?>
-        </div>
-
     </div>
 </section>

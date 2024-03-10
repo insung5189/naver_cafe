@@ -109,6 +109,7 @@ class ArticleDetailModel extends MY_Model
         return $basePath . $file->getCombinedName();
     }
 
+    // 게시글의 좋아요 수를 불러오는 쿼리
     public function getLikesByArticleId($articleId)
     {
         $queryBuilder = $this->em->createQueryBuilder();
@@ -118,6 +119,53 @@ class ArticleDetailModel extends MY_Model
             ->setParameter('articleId', $articleId);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function userLikedArticle($articleId, $userId)
+    {
+        $like = $this->em->getRepository('Models\Entities\Likes')->findOneBy([
+            'article' => $articleId,
+            'member' => $userId
+        ]);
+
+        return $like !== null;
+    }
+
+    public function processAddArticleLike($articleId, $memberId)
+    {
+        try {
+            $likeExists = $this->em->getRepository('Models\Entities\Likes')->findOneBy([
+                'article' => $articleId,
+                'member' => $memberId
+            ]);
+
+            if ($likeExists) {
+                $this->em->remove($likeExists);
+                $this->em->flush();
+                return ['success' => true, 'action' => 'removed'];
+            } else {
+                $like = new Models\Entities\Likes();
+
+                $article = $this->em->find('Models\Entities\Article', $articleId);
+                $member = $this->em->find('Models\Entities\Member', $memberId);
+
+                if (!$article) {
+                    return ['success' => false, 'message' => '게시글 정보를 찾을 수 없습니다.'];
+                } else if (!$member) {
+                    return ['success' => false, 'message' => '사용자 정보를 찾을 수 없습니다.'];
+                } else {
+                    $like->setArticle($article);
+                    $like->setMember($member);
+
+                    $this->em->persist($like);
+                    $this->em->flush();
+                    return ['success' => true, 'action' => 'added'];
+                }
+            }
+        } catch (\Exception $e) {
+            log_message('error', '좋아요 처리 실패: ' . $e->getMessage());
+            return ['success' => false, 'message' => '좋아요 처리 중 오류가 발생했습니다.'];
+        }
     }
 
     public function processCreateComment($formData)

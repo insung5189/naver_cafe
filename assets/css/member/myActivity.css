@@ -169,7 +169,8 @@ table {
 #myarticles-tbody td,
 #myarticles-deleted-tbody td,
 #mycomments-tbody td,
-#mycommented-article-tbody td {
+#mycommented-article-tbody td,
+#myliked-articles-tbody td {
     height: 28px;
     padding: 4px 7px;
     border-bottom: 1px solid #f2f2f2;

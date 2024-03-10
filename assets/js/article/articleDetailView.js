@@ -69,21 +69,42 @@ $(document).ready(function () {
         }
     });
 
-    // 댓글 관련 js
+    $('#articleLikeBtn').on('click', function () {
+        var articleId = $('#article').data('article-id');
 
-    // 댓글 등록 후 해당 위치로 스크롤
-    // if (window.location.hash) {
-    //     var commentElement = $(window.location.hash);
-    //     if (commentElement.length) {
-    //         $('html, body').animate({
-    //             scrollTop: commentElement.offset().top
-    //         }, 1000, function () {
-    //             // 스크롤 이동 완료 후 주소창에서 해시값 제거
-    //             var cleanUrl = window.location.href.split('#')[0];
-    //             window.history.replaceState({}, document.title, cleanUrl);
-    //         });
-    //     }
-    // }
+        $.ajax({
+            url: '/article/articleDetailController/articleLike',
+            type: 'POST',
+            dataType: 'json',
+            data: { articleId: articleId },
+            success: function (response) {
+                if (response.success) {
+                    // 좋아요 추가 또는 삭제에 따라 UI 업데이트
+                    if (response.action === 'added') {
+                        $('.fa-heart').addClass('fa-solid').removeClass('fa-regular');
+                    } else if (response.action === 'removed') {
+                        $('.fa-heart').addClass('fa-regular').removeClass('fa-solid');
+                    } else {
+                        alert(response.message);
+                    }
+                    $('.like-count-num').text(response.likeCount); // 업데이트된 좋아요 수 반영
+                } else if (response.loginRequired) {
+                    if (confirm('로그인이 필요한 기능입니다.\n로그인페이지로 이동하시겠습니까?')) {
+                        document.cookie = "redirect_url=" + window.location.href + ";path=/";
+                        window.location.href = '/member/logincontroller';
+                    }
+                } else {
+                    $('.like-count-num').text(response.likeCount); // 업데이트된 좋아요 수 반영
+                    alert(response.message);
+                }
+            },
+            error: function () {
+                alert('서버 통신 오류가 발생했습니다. 다시 시도해주세요.');
+            }
+        });
+    });
+
+    // 댓글 관련 js
 
     // 등록순 버튼 클릭 이벤트
     $('#sort-asc-btn').click(function (e) {
@@ -217,8 +238,6 @@ $(document).ready(function () {
 
 
     // 답글 관련 js
-
-    var commentReplyId = $(this).data('comment-reply-id');
 
     // 답글 작성 토글 버튼 클릭 이벤트
     $('body').on('click', '.create-comment-reply-btn', function (e) {

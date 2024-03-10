@@ -9,45 +9,21 @@ class MyActivityController extends MY_Controller
     }
     public function index()
     {
-        // 페이지 번호와 기본 설정
-        $currentPage = $this->input->get('page') ?? 1;
-        $articlesPerPage = $this->input->get('articlesPerPage') ? (int)$this->input->get('articlesPerPage') : 10;
-
         $userData = $this->session->userdata('user_data');
         $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
 
         if ($memberId) {
             // 회원 정보 및 관련 데이터 로드
             $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
-            $totalArticleCount = $this->MyActivityModel->getArticleCountByMemberId($memberId);
-            $totalPages = ceil($totalArticleCount / $articlesPerPage);
 
             // '작성글' 탭의 초기 콘텐츠 로드
-            $initialTabContent = $this->loadInitialTabContent($memberId, $currentPage, $articlesPerPage);
-
-            /**
-             * 
-            // 회원 관련 데이터 로드
-            $articlesByPage = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
-            $commentsByPage = $this->MyActivityModel->getCommentsByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
-            $commentIds = array_map(function ($comment) {
-                return $comment->getId();
-            }, $commentsByPage);
-            $commentCountByArticle = $this->MyActivityModel->getCommentCountByMemberArticles($commentIds);
-            $commentedArticlesByMemberId = $this->MyActivityModel->getArticlesCommentedByMember($memberId);
-            $deletedArticles = $this->MyActivityModel->getDeletedArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
-            $totalArticleCount = $this->MyActivityModel->getArticleCountByMemberId($memberId);
-            $totalPages = ceil($totalArticleCount / $articlesPerPage);
-             */
+            $initialTabContent = $this->loadInitialTabContent($memberId);
 
             // 페이지 데이터 준비
             $page_view_data = [
                 'title' => '나의 활동',
                 'member' => $member,
                 'initialTabContent' => $initialTabContent,
-                'currentPage' => $currentPage,
-                'totalPages' => $totalPages,
-                'articlesPerPage' => $articlesPerPage,
             ];
 
             // 뷰 로드
@@ -61,14 +37,25 @@ class MyActivityController extends MY_Controller
     /**
      * 나의활동 페이지에서 my_activity_my_articles_area.php 파일 로드하는 메서드(나의활동 초기탭)
      */
-    private function loadInitialTabContent($memberId, $currentPage, $articlesPerPage)
+    private function loadInitialTabContent($memberId)
     {
+        $currentPage = $this->input->get('page', TRUE) ?? 1;
+        $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ?? 10;
         $articlesByPage = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
-        $totalArticleCount = $this->MyActivityModel->getArticleCountByMemberId($memberId);
+        $totalArticleCount = count($this->MyActivityModel->getArticlesByMemberId($memberId));
         $totalPages = ceil($totalArticleCount / $articlesPerPage);
+
+        // 목록에 표시되는 게시물의 댓글 갯수 확인하기
+        $articlesByMemberId = $this->MyActivityModel->getArticlesByMemberId($memberId);
+        $articleIds = array_map(function ($article) {
+            return $article->getId();
+        }, $articlesByMemberId);
+        $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
+
 
         $myActivityMyArticlesData = [
             'articlesByPage' => $articlesByPage,
+            'commentCountByArticle' => $commentCountByArticle,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
             'articlesPerPage' => $articlesPerPage
@@ -86,17 +73,27 @@ class MyActivityController extends MY_Controller
             try {
                 $userData = $this->session->userdata('user_data');
                 $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
+                // 작성글 탭의 페이지네이션 관련 데이터
                 $currentPage = $this->input->get('page', TRUE) ?? 1;
                 $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ?? 10;
-                $totalArticleCount = $this->MyActivityModel->getArticleCountByMemberId($memberId);
+                $totalArticleCount = count($this->MyActivityModel->getArticlesByMemberId($memberId));
                 $totalPages = ceil($totalArticleCount / $articlesPerPage);
 
-                // 필요한 데이터 로드 로직
+                // 필요한 데이터 로드
                 $articlesByPage = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
 
-                // 데이터를 배열로 변환하는 로직
+                // 목록에 표시되는 게시물의 댓글 갯수 확인하기
+                $articlesByMemberId = $this->MyActivityModel->getArticlesByMemberId($memberId);
+                $articleIds = array_map(function ($article) {
+                    return $article->getId();
+                }, $articlesByMemberId);
+                $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
+
+                // 데이터를 배열로 변환
                 $myActivityMyArticlesData = [
                     'articlesByPage' => $articlesByPage,
+                    'commentCountByArticle' => $commentCountByArticle,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
                     'articlesPerPage' => $articlesPerPage
@@ -122,18 +119,22 @@ class MyActivityController extends MY_Controller
             try {
                 $userData = $this->session->userdata('user_data');
                 $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
+                // 작성댓글 탭의 페이지네이션 관련 데이터
                 $currentPage = $this->input->get('page', TRUE) ?? 1;
                 $commentsPerPage = $this->input->get('commentsPerPage', TRUE) ?? 10;
-                $totalCommentCount = $this->MyActivityModel->getCommentCountByMemberId($memberId);
+                $totalCommentCount = count($this->MyActivityModel->getCommentsByMemberId($memberId));
                 $totalPages = ceil($totalCommentCount / $commentsPerPage);
 
                 // 필요한 데이터 로드 로직
                 $commentsByPage = $this->MyActivityModel->getCommentsByMemberIdByPage($memberId, $currentPage, $commentsPerPage);
-                $commentsByMemberId = $this->MyActivityModel->getCommentsByMemberId($memberId);
-                $commentIds = array_map(function ($comment) {
+
+                // 목록에 표시되는 게시물의 댓글 갯수 확인하기
+                $commentsByMemberId = $this->MyActivityModel->getArticlesCommentedByMember($memberId);
+                $articleIds = array_map(function ($comment) {
                     return $comment->getId();
                 }, $commentsByMemberId);
-                $commentCountByArticle = $this->MyActivityModel->getCommentCountByMemberArticles($commentIds);
+                $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
 
                 // 데이터를 배열로 변환하는 로직
                 $myActivityMyCommentsData = [
@@ -159,44 +160,127 @@ class MyActivityController extends MY_Controller
 
     public function loadMyCommentedArticles()
     {
-        // 이 메서드에서 댓글단 글 탭의 데이터 로드 및 뷰 렌더링 로직 구현
+        // 댓글단 글 탭의 데이터 로드 및 뷰 렌더링
+        // AJAX 요청 인지 확인
+        if ($this->input->is_ajax_request()) {
+            try {
+                $userData = $this->session->userdata('user_data');
+                $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
+                // 댓글단 글 탭의 페이지네이션 관련 데이터
+                $currentPage = $this->input->get('page', TRUE) ?? 1;
+                $commentedArticlesPerPage = $this->input->get('commentedArticlesPerPage', TRUE) ?? 10;
+                $totalCommentedArticlesByMemberIdCount = count($this->MyActivityModel->getArticlesCommentedByMember($memberId));
+                $totalPages = ceil($totalCommentedArticlesByMemberIdCount / $commentedArticlesPerPage);
+
+                // 필요한 데이터 로드 로직
+                $commentedArticlesByMemberIdAndPage = $this->MyActivityModel->getArticlesCommentedByMemberIdAndPage($memberId, $currentPage, $commentedArticlesPerPage);
+
+                // 목록에 표시되는 게시물의 댓글 갯수 확인하기
+                $articlesCommentedByMemberId = $this->MyActivityModel->getArticlesCommentedByMember($memberId);
+                $articleIds = array_map(function ($commentedArticle) {
+                    return $commentedArticle->getId();
+                }, $articlesCommentedByMemberId);
+                $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
+
+                // 데이터를 배열로 변환하는 로직
+                $myActivityMyCommentedArticlesData = [
+                    'commentedArticlesByMemberIdAndPage' => $commentedArticlesByMemberIdAndPage,
+                    'commentCountByArticle' => $commentCountByArticle,
+                    'currentPage' => $currentPage,
+                    'totalPages' => $totalPages,
+                    'commentedArticlesPerPage' => $commentedArticlesPerPage
+                ];
+                $html = $this->load->view('member/my_activity_my_commented_articles_area', $myActivityMyCommentedArticlesData, TRUE);
+
+                // 데이터를 JSON 형태로 반환
+                echo json_encode(['success' => true, 'html' => $html]);
+            } catch (\Exception $e) {
+                echo json_encode(['success' => false, 'error' => '댓글단 글 목록을 불러오는 데 실패했습니다.']);
+            }
+        } else {
+            show_404();
+        }
     }
 
     public function loadMyLikedArticles()
     {
-        // 이 메서드에서 좋아요한 글 탭의 데이터 로드 및 뷰 렌더링 로직 구현
+        // 좋아요한 글 탭의 데이터 로드 및 뷰 렌더링
+        // AJAX 요청 인지 확인
+        if ($this->input->is_ajax_request()) {
+            try {
+                $userData = $this->session->userdata('user_data');
+                $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
+                // 작성글 탭의 페이지네이션 관련 데이터
+                $currentPage = $this->input->get('page', TRUE) ?? 1;
+                $likedArticlesPerPage = $this->input->get('likedArticlesPerPage', TRUE) ?? 10;
+
+                // 필요한 데이터 로드
+                $likedArticlesByPage = $this->MyActivityModel->getLikedArticlesByMemberIdWithCount($memberId, $currentPage, $likedArticlesPerPage);
+
+                $totalPages = ceil($likedArticlesByPage['totalCountLikedArticles'] / $likedArticlesPerPage);
+
+                // 목록에 표시되는 게시물의 댓글 갯수 확인하기
+                $likedArticlesByMemberId = $this->MyActivityModel->getAllLikedArticlesByMemberId($memberId);
+                $articleIds = array_map(function ($likedArticle) {
+                    return $likedArticle->getId();
+                }, $likedArticlesByMemberId);
+                $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
+
+                // 데이터를 배열로 변환
+                $myActivityMyLikedArticlesData = [
+                    'likeArticlesByPage' => $likedArticlesByPage['articlesByPage'],
+                    'commentCountByArticle' => $commentCountByArticle,
+                    'currentPage' => $currentPage,
+                    'totalPages' => $totalPages,
+                    'likedArticlesPerPage' => $likedArticlesPerPage
+                ];
+
+                $html = $this->load->view('member/my_activity_my_liked_articles_area', $myActivityMyLikedArticlesData, TRUE);
+
+                // 데이터를 JSON 형태로 반환
+                echo json_encode(['success' => true, 'html' => $html]);
+            } catch (\Exception $e) {
+                echo json_encode(['success' => false, 'error' => '좋아요한 글 목록을 불러오는 데 실패했습니다.']);
+            }
+        } else {
+            show_404();
+        }
     }
 
     public function loadMyDeletedArticles()
     {
-        // 이 메서드에서 삭제한 게시글 탭의 데이터 로드 및 뷰 렌더링 로직 구현
-    }
-
-    public function fetchArticles()
-    {
-        // AJAX 요청 검사
+        // 삭제한 게시글 탭의 데이터 로드 및 뷰 렌더링
+        // AJAX 요청 인지 확인
         if ($this->input->is_ajax_request()) {
-            $userData = $this->session->userdata('user_data');
-            $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
-            $currentPage = $this->input->get('page', TRUE) ?? 1;
-            $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ?? 10;
+            try {
+                $userData = $this->session->userdata('user_data');
+                $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
 
-            $articlesByPage = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
-            $totalArticleCount = $this->MyActivityModel->getArticleCountByMemberId($memberId);
-            $totalPages = ceil($totalArticleCount / $articlesPerPage);
+                // 삭제한 게시글 탭의 페이지네이션 관련 데이터
+                $currentPage = $this->input->get('page', TRUE) ?? 1;
+                $deletedArticlesPerPage = $this->input->get('deletedArticlesPerPage', TRUE) ?? 10;
+                $totalDeletedArticlesCount = count($this->MyActivityModel->getDeletedArticlesByMemberId($memberId));
+                $totalPages = ceil($totalDeletedArticlesCount / $deletedArticlesPerPage);
 
-            // 데이터를 배열로 변환
-            $myActivityMyArticlesData = [
-                'articlesByPage' => $articlesByPage,
-                'currentPage' => $currentPage,
-                'totalPages' => $totalPages,
-                'articlesPerPage' => $articlesPerPage
-            ];
+                // 필요한 데이터 로드 로직
+                $deletedArticlesByPage = $this->MyActivityModel->getDeletedArticlesByMemberIdByPage($memberId, $currentPage, $deletedArticlesPerPage);
 
-            $html = $this->load->view('member/my_activity_my_articles_area', $myActivityMyArticlesData, TRUE);
+                // 데이터를 배열로 변환하는 로직
+                $myActivityMyDeletedArticlesData = [
+                    'deletedArticlesByPage' => $deletedArticlesByPage,
+                    'currentPage' => $currentPage,
+                    'totalPages' => $totalPages,
+                    'deletedArticlesPerPage' => $deletedArticlesPerPage
+                ];
+                $html = $this->load->view('member/my_activity_my_deleted_articles_area', $myActivityMyDeletedArticlesData, TRUE);
 
-            // 데이터를 JSON 형태로 반환
-            echo json_encode(['success' => true, 'html' => $html]);
+                // 데이터를 JSON 형태로 반환
+                echo json_encode(['success' => true, 'html' => $html]);
+            } catch (\Exception $e) {
+                echo json_encode(['success' => false, 'error' => '댓글단 글 목록을 불러오는 데 실패했습니다.']);
+            }
         } else {
             show_404();
         }
@@ -216,6 +300,23 @@ class MyActivityController extends MY_Controller
             }
         } else {
             echo json_encode(['success' => false, 'message' => '선택된 게시글이 없습니다.']);
+        }
+    }
+
+    public function myActivityCommentsSoftDelete()
+    {
+        $commentIds = $this->input->post('comments');
+
+        if (!empty($commentIds) && is_array($commentIds)) {
+            $result = $this->MyActivityModel->softDeleteComments($commentIds);
+
+            if ($result) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => '댓글 삭제 실패']);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => '선택된 댓글이 없습니다.']);
         }
     }
 }

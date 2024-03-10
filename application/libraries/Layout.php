@@ -77,8 +77,8 @@ class Layout
 
 	protected function getUserActivityInfo($memberId)
 	{
-		$articleCount = $this->obj->MyActivityModel->getArticleCountByMemberId($memberId);
-		$commentCount = $this->obj->MyActivityModel->getCommentCountByMemberId($memberId);
+		$articleCount = count($this->obj->MyActivityModel->getArticlesByMemberId($memberId));
+		$commentCount = count($this->obj->MyActivityModel->getCommentsByMemberId($memberId));
 
 		return [
 			'articleCount' => $articleCount,

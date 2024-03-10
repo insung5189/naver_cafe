@@ -7,13 +7,19 @@ class ArticleDetailController extends MY_Controller
         parent::__construct();
         $this->load->model('article/ArticleDetailModel', 'ArticleDetailModel');
     }
+
     public function index($articleId)
     {
+        // 로그인한 사용자가 있다면 좋아요 여부 확인
+        $userLikedArticle = false;
+
         if (isset($_SESSION['user_data'])) {
             $user = $_SESSION['user_data'];
+            $userLikedArticle = $this->ArticleDetailModel->userLikedArticle($articleId, $user['user_id']);
         } else {
             $user = NULL;
         }
+
         $article = $this->ArticleDetailModel->getArticleById($articleId);
         if (!$article) {
             show_404();
@@ -39,11 +45,11 @@ class ArticleDetailController extends MY_Controller
         $userRole = $userData['role'] ?? null;
 
         if ($publicScope === 'public') {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle);
         } else if ($publicScope === 'members' && $userData) {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle);
         } else if ($publicScope === 'admins' && $userData && ($userRole === 'ROLE_ADMIN' || $userRole === 'ROLE_MASTER')) {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle);
         } else {
             if (!$userData) {
                 $this->setRedirectCookie(current_url());
@@ -54,7 +60,7 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
-    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle)
+    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle)
     {
         $memberPrflFileUrl = "/assets/file/images/memberImgs/";
         $commentFileUrl = "/assets/file/commentFiles/img/";
@@ -66,6 +72,7 @@ class ArticleDetailController extends MY_Controller
             'user' => $user,
             'articleFilesInfo' => $articleFilesInfo,
             'likeCountByArticle' => $likeCountByArticle,
+            'userLikedArticle' => $userLikedArticle,
             'memberPrflFileUrl' => $memberPrflFileUrl,
             'commentFileUrl' => $commentFileUrl,
         ];
@@ -93,6 +100,30 @@ class ArticleDetailController extends MY_Controller
             echo json_encode(['success' => true, 'newHitCount' => $article->getHit()]);
         } else {
             echo json_encode(['success' => false, 'message' => '유효하지 않은 게시물입니다.']);
+        }
+    }
+
+    public function articleLike()
+    {
+        if (isset($_SESSION['user_data'])) {
+            $memberId = $_SESSION['user_data']['user_id'];
+        } else {
+            echo json_encode(['success' => false, 'loginRequired' => true]);
+            return;
+        }
+
+        $articleId = $this->input->post('articleId');
+
+        // Likes 테이블에 레코드 추가 로직
+        $result = $this->ArticleDetailModel->processAddArticleLike($articleId, $memberId);
+
+        // 게시글의 좋아요 수 업데이트 로직
+        $articleLikeCount = count($this->ArticleDetailModel->getLikesByArticleId($articleId));
+
+        if ($result['success']) {
+            echo json_encode(['success' => true, 'action' => $result['action'], 'likeCount' => $articleLikeCount]);
+        } else {
+            echo json_encode(['success' => false, 'message' => $result['message'], 'likeCount' => $articleLikeCount]);
         }
     }
 

@@ -29,7 +29,22 @@ $(document).ready(function () {
     $('.link_sort').click(function () {
         $('.my-activity-list-style a').removeClass('on underline');
         $(this).addClass('on underline');
-        var tabId = $(this).attr('id');
+        var page = 1;
+        fetchPageData(page);
+    });
+
+
+    $('.pagination a:first').addClass('active');
+
+    // 페이지네이션 링크 클릭 이벤트
+    $(document).on('click', '.pagination a', function (e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+        fetchPageData(page); // AJAX 요청 함수 호출
+    });
+
+    function fetchPageData(page) {
+        var tabId = $('.on').attr('id');
         var tabMethod;
 
         switch (tabId) {
@@ -49,25 +64,25 @@ $(document).ready(function () {
                 tabMethod = 'loadMyDeletedArticles';
                 break;
             default:
-                console.log('Unknown tab');
+                console.log('잘못된 요청입니다.');
                 return;
         }
-
         $.ajax({
-            url: '/member/myactivitycontroller/' + tabMethod,
+            url: '/member/MyActivityController/' + tabMethod,
             type: 'GET',
-            dataType: 'json', // HTML 형식으로 응답을 받음
+            data: { page: page },
+            dataType: 'json',
             success: function (response) {
-                // 응답받은 HTML을 #tabContentArea에 삽입
+                // 성공 시 페이지 콘텐츠 업데이트
                 $('#tabContentArea').html(response.html);
             },
-            error: function (xhr, status, error) {
-                console.error("An error occurred: " + status + ", " + error);
+            error: function (error) {
+                console.log(error);
             }
         });
-    });
+    }
 
-    $('.my-articles-delete-btn').on('click', function () {
+    $(document).on('click', '.my-articles-delete-btn', function (e) {
         var selectedArticles = [];
         $('input.input_check_article:checked').each(function () {
             var articleId = $(this).attr('id').split('-')[2]; // "check-article-1"에서 ID 부분을 가져옴.
@@ -99,7 +114,7 @@ $(document).ready(function () {
         }
     });
 
-    $('.my-comments-delete-btn').on('click', function () {
+    $(document).on('click', '.my-comments-delete-btn', function (e) {
         var selectedComments = [];
         $('input.input_check_comment:checked').each(function () {
             var commentId = $(this).attr('id').split('-')[2]; // "check-comment-1"에서 ID 부분을 가져옴.
@@ -131,44 +146,50 @@ $(document).ready(function () {
         }
     });
 
-    $('.link-to-commented-article, .link-to-commented-article-contents').on('click', function () {
-        var articleId = $(this).data('comment-article-id');
-        var commentId = $(this).data('comment-id');
+    $(document).on('click', '.my-liked-articles-cancel-btn', function (e) {
+        var selectedArticles = [];
+        $('input.input_check_liked_article:checked').each(function () {
+            var articleId = $(this).attr('id').split('-')[3]; // "check-article-1"에서 ID 부분을 가져옴.
+            selectedArticles.push(articleId);
+        });
 
-        // 게시글 상세 페이지로 이동하며, URL에 댓글의 고유 ID를 해시로 추가
-        window.location.href = '/article/articleDetailcontroller/index/' + articleId + '#comment-' + commentId;
+        if (selectedArticles.length > 0) {
+            if (confirm('선택한 글의 좋아요를 취소하시겠습니까?')) {
+                $.ajax({
+                    url: '/member/myactivitycontroller/myActivityArticlesSoftDelete',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { articles: selectedArticles },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('선택한 글이 성공적으로 삭제되었습니다.');
+                            location.reload();
+                        } else {
+                            alert('글 삭제에 실패했습니다. 다시 시도해주세요.');
+                        }
+                    },
+                    error: function () {
+                        alert('서버 통신 오류가 발생했습니다. 다시 시도해주세요.');
+                    }
+                });
+            }
+        } else {
+            alert('삭제할 글을 선택해주세요.');
+        }
     });
 
     // 작성글 전체 선택/해제 기능
-    $('#check-article-all-this-page').change(function () {
+    $(document).on('change', '#check-article-all-this-page', function () {
         $('input.input_check_article').prop('checked', $(this).prop('checked'));
     });
 
     // 작성댓글 전체 선택/해제 기능
-    $('#check-comment-all-this-page').change(function () {
+    $(document).on('change', '#check-comment-all-this-page', function () {
         $('input.input_check_comment').prop('checked', $(this).prop('checked'));
     });
 
-    // 페이지네이션 링크 클릭 이벤트
-    $('.pagination a').on('click', function (e) {
-        e.preventDefault();
-        var page = $(this).data('page');
-        fetchPageData(page); // AJAX 요청 함수 호출
+    // 좋아요한글 전체 선택/해제 기능
+    $(document).on('change', '#check-liked-article-all-this-page', function () {
+        $('input.input_check_liked_article').prop('checked', $(this).prop('checked'));
     });
-
-    function fetchPageData(page) {
-        $.ajax({
-            url: '/member/MyActivityController/fetchArticles',
-            type: 'GET',
-            data: { page: page },
-            dataType: 'json',
-            success: function (response) {
-                // 성공 시 페이지 콘텐츠 업데이트
-                $('#myArticlesArea').html(response.html);
-            },
-            error: function (error) {
-                console.log(error);
-            }
-        });
-    }
 });
