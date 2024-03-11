@@ -300,17 +300,17 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/article/articlelistcontroller#freeBoard" class="board-url" id="freeBoard" data-board-id="1">
+                                    <a href="javascript:void(0);" class="board-url" id="freeBoard" data-board-id="1">
                                         📋자유게시판
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/article/articlelistcontroller#suggestedBoard" class="board-url" id="suggestedBoard" data-board-id="2">
+                                    <a href="javascript:void(0);" class="board-url" id="suggestedBoard" data-board-id="2">
                                         🙋‍♂️건의게시판
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/article/articlelistcontroller#wordVomitBoard" class="board-url" id="wordVomitBoard" data-board-id="3">
+                                    <a href="javascript:void(0);" class="board-url" id="wordVomitBoard" data-board-id="3">
                                         👄아무말게시판
                                     </a>
                                 </li>
@@ -322,12 +322,12 @@
                             </div>
                             <ul class="board-list">
                                 <li>
-                                    <a href="/article/articlelistcontroller#knowledgeSharingBoard" class="board-url" id="knowledgeSharingBoard" data-board-id="4">
+                                    <a href="javascript:void(0);" class="board-url" id="knowledgeSharingBoard" data-board-id="4">
                                         💡지식공유
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/article/articlelistcontroller#qnaBoard" class="board-url" id="qnaBoard" data-board-id="5">
+                                    <a href="javascript:void(0);" class="board-url" id="qnaBoard" data-board-id="5">
                                         ❓질문/답변게시판
                                     </a>
                                 </li>

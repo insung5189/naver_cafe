@@ -1,8 +1,8 @@
 <!-- article_list.php -->
 <section class="section-container">
     <div class="container">
-        <h1 class="title"><?= $articleBoard->getBoardName() ? htmlspecialchars($articleBoard->getBoardName(), ENT_QUOTES, 'UTF-8') : '⚠️ 게시판정보 불러오기 실패'; ?>타이틀 들어가는 자리($articleBoard->getBoardName())</h1>
-        <p class="page-guide"><?= $boardGuide ?>페이지가이드 들어가는 자리($boardGuide)</p>
+        <h1 class="title"><?= $articleBoard->getBoardName() ? htmlspecialchars($articleBoard->getBoardName(), ENT_QUOTES, 'UTF-8') : '⚠️ 게시판정보 불러오기 실패'; ?></h1>
+        <p class="page-guide"><?= $boardGuide ?></p>
 
         <? if (!empty($errors)) : ?>
             <div class="error-messages">
