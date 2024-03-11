@@ -267,6 +267,10 @@ table {
     text-align: center;
 }
 
+.article-absence {
+    text-align: center;
+}
+
 .my-articles-control-box,
 .my-comments-control-box {
     display: flex;
@@ -302,7 +306,8 @@ table {
 
 .my-articles-delete-btn,
 .my-comments-delete-btn,
-.my-articles-write-btn {
+.my-articles-write-btn,
+.my-liked-articles-cancel-btn {
     min-width: 46px;
     padding: 10px 12px;
     font-size: 13px;

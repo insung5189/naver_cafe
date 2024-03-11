@@ -42,7 +42,7 @@
                     <? endforeach; ?>
                 <? else : ?>
                     <tr>
-                        <td class="td-article">
+                        <td colspan="2" class="article-absence">
                             <span>삭제된 게시글이 없습니다.</span>
                         </td>
                     </tr>

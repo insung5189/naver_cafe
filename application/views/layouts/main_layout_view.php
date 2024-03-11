@@ -201,7 +201,7 @@
                                                 </li>
                                                 <li class="articles-count">
                                                     <strong>
-                                                        <a href="/내가_쓴_게시글">
+                                                        <a href="/member/myactivitycontroller#myarticles" class="my-wrote-articles">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="-4 -4 18 18" x="55" y="108">
                                                                 <path fill="#A3A9A9" fill-rule="evenodd" d="M2 2h6v1H2V2zm0 2h6v1H2V4zm0 2h3v1H2V6zm-2 4h10V0H0v10z" />
                                                             </svg>
@@ -211,7 +211,7 @@
                                                 </li>
                                                 <li class="comments-count">
                                                     <strong>
-                                                        <a href="/내가_쓴_댓글">
+                                                        <a href="/member/myactivitycontroller#mycomments" class="my-wrote-comments">
                                                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="-4 -4 18 18" x="115" y="39">
                                                                 <defs>
                                                                     <path id="c" d="M10 10V0H0v10h10z" />

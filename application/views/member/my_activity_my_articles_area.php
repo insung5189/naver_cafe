@@ -4,43 +4,24 @@
 
     <div id="myarticles-col-table">
         <table>
-            <? if ($articlesByPage) : ?>
-                <colgroup>
-                    <col>
-                    <col style="width:118px">
-                    <col style="width:80px">
-                </colgroup>
-                <thead id="myArticlesThead">
-                    <tr class="normalTableTitleCol">
-                        <th scope="col">
-                            <span class="article-title-col">제목</span>
-                        </th>
-                        <th scope="col">
-                            <span class="article-create-date-col">작성일</span>
-                        </th>
-                        <th scope="col">
-                            <span class="article-hit-col">조회수</span>
-                        </th>
-                    </tr>
-                </thead>
-            <? else : ?>
-                <colgroup>
-                    <col>
-                </colgroup>
-                <thead id="myArticlesThead">
-                    <tr class="normalTableTitleCol">
-                        <th scope="col">
-                            <span class="article-title-col">제목</span>
-                        </th>
-                        <th scope="col">
-                            <span class="article-create-date-col">작성일</span>
-                        </th>
-                        <th scope="col">
-                            <span class="article-hit-col">조회수</span>
-                        </th>
-                    </tr>
-                </thead>
-            <? endif; ?>
+            <colgroup>
+                <col>
+                <col style="width:118px">
+                <col style="width:80px">
+            </colgroup>
+            <thead id="myArticlesThead">
+                <tr class="normalTableTitleCol">
+                    <th scope="col">
+                        <span class="article-title-col">제목</span>
+                    </th>
+                    <th scope="col">
+                        <span class="article-create-date-col">작성일</span>
+                    </th>
+                    <th scope="col">
+                        <span class="article-hit-col">조회수</span>
+                    </th>
+                </tr>
+            </thead>
             <tbody id="myarticles-tbody">
                 <? if ($articlesByPage) : ?>
                     <? foreach ($articlesByPage as $article) : ?>
@@ -87,8 +68,8 @@
                     <? endforeach; ?>
                 <? else : ?>
                     <tr>
-                        <td>
-                            <span>작성한 글이 없습니다.</span>
+                        <td colspan="3" class="article-absence">
+                            <span>작성하신 글이 없습니다.</span>
                         </td>
                     </tr>
                 <? endif; ?>

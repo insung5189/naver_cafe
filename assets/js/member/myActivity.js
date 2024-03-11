@@ -24,15 +24,42 @@ $(document).ready(function () {
     //     }
     // });
 
+    if (location.hash === "#mycomments") {
+        $('.my-activity-list-style a').removeClass('on underline');
+        $('#my_activity_my_comments_area').addClass('on underline');
+
+        // '내가 쓴 댓글' 데이터 로드
+        fetchPageData(1);
+    }
+
+    if (location.hash === "#myarticles") {
+        $('.my-activity-list-style a').removeClass('on underline');
+        $('#my_activity_my_articles_area').addClass('on underline');
+
+        // '내가 쓴 게시글' 데이터 로드
+        fetchPageData(1);
+    }
+
+    // 나의활동요약(내가 쓴 게시글) 클릭이벤트
+    $(document).on('click', '.my-wrote-articles', function () {
+        $('.my-activity-list-style a').removeClass('on underline');
+        $('#my_activity_my_articles_area').addClass('on underline');
+        fetchPageData(1);
+    });
+
+    // 나의활동요약(내가 쓴 댓글) 클릭이벤트
+    $(document).on('click', '.my-wrote-comments', function () {
+        $('.my-activity-list-style a').removeClass('on underline');
+        $('#my_activity_my_comments_area').addClass('on underline');
+        fetchPageData(1);
+    });
 
     // 탭 처리 클릭이벤트
     $('.link_sort').click(function () {
         $('.my-activity-list-style a').removeClass('on underline');
         $(this).addClass('on underline');
-        var page = 1;
-        fetchPageData(page);
+        fetchPageData(1);
     });
-
 
     $('.pagination a:first').addClass('active');
 
@@ -40,7 +67,7 @@ $(document).ready(function () {
     $(document).on('click', '.pagination a', function (e) {
         e.preventDefault();
         var page = $(this).data('page');
-        fetchPageData(page); // AJAX 요청 함수 호출
+        fetchPageData(page);
     });
 
     function fetchPageData(page) {
@@ -75,6 +102,10 @@ $(document).ready(function () {
             success: function (response) {
                 // 성공 시 페이지 콘텐츠 업데이트
                 $('#tabContentArea').html(response.html);
+
+                if (window.location.hash) {
+                    history.pushState("", document.title, window.location.pathname + window.location.search);
+                }
             },
             error: function (error) {
                 console.log(error);
@@ -97,11 +128,10 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: { articles: selectedArticles },
                     success: function (response) {
+                        // response.message를 사용하여 서버로부터 받은 메시지를 사용자에게 보여줌
+                        alert(response.message);
                         if (response.success) {
-                            alert('선택한 글이 성공적으로 삭제되었습니다.');
                             location.reload();
-                        } else {
-                            alert('글 삭제에 실패했습니다. 다시 시도해주세요.');
                         }
                     },
                     error: function () {
@@ -117,7 +147,7 @@ $(document).ready(function () {
     $(document).on('click', '.my-comments-delete-btn', function (e) {
         var selectedComments = [];
         $('input.input_check_comment:checked').each(function () {
-            var commentId = $(this).attr('id').split('-')[2]; // "check-comment-1"에서 ID 부분을 가져옴.
+            var commentId = $(this).attr('id').split('-')[2];
             selectedComments.push(commentId);
         });
 
@@ -129,11 +159,9 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: { comments: selectedComments },
                     success: function (response) {
+                        alert(response.message);
                         if (response.success) {
-                            alert('선택한 댓글이 성공적으로 삭제되었습니다.');
                             location.reload();
-                        } else {
-                            alert('댓글 삭제에 실패했습니다. 다시 시도해주세요.');
                         }
                     },
                     error: function () {
@@ -156,16 +184,14 @@ $(document).ready(function () {
         if (selectedArticles.length > 0) {
             if (confirm('선택한 글의 좋아요를 취소하시겠습니까?')) {
                 $.ajax({
-                    url: '/member/myactivitycontroller/myActivityArticlesSoftDelete',
+                    url: '/member/myactivitycontroller/myActivityArticlesLikedCancel',
                     type: 'POST',
                     dataType: 'json',
                     data: { articles: selectedArticles },
                     success: function (response) {
+                        alert(response.message);
                         if (response.success) {
-                            alert('선택한 글이 성공적으로 삭제되었습니다.');
                             location.reload();
-                        } else {
-                            alert('글 삭제에 실패했습니다. 다시 시도해주세요.');
                         }
                     },
                     error: function () {
@@ -174,7 +200,7 @@ $(document).ready(function () {
                 });
             }
         } else {
-            alert('삭제할 글을 선택해주세요.');
+            alert('좋아요를 취소할 글을 선택해주세요.');
         }
     });
 

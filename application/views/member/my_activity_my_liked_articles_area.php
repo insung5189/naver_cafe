@@ -77,8 +77,8 @@
                         </tr>
                     <? endforeach; ?>
                 <? else : ?>
-                    <tr class="normalTableTitleRow">
-                        <td scope="col" class="td-article">
+                    <tr>
+                        <td colspan="3" class="article-absence">
                             <span>좋아요 한 게시글이 없습니다.</span>
                         </td>
                     </tr>

@@ -39,15 +39,25 @@ $(document).ready(function () {
         }
     });
 
-    $('#inviteLink').click(function() {
+    $('#inviteLink').click(function () {
         var textToCopy = "http://211.238.132.177/";
-        
+
         // 텍스트를 임시 textarea에 넣기
         var tempElement = $('<textarea>').val(textToCopy).appendTo('body').select();
         document.execCommand('copy');
         tempElement.remove();
-        
+
         // 사용자에게 알림 표시
         alert('주소가 클립보드에 복사되었습니다: ' + textToCopy);
     });
+
+    // // 나의활동요약(내가 쓴 게시글) 클릭이벤트
+    // $(document).on('click', '.my-wrote-articles', function () {
+    //     window.location.href = '/member/myactivitycontroller#myarticles';
+    // });
+
+    // // 나의활동요약(내가 쓴 댓글) 클릭이벤트
+    // $(document).on('click', '.my-wrote-comments', function () {
+    //     window.location.href = '/member/myactivitycontroller#mycomments';
+    // });
 });

@@ -14,6 +14,9 @@
                     <th scope="col">
                         <span class="comments-title-col">댓글</span>
                     </th>
+                    <th scope="col">
+                        <span class="comments-title-col"></span>
+                    </th>
                 </tr>
             </thead>
             <tbody id="mycomments-tbody">
@@ -68,7 +71,7 @@
                     <? endforeach; ?>
                 <? else : ?>
                     <tr class="normalTableTitleRow">
-                        <td scope="col" class="td-article">
+                        <td colspan="2" class="article-absence">
                             <span>작성하신 댓글이 없습니다.</span>
                         </td>
                     </tr>

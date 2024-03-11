@@ -288,16 +288,17 @@ class MyActivityController extends MY_Controller
 
     public function myActivityArticlesSoftDelete()
     {
+        if (!isset($_SESSION['user_data'])) {
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            return;
+        }
+
+        $memberId = $_SESSION['user_data']['user_id'];
         $articleIds = $this->input->post('articles');
 
         if (!empty($articleIds) && is_array($articleIds)) {
-            $result = $this->MyActivityModel->softDeleteArticles($articleIds);
-
-            if ($result) {
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false, 'message' => '게시글 삭제 실패']);
-            }
+            $result = $this->MyActivityModel->softDeleteArticles($memberId, $articleIds);
+            echo json_encode($result);
         } else {
             echo json_encode(['success' => false, 'message' => '선택된 게시글이 없습니다.']);
         }
@@ -305,18 +306,37 @@ class MyActivityController extends MY_Controller
 
     public function myActivityCommentsSoftDelete()
     {
+        if (!isset($_SESSION['user_data'])) {
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            return;
+        }
+
+        $memberId = $_SESSION['user_data']['user_id'];
         $commentIds = $this->input->post('comments');
 
         if (!empty($commentIds) && is_array($commentIds)) {
-            $result = $this->MyActivityModel->softDeleteComments($commentIds);
-
-            if ($result) {
-                echo json_encode(['success' => true]);
-            } else {
-                echo json_encode(['success' => false, 'message' => '댓글 삭제 실패']);
-            }
+            $result = $this->MyActivityModel->softDeleteComments($memberId, $commentIds);
+            echo json_encode($result);
         } else {
             echo json_encode(['success' => false, 'message' => '선택된 댓글이 없습니다.']);
+        }
+    }
+
+    public function myActivityArticlesLikedCancel()
+    {
+        if (!isset($_SESSION['user_data'])) {
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            return;
+        }
+
+        $memberId = $_SESSION['user_data']['user_id'];
+        $articleIds = $this->input->post('articles');
+
+        if (!empty($articleIds) && is_array($articleIds)) {
+            $result = $this->MyActivityModel->cancelArticleLikes($memberId, $articleIds);
+            echo json_encode($result);
+        } else {
+            echo json_encode(['success' => false, 'message' => '좋아요를 취소할 글을 선택해주세요.']);
         }
     }
 }

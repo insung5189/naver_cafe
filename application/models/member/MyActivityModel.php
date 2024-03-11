@@ -26,8 +26,10 @@ class MyActivityModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('c')
             ->from('Models\Entities\Comment', 'c')
+            ->join('Models\Entities\Article', 'a', 'WITH', 'c.article = a.id')
             ->where('c.member = :memberId')
-            ->andWhere('c.isActive = 1')
+            ->andWhere('c.isActive = 1') // 댓글이 활성 상태인지 확인
+            ->andWhere('a.isActive = 1') // 게시글이 활성 상태인지 확인
             ->setParameter('memberId', $memberId);
 
         return $queryBuilder->getQuery()->getResult();
@@ -57,20 +59,23 @@ class MyActivityModel extends MY_Model
     LIMIT (최대값) OFFSET (현재세팅값)
      */
 
-    public function getCommentsByMemberIdByPage($memberId, $currentPage, $articlesPerPage)
+    public function getCommentsByMemberIdByPage($memberId, $currentPage, $commentsPerPage)
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('c')
             ->from('Models\Entities\Comment', 'c')
+            ->join('Models\Entities\Article', 'a', 'WITH', 'c.article = a.id') // 댓글이 속한 게시글 조인
             ->where('c.member = :memberId')
-            ->andWhere('c.isActive = 1')
+            ->andWhere('c.isActive = 1') // 댓글이 활성 상태인지 확인
+            ->andWhere('a.isActive = 1') // 게시글이 활성 상태인지 확인
             ->orderBy('c.createDate', 'DESC')
             ->setParameter('memberId', $memberId)
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+            ->setFirstResult(($currentPage - 1) * $commentsPerPage)
+            ->setMaxResults($commentsPerPage);
 
         return $queryBuilder->getQuery()->getResult();
     }
+
 
     /**
      * 내가 남긴 댓글을 가지고있는 게시물의 댓글 수를 파악함.(게시글은 내가 작성한것일수도, 내가 작성한 것이 아닐 수도 있음.)
@@ -83,8 +88,8 @@ class MyActivityModel extends MY_Model
         $queryBuilder->select('IDENTITY(c.article) as articleId, COUNT(c.id) as commentCount')
             ->from('Models\Entities\Comment', 'c')
             ->where($queryBuilder->expr()->in('c.id', ':commentIds')) // c.id가 $commentIds 배열에 속하는 경우
-            ->andWhere('c.isActive = 1') // 활성 상태인 댓글만 고려
-            ->groupBy('c.article') // 댓글이 속한 게시글 기준으로 그룹화
+            ->andWhere('c.isActive = 1')
+            ->groupBy('c.article')
             ->setParameter('commentIds', $commentIds);
 
         $results = $queryBuilder->getQuery()->getResult();
@@ -105,18 +110,22 @@ class MyActivityModel extends MY_Model
     {
         $queryBuilder = $this->em->createQueryBuilder();
 
-        // 댓글을 남긴 게시글의 ID를 찾음
+        // 댓글을 남긴 게시글의 ID를 찾음, 댓글과 게시글 모두 활성 상태인 경우만
         $queryBuilder->select('DISTINCT IDENTITY(c.article) as articleId')
             ->from('Models\Entities\Comment', 'c')
             ->where('c.member = :memberId')
+            ->andWhere('c.isActive = 1') // 댓글이 활성 상태인지 확인
             ->setParameter('memberId', $memberId);
 
         $articleIds = $queryBuilder->getQuery()->getResult();
 
-        // 찾은 게시글 ID를 기반으로 게시글 정보 조회
+        // 찾은 게시글 ID를 기반으로 게시글 정보 조회, 게시글도 활성 상태인지 확인
         $articles = [];
         foreach ($articleIds as $articleId) {
-            $article = $this->em->getRepository('Models\Entities\Article')->find($articleId['articleId']);
+            $article = $this->em->getRepository('Models\Entities\Article')->findOneBy([
+                'id' => $articleId['articleId'],
+                'isActive' => 1 // 게시글이 활성 상태인지 확인
+            ]);
             if ($article) {
                 $articles[] = $article;
             }
@@ -155,6 +164,7 @@ class MyActivityModel extends MY_Model
         $queryBuilder->select('DISTINCT IDENTITY(c.article) as articleId')
             ->from('Models\Entities\Comment', 'c')
             ->where('c.member = :memberId')
+            ->andWhere('c.isActive = 1')
             ->orderBy('c.createDate', 'DESC')
             ->setParameter('memberId', $memberId)
             ->setFirstResult(($currentPage - 1) * $commentedArticlesPerPage)
@@ -162,10 +172,13 @@ class MyActivityModel extends MY_Model
 
         $articleIds = $queryBuilder->getQuery()->getResult();
 
-        // 찾은 게시글 ID를 기반으로 게시글 정보 조회
+        // 찾은 게시글 ID를 기반으로 게시글 정보 조회, 게시글도 활성 상태인지 확인
         $commentedArticles = [];
         foreach ($articleIds as $articleId) {
-            $article = $this->em->getRepository('Models\Entities\Article')->find($articleId['articleId']);
+            $article = $this->em->getRepository('Models\Entities\Article')->findOneBy([
+                'id' => $articleId['articleId'],
+                'isActive' => 1
+            ]);
             if ($article) {
                 $commentedArticles[] = $article;
             }
@@ -178,6 +191,9 @@ class MyActivityModel extends MY_Model
      */
     public function getLikedArticlesByMemberIdWithCount($memberId, $currentPage, $articlesPerPage)
     {
+        $articlesByPage = [];
+        $totalCountLikedArticles = 0;
+
         // Likes 테이블에서 memberId에 해당하는 모든 좋아요 행을 찾습니다.
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('IDENTITY(l.article) as articleId')
@@ -284,35 +300,243 @@ class MyActivityModel extends MY_Model
         return $queryBuilder->getQuery()->getResult();
     }
 
-    public function softDeleteArticles(array $articleIds)
+    /**
+     * 게시글 삭제(비활성화)로직, 사용자와 작성자를 검증하는 과정에서 파라미터가 중복되게 인식되어 select와 update문을 메서드 단위로 분리함. 
+     */
+    public function softDeleteArticles($memberId, array $articleIds)
+    {
+        try {
+            $queryBuilder = $this->em->createQueryBuilder();
+            $allArticleIds = $this->getAllArticleIds($articleIds);
+
+            // 사용자가 권한을 가진 게시글 ID 확인
+            $query = $queryBuilder
+                ->select('a.id')
+                ->from('Models\Entities\Article', 'a')
+                ->where('a.member = :memberId AND a.id IN (:articleIds)')
+                ->setParameter('memberId', $memberId)
+                ->setParameter('articleIds', $articleIds)
+                ->getQuery();
+            $ownedArticleIds = array_map(function ($article) {
+                return $article['id'];
+            }, $query->getResult());
+
+            // 실제로 존재하면서 권한이 있는 게시글 삭제하고 삭제된 게시글 ID 기록
+            $deletedArticleIds = $this->updateArticleStatus($ownedArticleIds);
+
+            // 권한이 없는 게시글 ID 구분
+            $unauthorizedIds = array_diff($allArticleIds, $ownedArticleIds);
+            $unauthorizedCount = count($unauthorizedIds);
+
+            // 존재하지 않는 게시글 ID 구분
+            $nonExistentIds = array_diff($articleIds, $allArticleIds);
+            $nonExistentCount = count($nonExistentIds);
+
+            $messages = [];
+            if (!empty($deletedArticleIds)) {
+                $messages[] = count($deletedArticleIds) . "개의 게시글이 성공적으로 삭제되었습니다.(id : " . implode(", ", $deletedArticleIds) . ")";
+            }
+            if (!empty($unauthorizedIds)) {
+                $messages[] = "삭제 권한이 없는 게시글이 " . $unauthorizedCount . "개 있습니다.(id : " . implode(", ", $unauthorizedIds) . ")";
+            }
+            if (!empty($nonExistentIds)) {
+                $messages[] = "존재하지 않는 게시글이 " . $nonExistentCount . "개 있습니다.(id : " . implode(", ", $nonExistentIds) . ")";
+            }
+
+            $message = implode("\n", $messages);
+
+            return ['success' => true, 'message' => $message];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => '게시글 삭제 중 오류가 발생했습니다. 오류 메시지: ' . $e->getMessage()];
+        }
+    }
+
+    private function getAllArticleIds(array $articleIds)
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $query = $queryBuilder
-            ->update('Models\Entities\Article', 'a')
-            ->set('a.isActive', ':isActive')
-            ->set('a.deletedDate', ':deleteTime')
+            ->select('a.id')
+            ->from('Models\Entities\Article', 'a')
             ->where('a.id IN (:articleIds)')
-            ->setParameter('isActive', 0)
-            ->setParameter('deleteTime', new \DateTime())
             ->setParameter('articleIds', $articleIds)
             ->getQuery();
 
-        return $query->execute();
+        return array_map(function ($article) {
+            return $article['id'];
+        }, $query->getResult());
     }
 
-    public function softDeleteComments(array $commentIds)
+    private function updateArticleStatus(array $ownedArticleIds)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $deletedArticleIds = [];
+
+        foreach ($ownedArticleIds as $articleId) {
+            $query = $queryBuilder
+                ->update('Models\Entities\Article', 'a')
+                ->set('a.isActive', 0)
+                ->set('a.deletedDate', ':deleteTime')
+                ->where('a.id = :articleId')
+                ->setParameter('deleteTime', new \DateTime())
+                ->setParameter('articleId', $articleId)
+                ->getQuery();
+            $query->execute();
+            $deletedArticleIds[] = $articleId;
+        }
+
+        return $deletedArticleIds; // 삭제된 게시글 ID 반환
+    }
+
+    /**
+     * 댓글 삭제(비활성화)로직, 사용자와 작성자를 검증하는 과정에서 파라미터가 중복되게 인식되어 select와 update문을 메서드 단위로 분리함. 
+     */
+    public function softDeleteComments($memberId, array $commentIds)
+    {
+        try {
+            $queryBuilder = $this->em->createQueryBuilder();
+            $allCommentIds = $this->getAllCommentIds($commentIds);
+
+            // 사용자가 권한을 가진 댓글 ID 확인
+            $query = $queryBuilder
+                ->select('c.id')
+                ->from('Models\Entities\Comment', 'c')
+                ->where('c.member = :memberId AND c.id IN (:commentIds)')
+                ->setParameter('memberId', $memberId)
+                ->setParameter('commentIds', $commentIds)
+                ->getQuery();
+            $ownedCommentIds = array_map(function ($comment) {
+                return $comment['id'];
+            }, $query->getResult());
+
+            // 실제로 존재하면서 권한이 있는 댓글 삭제하고 삭제된 댓글 ID 기록
+            $deletedCommentIds = $this->updateCommentStatus($ownedCommentIds);
+
+            // 권한이 없는 댓글 ID 구분
+            $unauthorizedIds = array_diff($allCommentIds, $ownedCommentIds);
+            $unauthorizedCount = count($unauthorizedIds);
+
+            // 존재하지 않는 댓글 ID 구분
+            $nonExistentIds = array_diff($commentIds, $allCommentIds);
+            $nonExistentCount = count($nonExistentIds);
+
+            $messages = [];
+            if (!empty($deletedCommentIds)) {
+                $messages[] = count($deletedCommentIds) . "개의 댓글이 성공적으로 삭제되었습니다.(id : " . implode(", ", $deletedCommentIds) . ")";
+            }
+            if (!empty($unauthorizedIds)) {
+                $messages[] = "삭제 권한이 없는 댓글이 " . $unauthorizedCount . "개 있습니다.(id : " . implode(", ", $unauthorizedIds) . ")";
+            }
+            if (!empty($nonExistentIds)) {
+                $messages[] = "존재하지 않는 댓글이 " . $nonExistentCount . "개 있습니다.(id : " . implode(", ", $nonExistentIds) . ")";
+            }
+
+            $message = implode("\n", $messages);
+
+            return ['success' => true, 'message' => $message];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => '댓글 삭제 중 오류가 발생했습니다. 오류 메시지: ' . $e->getMessage()];
+        }
+    }
+
+    private function getAllCommentIds(array $commentIds)
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $query = $queryBuilder
-            ->update('Models\Entities\Comment', 'c')
-            ->set('c.isActive', ':isActive')
-            ->set('c.deletedDate', ':deleteTime')
+            ->select('c.id')
+            ->from('Models\Entities\Comment', 'c')
             ->where('c.id IN (:commentIds)')
-            ->setParameter('isActive', 0)
-            ->setParameter('deleteTime', new \DateTime())
             ->setParameter('commentIds', $commentIds)
             ->getQuery();
 
-        return $query->execute();
+        return array_map(function ($comment) {
+            return $comment['id'];
+        }, $query->getResult());
+    }
+
+    private function updateCommentStatus(array $ownedCommentIds)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $deletedCommentIds = [];
+
+        foreach ($ownedCommentIds as $commentId) {
+            $query = $queryBuilder
+                ->update('Models\Entities\Comment', 'c')
+                ->set('c.isActive', 0)
+                ->set('c.deletedDate', ':deleteTime')
+                ->where('c.id = :commentId')
+                ->setParameter('deleteTime', new \DateTime())
+                ->setParameter('commentId', $commentId)
+                ->getQuery();
+            if ($query->execute()) {
+                $deletedCommentIds[] = $commentId;
+            }
+        }
+
+        return $deletedCommentIds; // 삭제된 댓글 ID 반환
+    }
+
+    /**
+     * 좋아요 취소(Likes맵핑테이블에서 row제거)로직.
+     */
+    public function cancelArticleLikes($memberId, array $articleIds)
+    {
+        try {
+            $queryBuilder = $this->em->createQueryBuilder();
+
+            // 존재하는 모든 게시글 ID 확인
+            $allArticleIds = $this->getAllArticleIds($articleIds);
+
+            // 현재 사용자가 좋아요한 게시글 ID 확인
+            $likedArticleIdsQuery = $queryBuilder
+                ->select('IDENTITY(l.article) as articleId')
+                ->from('Models\Entities\Likes', 'l')
+                ->where('l.member = :memberId AND l.article IN (:articleIds)')
+                ->setParameter('memberId', $memberId)
+                ->setParameter('articleIds', $articleIds)
+                ->getQuery();
+            $likedArticleIdsResult = $likedArticleIdsQuery->getResult();
+            $likedArticleIds = array_column($likedArticleIdsResult, 'articleId');
+
+            // 좋아요 해제 처리 및 처리된 ID들 확인
+            $deletedLikesIds = $this->removeLikes($memberId, $likedArticleIds);
+
+            // 권한이 없는 게시글 ID 및 존재하지 않는 게시글 ID 구분
+            $unauthorizedArticleIds = array_diff($articleIds, $likedArticleIds);
+            $nonExistentArticleIds = array_diff($articleIds, $allArticleIds);
+
+            $messages = [];
+            if (!empty($deletedLikesIds)) {
+                $messages[] = count($deletedLikesIds) . "개의 좋아요가 성공적으로 해제되었습니다.(id : " . implode(", ", $deletedLikesIds) . ")";
+            }
+            if (!empty($unauthorizedArticleIds)) {
+                $messages[] = "해당 id는 좋아요 취소권한이 없습니다.(id : " . implode(", ", $unauthorizedArticleIds) . ")";
+            }
+            if (!empty($nonExistentArticleIds)) {
+                $messages[] = "존재하지 않는 게시글id 입니다.(id : " . implode(", ", $nonExistentArticleIds) . ")";
+            }
+
+            $message = implode("\n", $messages);
+
+            return ['success' => true, 'message' => $message];
+        } catch (\Exception $e) {
+            return ['success' => false, 'message' => '좋아요 해제 중 오류가 발생했습니다. 오류 메시지: ' . $e->getMessage()];
+        }
+    }
+
+    private function removeLikes($memberId, array $likedArticleIds)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+
+        // 좋아요 해제 처리
+        $query = $queryBuilder
+            ->delete('Models\Entities\Likes', 'l')
+            ->where('l.member = :memberId AND l.article IN (:articleIds)')
+            ->setParameter('memberId', $memberId)
+            ->setParameter('articleIds', $likedArticleIds)
+            ->getQuery();
+
+        $query->execute();
+        // 성공적으로 처리된 좋아요(ID) 반환
+        return $likedArticleIds;
     }
 }

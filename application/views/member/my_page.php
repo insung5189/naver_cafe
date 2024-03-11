@@ -34,7 +34,6 @@ $GLOBALS['pageResources'] = [
                     ?>
                     <img class="my-page-image-preview" src="<?= $fileUrl . $profileImagePath; ?>" alt="프로필사진">
 
-
                     <div data-member-img-src="<?= $fileUrl . $profileImagePath; ?>"></div>
                     <form id="prfl-img-form" action="">
                         <label class="prfl-img-edit" for="member-prfl-img-edit">

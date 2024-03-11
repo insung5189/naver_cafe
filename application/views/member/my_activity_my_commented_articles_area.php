@@ -74,8 +74,8 @@
                         </tr>
                     <? endforeach; ?>
                 <? else : ?>
-                    <tr class="normalTableTitleRow">
-                        <td scope="col" class="td-article">
+                    <tr>
+                        <td colspan="4" class="article-absence">
                             <span>댓글을 남기신 게시글이 없습니다.</span>
                         </td>
                     </tr>
@@ -85,7 +85,6 @@
     </div>
     <div class="my-commented-articles-control-box">
         <div class="my-commented-articles-delete-and-write-btn">
-            <a href="javascript:void(0);" class="my-articles-delete-btn">삭제</a>
             <a href="/article/articleEditController" target="_blank" class="my-articles-write-btn">글쓰기</a>
         </div>
     </div>
