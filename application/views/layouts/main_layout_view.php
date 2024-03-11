@@ -50,7 +50,7 @@
 
         <main>
             <div class="search-box-main">
-                <form action="/article/articlelistcontroller/search" method="GET" class="search-form-main">
+                <form action="/article/articlelistallcontroller/search" method="GET" class="search-form-main">
                     <div class="search-keyword-main">
                         <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-search-input-main" required>
                         <button type="submit" class="search-btn-main">검색</button>
@@ -278,7 +278,7 @@
                             </ul>
                             <ul class="board-list">
                                 <li>
-                                    <a href="/article/articlelistcontroller">📃전체글보기</a>
+                                    <a href="/article/articlelistallcontroller" id="allArticleBoard" data-board-id="6">📃전체글보기</a>
                                     <span class="article-count"><?= isset($totalArticleCount) ? htmlspecialchars($totalArticleCount, ENT_QUOTES, 'UTF-8') : '0'; ?></span>
                                 </li>
 
@@ -300,17 +300,17 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/자유게시판" class="board-url">
+                                    <a href="/article/articlelistcontroller#freeBoard" class="board-url" id="freeBoard" data-board-id="1">
                                         📋자유게시판
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/건의게시판" class="board-url">
+                                    <a href="/article/articlelistcontroller#suggestedBoard" class="board-url" id="suggestedBoard" data-board-id="2">
                                         🙋‍♂️건의게시판
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/아무말게시판" class="board-url">
+                                    <a href="/article/articlelistcontroller#wordVomitBoard" class="board-url" id="wordVomitBoard" data-board-id="3">
                                         👄아무말게시판
                                     </a>
                                 </li>
@@ -322,12 +322,12 @@
                             </div>
                             <ul class="board-list">
                                 <li>
-                                    <a href="/지식공유게시판" class="board-url">
+                                    <a href="/article/articlelistcontroller#knowledgeSharingBoard" class="board-url" id="knowledgeSharingBoard" data-board-id="4">
                                         💡지식공유
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="/질문_답변게시판" class="board-url">
+                                    <a href="/article/articlelistcontroller#qnaBoard" class="board-url" id="qnaBoard" data-board-id="5">
                                         ❓질문/답변게시판
                                     </a>
                                 </li>

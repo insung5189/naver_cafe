@@ -51,13 +51,10 @@ $(document).ready(function () {
         alert('주소가 클립보드에 복사되었습니다: ' + textToCopy);
     });
 
-    // // 나의활동요약(내가 쓴 게시글) 클릭이벤트
-    // $(document).on('click', '.my-wrote-articles', function () {
-    //     window.location.href = '/member/myactivitycontroller#myarticles';
-    // });
+    // 글쓰기 버튼 해시값에 따라 글쓰기 화면 내에 게시판세팅(어떤 게시판과 연관된 화면에서 진입했는지에 따라서 글쓰기 화면에서 게시판이 미리 픽스되어있음.)
+    //...
 
-    // // 나의활동요약(내가 쓴 댓글) 클릭이벤트
-    // $(document).on('click', '.my-wrote-comments', function () {
-    //     window.location.href = '/member/myactivitycontroller#mycomments';
-    // });
+
+
+
 });

@@ -1,7 +1,7 @@
 <?
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class ArticleListModel extends MY_Model
+class ArticleListAllModel extends MY_Model
 {
     public function __construct()
     {

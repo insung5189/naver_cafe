@@ -6,7 +6,7 @@ class Layout
 	{
 		$this->obj = &get_instance();
 		$this->obj->load->model('member/MyActivityModel', 'MyActivityModel');
-		$this->obj->load->model('article/ArticleListModel', 'ArticleListModel');
+		$this->obj->load->model('article/ArticleListAllModel', 'ArticleListAllModel');
 	}
 
 	public function view($view = "", $page_view_data = array())

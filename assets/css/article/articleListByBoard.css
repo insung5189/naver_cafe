@@ -32,7 +32,6 @@ h1 {
     margin: 16px 0 !important;
 }
 
-
 .list-style {
     display: flex;
     padding: 0 0 10px;
@@ -81,54 +80,6 @@ table {
     width: 100%;
 }
 
-.board-name {
-    display: table-cell;
-    padding: 0 7px 0 0;
-    vertical-align: middle;
-}
-
-.title-list {
-    display: table-cell;
-    padding-top: 1px;
-    width: 454px;
-}
-
-.inner-board-name {
-    display: inline-block;
-    width: 85px;
-    vertical-align: 2px;
-}
-
-.inner-title-name {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-    word-break: break-all;
-    word-wrap: break-word;
-    word-break: break-word;
-}
-
-.board-link {
-    display: inline-block;
-    max-width: 100%;
-    font-size: 11px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    vertical-align: middle;
-}
-
-.article-title-link {
-    line-height: 18px;
-    color: #333;
-}
-
-.prefix {
-    color: #959595;
-    font-weight: bold;
-    margin-right: 2px;
-}
-
 #article-row-table tbody td {
     height: 28px;
     padding: 4px 7px;
@@ -147,13 +98,30 @@ table {
     text-align: center;
 }
 
-.article-author-row,
+.title-list {
+    display: table-cell;
+    padding-top: 1px;
+    width: 454px;
+}
+
+.inner-title-name {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    word-break: break-all;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
 .article-title-link {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    line-height: 18px;
+    color: #333;
+}
+
+.prefix {
+    color: #959595;
+    font-weight: bold;
+    margin-right: 2px;
 }
 
 .articles-comment-count {
@@ -164,6 +132,11 @@ table {
 
 .author-name {
     width: 106px;
+}
+
+.article-title-link:hover,
+.author-name-link:hover {
+    text-decoration: underline;
 }
 
 .pagination-box,
@@ -180,10 +153,10 @@ table {
     padding: 16px 0 16px;
 }
 
-.board-link:hover,
-.article-title-link:hover,
-.author-name-link:hover {
-    text-decoration: underline;
+.search-box {
+    border-top: 1px solid #ebebea;
+    border-top-color: #ebebea;
+    padding: 16px 0 16px;
 }
 
 .pagination {
@@ -216,12 +189,6 @@ table {
     color: #ffffff;
 }
 
-.search-box {
-    border-top: 1px solid #ebebea;
-    border-top-color: #ebebea;
-    padding: 16px 0 16px;
-}
-
 .search-container {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -245,6 +212,10 @@ table {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+.date-input {
+    width: 90px;
 }
 
 .select-date {

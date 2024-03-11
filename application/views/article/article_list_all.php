@@ -193,7 +193,7 @@ $GLOBALS['pageResources'] = [
 
             for ($page = 1; $page <= $totalPages; $page++) {
                 $isActive = ($page == $currentPage) ? 'active' : '';
-                $link = "/article/articlelistcontroller?"
+                $link = "/article/articlelistallcontroller?"
                     . "&page=$page"
                     . "&articlesPerPage=$articlesPerPage"
                     . "&keyword=" . urlencode($keyword)
@@ -209,7 +209,7 @@ $GLOBALS['pageResources'] = [
             ?>
         </div>
         <div class="search-box">
-            <form action="/article/articlelistcontroller" method="GET" class="search-form">
+            <form action="/article/articlelistallcontroller" method="GET" class="search-form">
 
                 <div class="search-criteria">
 
@@ -224,12 +224,10 @@ $GLOBALS['pageResources'] = [
                         <option value="custom" <?= ($period === 'custom') ? 'selected' : ''; ?>>사용자 지정 기간</option>
                     </select>
 
-                    <?php if ($period === 'custom') : ?>
                         <div class="select-date">
                             <input type="date" name="startDate" class="date-input" placeholder="시작 날짜" id="start-date" value="<?= htmlspecialchars($startDate); ?>">
                             <input type="date" name="endDate" class="date-input" placeholder="종료 날짜" id="end-date" value="<?= htmlspecialchars($endDate); ?>">
                         </div>
-                    <?php endif; ?>
 
                     <select name="element" class="custom-input">
                         <option value="article-comment" <?= ($element === 'article-comment') ? 'selected' : ''; ?>>게시글 + 댓글</option>
