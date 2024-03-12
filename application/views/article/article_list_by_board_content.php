@@ -1,6 +1,7 @@
-<!-- article_list_all_content.php -->
+<!-- article_list_by_content.php -->
 <div class="container">
-    <h1 class="title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h1>
+    <h1 class="title"><?= $articleBoard->getBoardName() ? htmlspecialchars($articleBoard->getBoardName(), ENT_QUOTES, 'UTF-8') : '⚠️ 게시판정보 불러오기 실패'; ?></h1>
+    <p class="page-guide"><?= $boardGuide ?></p>
 
     <? if (!empty($errors)) : ?>
         <div class="error-messages">
@@ -106,14 +107,14 @@
                 <col style="width:118px">
                 <col style="width:80px">
                 <col style="width:68px">
+                <col style="width:68px">
             </colgroup>
             <thead>
                 <tr class="normalTableTitleCol">
-                    <th></th>
+                    <th scope="col"></th>
                     <th scope="col">
                         <span class="article-title-col">제목</span>
                     </th>
-
                     <th scope="col">
                         <span class="article-author-col">작성자</span>
                     </th>
@@ -122,6 +123,9 @@
                     </th>
                     <th scope="col">
                         <span class="article-hit-col">조회수</span>
+                    </th>
+                    <th scope="col">
+                        <span class="article-liked-col">좋아요</span>
                     </th>
                 </tr>
             </thead>
@@ -135,22 +139,23 @@
                 <col style="width:118px">
                 <col style="width:80px">
                 <col style="width:68px">
+                <col style="width:68px">
             </colgroup>
             <tbody>
                 <? foreach ($articles as $article) : ?>
                     <tr class="normalTableTitleRow">
                         <td colspan="2" class="td-article">
-                            
-                            <div class="board-name">
-                                <div class="inner-board-name">
-                                    <a href="/해당게시판 링크" class="board-link"><?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?></a>
+
+                            <div class="article-num-cell">
+                                <div class="article-num">
+                                    <?= $article->getId(); ?>
                                 </div>
                             </div>
 
                             <div class="title-list">
                                 <div class="inner-title-name">
                                     <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
-                                        <? if (!empty($article->getPrefix())) : ?>
+                                        <? if (!empty($article->getPrefix()) && ($articleBoard->getId() == 4 || $articleBoard->getId() == 5)) : ?>
                                             <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                         <? endif; ?>
                                         <?= $article->getTitle() ? htmlspecialchars($article->getTitle(), ENT_QUOTES, 'UTF-8') : '제목을 찾을 수 없음'; ?>
@@ -163,6 +168,7 @@
                                     </a>
                                 </div>
                             </div>
+
                         </td>
 
                         <td scope="col" class="td-author">
@@ -181,17 +187,26 @@
                             <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
                         </td>
 
+                        <td scope="col" class="td-like">
+                            <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
+                        </td>
+
                     </tr>
                 <? endforeach; ?>
             </tbody>
         </table>
+    </div>
+    <div class="board-article-control-box">
+        <div class="board-article-write-btn">
+            <a href="/article/articleEditController" target="_blank" class="article-write-btn">글쓰기</a>
+        </div>
     </div>
     <div class="pagination-box">
         <div class="pagination">
             <?
             for ($page = 1; $page <= $totalPages; $page++) {
                 $isActive = ($page == $currentPage) ? 'active' : '';
-                echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn ' . $isActive . '" data-page="' . $page . '">' . $page . '</a>';
+                echo '<a href="javascript:void(0);" class="article-board-list-page-btn page-btn ' . $isActive . '" data-page="' . $page . '">' . $page . '</a>';
             }
             ?>
         </div>

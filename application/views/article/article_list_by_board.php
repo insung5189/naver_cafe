@@ -6,8 +6,4 @@ $GLOBALS['pageResources'] = [
 ?>
 
 <!-- article_list_by_board.php -->
-<div id="dynamicContent">
-    <!-- AJAX로 로드될 내용이 이곳에 삽입됩니다. -->
-</div>
-<section class="section-container" id="articleContent">
-</section>
+<section class="section-container" id="articleContent" data-article-board-id="<?= $boardId ?>"></section>

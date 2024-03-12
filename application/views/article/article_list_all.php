@@ -4,6 +4,6 @@ $GLOBALS['pageResources'] = [
     'js' => ['/assets/js/article/articleListAll.js']
 ];
 ?>
+
 <!-- article_list_all.php -->
-<section class="section-container" id="articleContent">
-</section>
+<section class="section-container" id="articleContent"></section>

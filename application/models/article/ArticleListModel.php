@@ -57,7 +57,7 @@ class ArticleListModel extends MY_Model
         return $commentCounts;
     }
 
-    public function searchArticles($keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
+    public function searchArticles($boardId, $keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
     {
         $errors = $this->validateInputs($keyword, $element, $period, $startDate, $endDate);
         if (!empty($errors)) {
@@ -66,7 +66,9 @@ class ArticleListModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
-            ->where('a.isActive = 1');
+            ->where('a.isActive = 1')
+            ->andWhere('a.articleBoard = :boardId')
+            ->setParameter('boardId', $boardId);
 
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {
@@ -160,11 +162,21 @@ class ArticleListModel extends MY_Model
                 ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
         }
 
+        // 게시글 총 수 조회
+        $totalQuery = clone $queryBuilder;
+        $totalQuery->select('COUNT(a.id)');
+        $totalCount = $totalQuery->getQuery()->getSingleScalarResult();
+
+        // 페이징 처리된 게시글 조회
         $queryBuilder->orderBy('a.createDate', 'DESC')
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage);
+        $pagedResults = $queryBuilder->getQuery()->getResult();
 
-        return $queryBuilder->getQuery()->getResult();
+        return [
+            'results' => $pagedResults,
+            'total' => $totalCount
+        ];
     }
 
     private function calculateStartDateBasedOnPeriod($period)

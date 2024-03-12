@@ -52,6 +52,8 @@ class ArticleListAllController extends MY_Controller
                     $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
                 }
 
+                $totalPages = ceil($totalArticleCount / $articlesPerPage);
+
                 // 게시글 ID 배열 생성
                 $articleIds = array_map(function ($article) {
                     return $article->getId();
@@ -60,7 +62,7 @@ class ArticleListAllController extends MY_Controller
                 // 게시글별 댓글 개수 조회
                 $commentCounts = $this->ArticleListAllModel->getCommentCountForArticles($articleIds);
 
-                $totalPages = ceil($totalArticleCount / $articlesPerPage);
+
 
                 $page_view_data = [
                     'title' => !empty($keyword) ? '검색 결과' : '전체글보기',

@@ -7,9 +7,9 @@ $(document).ready(function () {
 
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {
-            $('.select-date').show();
+            $('.select-date').show(100);
         } else {
-            $('.select-date').hide();
+            $('.select-date').hide(100);
             $('#start-date').val('');
             $('#end-date').val('');
         }
