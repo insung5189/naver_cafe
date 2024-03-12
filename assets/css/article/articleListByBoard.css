@@ -82,26 +82,37 @@ table {
 
 #article-row-table tbody td {
     height: 28px;
-    padding: 4px 7px;
+    padding: 4px 0px;
     border-bottom: 1px solid #f2f2f2;
 }
 
 .td-article {
     padding-left: 12px;
     padding-right: 18px;
-    width: 510px;
+    width: 484px;
+}
+
+.article-num-cell {
+    display: table-cell;
+}
+
+.article-num {
+    width: 88px;
+    text-align: center;
+    display: inline-block;
+    margin-right: 5px;
 }
 
 .td-author,
 .td-create-date,
-.td-hit {
+.td-hit,
+.td-like {
     text-align: center;
 }
 
 .title-list {
     display: table-cell;
     padding-top: 1px;
-    width: 454px;
 }
 
 .inner-title-name {
@@ -116,6 +127,11 @@ table {
 .article-title-link {
     line-height: 18px;
     color: #333;
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .prefix {
@@ -137,6 +153,29 @@ table {
 .article-title-link:hover,
 .author-name-link:hover {
     text-decoration: underline;
+}
+
+.board-article-control-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.article-write-btn {
+    min-width: 46px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 36px;
+    color: #000;
+    background-color: #eff0f2;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: top;
 }
 
 .pagination-box,

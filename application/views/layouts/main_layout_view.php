@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/css/reset.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/errors.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/home/layout.css">
+
     <!-- 폰트어썸 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -300,17 +301,17 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="board-url" id="freeBoard" data-board-id="1">
+                                    <a href="/article/articlelistcontroller/loadfreeboard" class="board-url" id="freeBoard" data-board-id="1">
                                         📋자유게시판
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="board-url" id="suggestedBoard" data-board-id="2">
+                                    <a href="/article/articlelistcontroller/loadSuggestedBoard" class="board-url" id="suggestedBoard" data-board-id="2">
                                         🙋‍♂️건의게시판
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="board-url" id="wordVomitBoard" data-board-id="3">
+                                    <a href="/article/articlelistcontroller/loadWordVomitBoard" class="board-url" id="wordVomitBoard" data-board-id="3">
                                         👄아무말게시판
                                     </a>
                                 </li>
@@ -322,12 +323,12 @@
                             </div>
                             <ul class="board-list">
                                 <li>
-                                    <a href="javascript:void(0);" class="board-url" id="knowledgeSharingBoard" data-board-id="4">
+                                    <a href="/article/articlelistcontroller/loadKnowledgeSharingBoard" class="board-url" id="knowledgeSharingBoard" data-board-id="4">
                                         💡지식공유
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="javascript:void(0);" class="board-url" id="qnaBoard" data-board-id="5">
+                                    <a href="/article/articlelistcontroller/loadQnaBoard" class="board-url" id="qnaBoard" data-board-id="5">
                                         ❓질문/답변게시판
                                     </a>
                                 </li>
@@ -413,8 +414,10 @@
                         </li>
                     </ul>
                 </div>
-                <!-- 동적으로 삽입될 페이지의 내용 -->
-                <?= isset($contents) ? $contents : ''; ?>
+                <div id="dynamicContent">
+                    <!-- 동적으로 삽입될 페이지의 내용 -->
+                    <?= isset($contents) ? $contents : ''; ?>
+                </div>
             </div>
         </main>
 

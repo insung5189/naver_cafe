@@ -49,7 +49,26 @@ $GLOBALS['pageResources'] = [
                     </div>
                 <? endif; ?>
 
-                <a href="/해당 게시판 링크" class="board-name">
+                <?
+                switch ($article->getArticleBoard()->getId()) {
+                    case 1:
+                        $boardMethod = 'loadFreeBoard';
+                        break;
+                    case 2:
+                        $boardMethod = 'loadSuggestedBoard';
+                        break;
+                    case 3:
+                        $boardMethod = 'loadWordVomitBoard';
+                        break;
+                    case 4:
+                        $boardMethod = 'loadKnowledgeSharingBoard';
+                        break;
+                    case 5:
+                        $boardMethod = 'loadQnaBoard';
+                        break;
+                }
+                ?>
+                <a href="/article/articlelistcontroller/<?= $boardMethod ?>" class="board-name">
                     <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
                     <i class="fa-solid fa-angle-right"></i>
                 </a>
@@ -447,7 +466,7 @@ $GLOBALS['pageResources'] = [
                     <a href="javascript:void(0);" class="article-base-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">삭제</a>
                 </div>
                 <div class="article-bottom-btn-right-box">
-                    <a href="/진입했던_게시판_목록보기" class="article-base-btn">목록</a>
+                    <a href="/article/articlelistcontroller/<?= $boardMethod ?>" class="article-base-btn">목록</a>
                     <a href="/스크롤_맨위로_이동하기" class="article-base-btn">
                         <i class="fa-solid fa-caret-up"></i>
                         TOP
@@ -459,7 +478,9 @@ $GLOBALS['pageResources'] = [
 
             <div class="related-articles">
                 <div class="related-articles-board-name">
-                    <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
+                    <a href="/article/articlelistcontroller/<?= $boardMethod ?>">
+                        <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
+                    </a>
                 </div>
                 <ul>
                     <li>
@@ -470,7 +491,9 @@ $GLOBALS['pageResources'] = [
                     관련 게시글 페이지네이션 자리
                 </div>
                 <div class="board-link">
-                    전체보기(해당 게시판으로 가는 링크)
+                    <a href="/article/articlelistcontroller/<?= $boardMethod ?>">
+                        전체보기(해당 게시판으로 가는 링크)
+                    </a>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-<?php
+<?
 // /application/libraries/Layout.php
 class Layout
 {

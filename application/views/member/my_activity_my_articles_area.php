@@ -13,7 +13,7 @@
                 <tr class="normalTableTitleCol">
                     <th scope="col">
                         <span class="article-title-col">제목</span>
-                    </th>
+                        </th>
                     <th scope="col">
                         <span class="article-create-date-col">작성일</span>
                     </th>

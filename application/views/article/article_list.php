@@ -1,3 +1,10 @@
+<?
+$GLOBALS['pageResources'] = [
+    'css' => ['/assets/css/article/articleListByBoard.css'],
+    'js' => ['/assets/js/article/articleListByBoard.js']
+];
+?>
+
 <!-- article_list.php -->
 <section class="section-container">
     <div class="container">
@@ -103,14 +110,14 @@
                     <col style="width:118px">
                     <col style="width:80px">
                     <col style="width:68px">
+                    <col style="width:68px">
                 </colgroup>
                 <thead>
                     <tr class="normalTableTitleCol">
-                        <th></th>
+                        <th scope="col"></th>
                         <th scope="col">
                             <span class="article-title-col">제목</span>
                         </th>
-
                         <th scope="col">
                             <span class="article-author-col">작성자</span>
                         </th>
@@ -119,6 +126,9 @@
                         </th>
                         <th scope="col">
                             <span class="article-hit-col">조회수</span>
+                        </th>
+                        <th scope="col">
+                            <span class="article-liked-col">좋아요</span>
                         </th>
                     </tr>
                 </thead>
@@ -132,12 +142,17 @@
                     <col style="width:118px">
                     <col style="width:80px">
                     <col style="width:68px">
+                    <col style="width:68px">
                 </colgroup>
                 <tbody>
                     <? foreach ($articles as $article) : ?>
                         <tr class="normalTableTitleRow">
-
                             <td colspan="2" class="td-article">
+                                <div class="article-num-cell">
+                                    <div class="article-num">
+                                        <?= $article->getId(); ?>
+                                    </div>
+                                </div>
                                 <div class="title-list">
                                     <div class="inner-title-name">
                                         <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
@@ -172,17 +187,27 @@
                                 <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
                             </td>
 
+                            <td scope="col" class="td-like">
+                                <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
+                            </td>
+
                         </tr>
                     <? endforeach; ?>
                 </tbody>
             </table>
         </div>
+        <div class="board-article-control-box">
+            <div class="board-article-write-btn">
+                <a href="/article/articleEditController" target="_blank" class="article-write-btn">글쓰기</a>
+            </div>
+        </div>
+
         <div class="pagination-box">
             <?= '<div class="pagination">';
 
             for ($page = 1; $page <= $totalPages; $page++) {
                 $isActive = ($page == $currentPage) ? 'active' : '';
-                $link = "/article/articlelistallcontroller?"
+                $link = "/article/articlelistcontroller/$methodName?"
                     . "&page=$page"
                     . "&articlesPerPage=$articlesPerPage"
                     . "&keyword=" . urlencode($keyword)
@@ -213,7 +238,7 @@
                         <option value="custom" <?= ($period === 'custom') ? 'selected' : ''; ?>>사용자 지정 기간</option>
                     </select>
 
-                    <div class="select-date">
+                    <div class="select-date" style="display:none;">
                         <input type="date" name="startDate" class="date-input" placeholder="시작 날짜" id="start-date" value="<?= htmlspecialchars($startDate); ?>">
                         <input type="date" name="endDate" class="date-input" placeholder="종료 날짜" id="end-date" value="<?= htmlspecialchars($endDate); ?>">
                     </div>
