@@ -134,10 +134,21 @@ table {
     text-overflow: ellipsis;
 }
 
+.left-bottom-edge {
+    color: #959595;
+    font-weight: bold;
+    font-size: 17px;
+}
+
 .prefix {
     color: #959595;
     font-weight: bold;
     margin-right: 2px;
+}
+
+.parent-article-is-deleted {
+    color: red;
+    font-weight: bold;
 }
 
 .articles-comment-count {

@@ -37,7 +37,7 @@ class ArticleListController extends MY_Controller
                     'articleBoard' => $articleBoard,
                     'title' => '게시판이름',
                     'boardGuide' => '게시판설명',
-                    'errors' => $errors ?? [] // 에러처리
+                    'errors' => $errors ?? []
                 ];
 
                 $html = $this->load->view('article/article_list_by_board_content', $freeBoardListData, TRUE);
@@ -106,6 +106,7 @@ class ArticleListController extends MY_Controller
                 }
 
                 $totalPages = ceil($totalArticleCount / $articlesPerPage);
+                $parentArticlesExist = $this->ArticleListModel->checkParentArticlesExist($articles);
 
                 // 게시글 ID 배열 생성
                 $articleIds = array_map(function ($article) {
@@ -122,6 +123,7 @@ class ArticleListController extends MY_Controller
                     'articles' => $articles,
                     'commentCounts' => $commentCounts,
                     'totalArticleCountAll' => $totalArticleCount,
+                    'parentArticlesExist' => $parentArticlesExist,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
                     'articlesPerPage' => $articlesPerPage,

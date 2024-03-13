@@ -1,32 +1,31 @@
 <?
 $GLOBALS['pageResources'] = [
-    'css' => [
-        '/assets/css/article/articleEdit.css',
-    ],
-    'js' => [
-        '/assets/js/article/articleEdit.js',
-    ]
+    'css' => ['/assets/css/article/articleEdit.css',],
+    'js' => ['/assets/js/article/articleEdit.js',]
 ];
 $user = $_SESSION['user_data'];
 ?>
 <section class="section-container">
     <div class="container">
-        <form action="/article/articleeditcontroller/processCreateArticle" method="POST">
+        <form action="/article/articleeditcontroller/createArticle" method="POST">
             <div class="writingHeader">
                 <h1 class="title">카페 글쓰기</h1>
                 <input class="form-btn-box btn-box submit-btn" type="submit" value="등록">
             </div>
             <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
-            <input type="hidden" name="depth" value="0">
-            <input type="hidden" name="parentId" value="NULL">
+            <input type="hidden" name="parentId" value="<?= isset($parentArticle) ? $parentArticle->getId() : ''; ?>">
+            <input type="hidden" name="depth" value="<?= isset($parentArticle) ? $parentArticle->getDepth() + 1 : 0; ?>">
+            <input type="hidden" name="orderGroup" value="<?= isset($parentArticle) ? $parentArticle->getOrderGroup() : ''; ?>">
+            <input type="hidden" id="parentBoardId" value="<?= isset($parentArticle) ? $parentArticle->getArticleBoard()->getId() : ''; ?>">
+            <input type="hidden" id="parentPrefix" value="<?= isset($parentArticle) ? $parentArticle->getPrefix() : ''; ?>">
             <div class="editer-box">
                 <div class="select-box">
                     <div class="board-select-box">
                         <select id="board-select" name="board" class="custom-input">
                             <option value="">게시판을 선택해 주세요.</option>
-                            <?php foreach ($boards as $board) : ?>
+                            <? foreach ($boards as $board) : ?>
                                 <option value="<?= $board->getId(); ?>"><?= $board->getBoardName(); ?></option>
-                            <?php endforeach; ?>
+                            <? endforeach; ?>
                         </select>
                     </div>
                     <div class="prefix-select-box">
@@ -57,8 +56,6 @@ $user = $_SESSION['user_data'];
                         </label>
                     <?php endif; ?>
                 </div>
-                <!-- 부모 게시글 ID를 위한 숨겨진 필드 (답글일 경우) -->
-                <input type="hidden" name="parent_id" id="parent_id" value="">
             </div>
         </form>
     </div>

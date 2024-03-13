@@ -138,50 +138,78 @@
             </colgroup>
             <tbody>
                 <? foreach ($articles as $article) : ?>
-                    <tr class="normalTableTitleRow">
-                        <td colspan="2" class="td-article">
-                            
-                            <div class="board-name">
-                                <div class="inner-board-name">
-                                    <a href="/해당게시판 링크" class="board-link"><?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?></a>
-                                </div>
-                            </div>
+                    <?
+                    $styleAttributes = '';
+                    $parentArticleDeleted = '';
+                    $leftBottomEdge = '';
+                    $paddingVal = 0;
+                    if ($article->getDepth() > 0 && $parentArticlesExist[$article->getId()]) {
+                        $leftBottomEdge = '┗';
+                        $parentArticleDeleted = '';
+                        $paddingVal = $article->getDepth() * 12;
+                        $styleAttributes = 'style="padding-left:' . $paddingVal . 'px;"';
+                    } else if (!$parentArticlesExist[$article->getId()]) {
+                        $leftBottomEdge = '';
+                        $parentArticleDeleted = '[원글이 삭제된 답글]';
+                        $paddingVal = 0;
+                        $styleAttributes = 'style="padding-left:' . $paddingVal . 'px;"';
+                    } else {
+                        $parentArticleDeleted = '';
+                        $leftBottomEdge = '';
+                        $paddingVal = 0;
+                        $styleAttributes = '';
+                    }
+                    ?>
+                    <? if ($parentArticlesExist[$article->getId()] && empty($keyword)) : ?>
+                        <tr class="normalTableTitleRow">
+                            <td colspan="2" class="td-article">
 
-                            <div class="title-list">
-                                <div class="inner-title-name">
-                                    <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
-                                        <? if (!empty($article->getPrefix())) : ?>
-                                            <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
-                                        <? endif; ?>
-                                        <?= $article->getTitle() ? htmlspecialchars($article->getTitle(), ENT_QUOTES, 'UTF-8') : '제목을 찾을 수 없음'; ?>
-                                        <? $commentCount = $commentCounts[$article->getId()] ?? 0; ?>
-                                        <? if ($commentCount !== 0) : ?>
-                                            <span class="articles-comment-count">
-                                                <?= '[' . $commentCount . ']' ?>
+                                <div class="board-name">
+                                    <div class="inner-board-name">
+                                        <a href="/해당게시판 링크" class="board-link"><?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?></a>
+                                    </div>
+                                </div>
+
+                                <div class="title-list">
+                                    <div class="inner-title-name">
+                                        <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
+                                            <span class="left-bottom-edge"><?= $leftBottomEdge ?></span>
+                                            <span class="parent-article-is-deleted">
+                                                <?= $parentArticleDeleted ?>
                                             </span>
-                                        <? endif; ?>
+                                            <? if (!empty($article->getPrefix())) : ?>
+                                                <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
+                                            <? endif; ?>
+                                            <?= $article->getTitle() ? htmlspecialchars($article->getTitle(), ENT_QUOTES, 'UTF-8') : '제목을 찾을 수 없음'; ?>
+                                            <? $commentCount = $commentCounts[$article->getId()] ?? 0; ?>
+                                            <? if ($commentCount !== 0) : ?>
+                                                <span class="articles-comment-count">
+                                                    <?= '[' . $commentCount . ']' ?>
+                                                </span>
+                                            <? endif; ?>
+                                        </a>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td scope="col" class="td-author">
+                                <div class="author-name">
+                                    <a href="/해당 작성자 활동내역" class="author-name-link">
+                                        <span class="article-author-row"><?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자미상'; ?></span>
                                     </a>
                                 </div>
-                            </div>
-                        </td>
+                            </td>
 
-                        <td scope="col" class="td-author">
-                            <div class="author-name">
-                                <a href="/해당 작성자 활동내역" class="author-name-link">
-                                    <span class="article-author-row"><?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자미상'; ?></span>
-                                </a>
-                            </div>
-                        </td>
+                            <td scope="col" class="td-create-date">
+                                <span class="article-create-date-row"><?= $article->getCreateDate()->format('Y-m-d'); ?></span>
+                            </td>
 
-                        <td scope="col" class="td-create-date">
-                            <span class="article-create-date-row"><?= $article->getCreateDate()->format('Y-m-d'); ?></span>
-                        </td>
+                            <td scope="col" class="td-hit">
+                                <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
+                            </td>
 
-                        <td scope="col" class="td-hit">
-                            <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
-                        </td>
-
-                    </tr>
+                        </tr>
+                    <? endif; ?>
                 <? endforeach; ?>
             </tbody>
         </table>

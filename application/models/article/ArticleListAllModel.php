@@ -25,7 +25,8 @@ class ArticleListAllModel extends MY_Model
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
             ->where('a.isActive = 1')
-            ->orderBy('a.createDate', 'DESC')
+            ->andWhere('a.depth = 0')
+            ->orderBy('a.orderGroup', 'DESC')
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage);
 
@@ -51,6 +52,68 @@ class ArticleListAllModel extends MY_Model
         }
 
         return $commentCounts;
+    }
+
+    // 부모글의 id를 기준으로 찾음.
+    public function getArticleById($parentId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.id = :parentId')
+            ->andWhere('a.isActive = 1')
+            ->setParameter('parentId', $parentId);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getOneOrNullResult();
+    }
+
+    public function checkParentArticlesExist($articles)
+    {
+        $result = [];
+        foreach ($articles as $article) {
+            $articleId = $article->getId();
+            if (!empty($article->getParent())) {
+                $articleParentId = $article->getParent()->getId();
+                $parentArticleIsExsist = (bool)$this->getArticleById($articleParentId);
+                $result[$articleId] = $parentArticleIsExsist;
+            } else {
+                // 부모 게시글이 없는 경우(최상위 게시글) 또는 게시글 자체가 존재하지 않는 경우
+                $result[$articleId] = true;
+            }
+        }
+        return $result;
+    }
+
+    // 부모글의 id를 key로 하고 자식글들을 배열에 담는 메서드(전체글보기에서 자식글이 존재하면 접었다 폈다 하기 위함.)
+    public function getChildArticles()
+    {
+        $childArticles = [];
+
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('parent.id as parentId, article')
+            ->from('Models\Entities\Article', 'article')
+            ->leftJoin('article.parent', 'parent')
+            ->where('parent.id IS NOT NULL') // 부모글이 있는 자식글만 선택
+            ->andWhere('article.depth >= 1') // depth가 1 이상인 글들만 선택
+            ->orderBy('article.orderGroup', 'ASC')
+            ->addOrderBy('article.depth', 'ASC');
+
+        $results = $queryBuilder->getQuery()->getResult();
+
+        // 결과 처리
+        foreach ($results as $result) {
+            $parentId = $result['parentId'];
+            $article = $result['article'];
+
+            if (!isset($childArticles[$parentId])) {
+                $childArticles[$parentId] = [];
+            }
+
+            $childArticles[$parentId][] = $article;
+        }
+
+        return $childArticles;
     }
 
     public function searchArticles($keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
@@ -156,7 +219,7 @@ class ArticleListAllModel extends MY_Model
                 ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
         }
 
-        $queryBuilder->orderBy('a.createDate', 'DESC')
+        $queryBuilder->orderBy('a.orderGroup', 'DESC')
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage);
 

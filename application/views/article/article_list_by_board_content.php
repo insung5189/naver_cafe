@@ -143,6 +143,25 @@
             </colgroup>
             <tbody>
                 <? foreach ($articles as $article) : ?>
+                    <?
+                    $styleAttributes = '';
+                    if ($article->getDepth() > 0 && $parentArticlesExist[$article->getId()]) {
+                        $leftBottomEdge = '┗';
+                        $parentArticleDeleted = '';
+                        $paddingVal = $article->getDepth() * 12;
+                        $styleAttributes = 'style="padding-left:' . $paddingVal . 'px;"';
+                    } else if (!$parentArticlesExist[$article->getId()]) {
+                        $leftBottomEdge = '';
+                        $parentArticleDeleted = '[원글이 삭제된 답글]';
+                        $paddingVal = 0;
+                        $styleAttributes = 'style="padding-left:' . $paddingVal . 'px;"';
+                    } else {
+                        $parentArticleDeleted = '';
+                        $leftBottomEdge = '';
+                        $paddingVal = 0;
+                        $styleAttributes = '';
+                    }
+                    ?>
                     <tr class="normalTableTitleRow">
                         <td colspan="2" class="td-article">
 
@@ -154,7 +173,11 @@
 
                             <div class="title-list">
                                 <div class="inner-title-name">
-                                    <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
+
+                                    <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
+                                        <span class="left-bottom-edge"><?= $leftBottomEdge ?></span>
+                                        <span class="parent-article-is-deleted">
+                                        </span>
                                         <? if (!empty($article->getPrefix()) && ($articleBoard->getId() == 4 || $articleBoard->getId() == 5)) : ?>
                                             <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                         <? endif; ?>

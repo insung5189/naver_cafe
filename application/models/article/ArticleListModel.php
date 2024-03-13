@@ -15,7 +15,8 @@ class ArticleListModel extends MY_Model
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
             ->where('a.articleBoard = :boardId')
-            ->orderBy('a.createDate', 'DESC')
+            ->andWhere('a.isActive = 1')
+            ->orderBy('a.orderGroup', 'DESC')
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage)
             ->setParameter('boardId', $boardId);
@@ -30,7 +31,8 @@ class ArticleListModel extends MY_Model
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
             ->where('a.articleBoard = :boardId')
-            ->orderBy('a.createDate', 'DESC')
+            ->andWhere('a.isActive = 1')
+            ->orderBy('a.orderGroup', 'DESC')
             ->setParameter('boardId', $boardId);
 
         return $queryBuilder->getQuery()->getResult();
@@ -55,6 +57,36 @@ class ArticleListModel extends MY_Model
         }
 
         return $commentCounts;
+    }
+
+    public function getArticleById($parentId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.id = :parentId')
+            ->andWhere('a.isActive = 1')
+            ->setParameter('parentId', $parentId);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getOneOrNullResult();
+    }
+
+    public function checkParentArticlesExist($articles)
+    {
+        $result = [];
+        foreach ($articles as $article) {
+            $articleId = $article->getId();
+            if (!empty($article->getParent())) {
+                $articleParentId = $article->getParent()->getId();
+                $parentArticleIsExsist = (bool)$this->getArticleById($articleParentId);
+                $result[$articleId] = $parentArticleIsExsist;
+            } else {
+                // 부모 게시글이 없는 경우(최상위 게시글) 또는 게시글 자체가 존재하지 않는 경우
+                $result[$articleId] = true;
+            }
+        }
+        return $result;
     }
 
     public function searchArticles($boardId, $keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
@@ -168,7 +200,7 @@ class ArticleListModel extends MY_Model
         $totalCount = $totalQuery->getQuery()->getSingleScalarResult();
 
         // 페이징 처리된 게시글 조회
-        $queryBuilder->orderBy('a.createDate', 'DESC')
+        $queryBuilder->orderBy('a.orderGroup', 'DESC')
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage);
         $pagedResults = $queryBuilder->getQuery()->getResult();

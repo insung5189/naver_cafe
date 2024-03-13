@@ -8,73 +8,125 @@ class ArticleEditModel extends MY_Model
         parent::__construct();
     }
 
-    public function createArticle($formData)
+    public function getArticleById($parentId)
     {
-        $boardId = $formData['boardId'];
-        $prefix = isset($formData['prefix']) ? $formData['prefix'] : NULL;
-        $title = $formData['title'];
-        $content = $formData['content'];
-        $parentId = $formData['parentId'];
-        $publicScope = $formData['publicScope'];
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.id = :parentId')
+            ->andWhere('a.isActive = 1')
+            ->setParameter('parentId', $parentId);
 
-        $orderGroup = 0;
-        if (!$parentId) {
-            // 최상위 부모글인 경우, orderGroup을 새로 부여
-            // 쿼리 빌더를 사용하여 최대 orderGroup 값을 찾음
+        $query = $queryBuilder->getQuery();
+
+        try {
+            return $query->getOneOrNullResult();
+        } catch (\Doctrine\ORM\NonUniqueResultException $e) {
+            // 쿼리 결과가 유니크하지 않은 경우의 예외 처리
+            throw new \Exception("Expected a single result but got multiple.");
+        }
+    }
+
+    public function processCreateNewArticle($formData)
+    {
+        try {
+            // 게시판 확인
+            $board = $this->em->getRepository('Models\Entities\ArticleBoard')->find($formData['boardId']);
+            if (!$board) {
+                throw new Exception('게시판을 찾을 수 없습니다.');
+            }
+
+            // 게시판 ID에 따른 유효한 말머리 설정
+            $validPrefixesMap = [
+                '4' => ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타'],
+                '5' => ['질문', '답변'],
+            ];
+
+            $boardIdAsString = (string)$formData['boardId'];
+            $validPrefixes = array_key_exists($boardIdAsString, $validPrefixesMap) ? $validPrefixesMap[$boardIdAsString] : [];
+            $prefix = in_array($formData['prefix'], $validPrefixes) ? $formData['prefix'] : null;
+
+            // orderGroup 계산
             $queryBuilder = $this->em->createQueryBuilder();
-            $queryBuilder->select($queryBuilder->expr()->max('a.orderGroup'))
+            $queryBuilder->select('MAX(a.orderGroup) as maxOrderGroup')
                 ->from('Models\Entities\Article', 'a');
-            $maxOrderGroup = $queryBuilder->getQuery()->getSingleScalarResult();
-            $orderGroup = $maxOrderGroup ? $maxOrderGroup + 1 : 1;
-        } else {
-            // 부모글이 있는 경우, 부모글의 orderGroup을 상속받음
-            if ($parentArticle) {
-                $orderGroup = $parentArticle->getOrderGroup();
+            $maxOrderGroupResult = $queryBuilder->getQuery()->getSingleScalarResult();
+            $orderGroup = $maxOrderGroupResult ? $maxOrderGroupResult + 1 : 1;
+
+            $article = new Models\Entities\Article();
+            // 기본 데이터 설정
+            $article->setTitle($formData['title']);
+            $article->setContent($formData['content']);
+            $member = $this->em->getRepository('Models\Entities\Member')->find($formData['memberId']);
+            $article->setMember($member);
+            $article->setCreateDate(new \DateTime());
+            $article->setArticleBoard($board);
+            $article->setPublicScope($formData['publicScope']);
+            $article->setPrefix($prefix);
+            $article->setOrderGroup($orderGroup);
+            $article->setDepth(0);
+            $article->setIsActive(true);
+            $article->setIp($_SERVER['REMOTE_ADDR']);
+
+            $this->em->persist($article);
+            $this->em->flush();
+
+            return ['success' => true, 'articleId' => $article->getId()];
+        } catch (\Exception $e) {
+            return ['success' => false, 'errors' => ['message' => '게시글 작성 중 오류 발생: ' . $e->getMessage()]];
+        }
+    }
+
+    public function processCreateReplyArticle($formData)
+    {
+        try {
+            $parentArticle = $this->getArticleById($formData['parentId']);
+            if (!$parentArticle) {
+                throw new Exception('부모 게시물을 찾을 수 없습니다.');
             }
-        }
 
-        $board = $this->em->find('Models\Entities\ArticleBoard', $boardId);
-        if (!$board) {
-            throw new Exception('게시판을 찾을 수 없습니다.');
-        }
-
-        $validPrefixes = [
-            '4' => ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타'],
-            '5' => ['질문', '답변'],
-        ];
-
-        if (isset($validPrefixes[$boardId])) {
-            $currentValidPrefixes = $validPrefixes[$boardId];
-            if (!in_array($prefix, $currentValidPrefixes)) {
-                throw new Exception('유효하지 않은 말머리입니다.');
+            $board = $parentArticle->getArticleBoard();
+            if (!$board) {
+                throw new Exception('게시판을 찾을 수 없습니다.');
             }
-        } else {
-            $prefix = NULL;
-        }
 
-        $memberId = $this->session->userdata('user_data')['user_id'];
-        $member = $this->em->find('Models\Entities\Member', $memberId);
-        if (!$member) {
-            throw new Exception('작성자 정보를 찾을 수 없습니다.');
-        }
+            // 게시판 ID에 따른 유효한 말머리 설정
+            $validPrefixesMap = [
+                '4' => ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타'],
+                '5' => ['질문', '답변'],
+            ];
 
-        $article = new Models\Entities\Article();
-        $article->setArticleBoard($board);
-        $article->setMember($member);
-        $article->setPrefix($prefix); // 조건에 따라 설정된 말머리 사용
-        $article->setTitle($title);
-        $article->setContent($content);
-        $article->setPublicScope($publicScope);
-        $article->setDepth($depth);
-        $article->setIp($_SERVER['REMOTE_ADDR']);
-        $article->setOrderGroup($orderGroup);
+            $boardIdAsString = (string)$parentArticle->getArticleBoard()->getId();
+            $validPrefixes = array_key_exists($boardIdAsString, $validPrefixesMap) ? $validPrefixesMap[$boardIdAsString] : [];
+            $prefix = in_array($formData['prefix'], $validPrefixes) ? $formData['prefix'] : null;
+            $publicScope = $parentArticle->getPublicScope();
 
-        if ($parentId && $parentArticle) {
+            // depth와 orderGroup 설정
+            $depth = $parentArticle->getDepth() + 1;
+            $orderGroup = $parentArticle->getOrderGroup();
+
+            $article = new Models\Entities\Article();
+            // 기본 데이터 설정
+            $article->setTitle($formData['title']);
+            $article->setContent($formData['content']);
+            $member = $this->em->getRepository('Models\Entities\Member')->find($formData['memberId']);
+            $article->setMember($member);
+            $article->setCreateDate(new \DateTime());
+            $article->setArticleBoard($board);
+            $article->setPublicScope($publicScope);
+            $article->setPrefix($prefix);
+            $article->setOrderGroup($orderGroup);
+            $article->setDepth($depth);
+            $article->setIsActive(true);
+            $article->setIp($_SERVER['REMOTE_ADDR']);
             $article->setParent($parentArticle);
-        }
 
-        // 게시글 저장
-        $this->em->persist($article);
-        $this->em->flush();
+            $this->em->persist($article);
+            $this->em->flush();
+
+            return ['success' => true, 'articleId' => $article->getId()];
+        } catch (\Exception $e) {
+            return ['success' => false, 'errors' => ['message' => '답글 작성 중 오류 발생: ' . $e->getMessage()]];
+        }
     }
 }

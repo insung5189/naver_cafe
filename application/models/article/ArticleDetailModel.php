@@ -180,6 +180,10 @@ class ArticleDetailModel extends MY_Model
         }
 
         try {
+            $article = $this->em->getRepository('Models\Entities\Article')->find($formData['articleId']);
+            if (!$article) {
+                throw new \Exception('게시물을 찾을 수 없습니다.');
+            }
             // 고유 식별 정보 생성
             $uniqueIdentifier = $this->generateUniqueIdentifier($formData['memberId']);
 
@@ -188,7 +192,7 @@ class ArticleDetailModel extends MY_Model
             $comment->setMember($this->em->find('Models\Entities\Member', $formData['memberId']));
             $comment->setContent($formData['content']);
             $comment->setCreateDate(new \DateTime(date('Y-m-d H:i')));
-            $comment->setPublicScope($formData['publicScope']);
+            $comment->setPublicScope($article->getPublicScope());
             $comment->setUniqueIdentifier($uniqueIdentifier);
             $comment->setParent($this->em->find('Models\Entities\Comment', $formData['parentId']));
             $comment->setDepth($formData['depth']);

@@ -35,24 +35,28 @@ class ArticleListAllController extends MY_Controller
                 $startDate = $this->input->get('startDate', TRUE) ?? '';
                 $endDate = $this->input->get('endDate', TRUE) ?? '';
 
-                if (!empty($keyword) || !empty($period) || !empty($startDate) || !empty($endDate)) {
+                if (!empty($keyword) && !empty($period) || !empty($startDate) || !empty($endDate)) {
 
                     $result = $this->ArticleListAllModel->searchArticles($keyword, $element, $period, $startDate, $endDate, $currentPage, $articlesPerPage);
 
                     if (isset($result['errors'])) {
                         $errors = $result['errors'];
-                        $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage);
+                        $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
+                        $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
                     } else {
-                        $articles = $result;
+                        $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 불러옴.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
                     }
                 } else {
-                    $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage);
+                    $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
+                    $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                     $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
                 }
 
                 $totalPages = ceil($totalArticleCount / $articlesPerPage);
+
+                $parentArticlesExist = $this->ArticleListAllModel->checkParentArticlesExist($articles);
 
                 // 게시글 ID 배열 생성
                 $articleIds = array_map(function ($article) {
@@ -62,8 +66,6 @@ class ArticleListAllController extends MY_Controller
                 // 게시글별 댓글 개수 조회
                 $commentCounts = $this->ArticleListAllModel->getCommentCountForArticles($articleIds);
 
-
-
                 $page_view_data = [
                     'title' => !empty($keyword) ? '검색 결과' : '전체글보기',
                     'articles' => $articles,
@@ -72,6 +74,8 @@ class ArticleListAllController extends MY_Controller
                     'totalPages' => $totalPages,
                     'articlesPerPage' => $articlesPerPage,
                     'totalArticleCountAll' => $totalArticleCount,
+                    'parentArticlesExist' => $parentArticlesExist,
+                    'childArticles' => $childArticles,
                     'keyword' => $keyword,
                     'element' => $element,
                     'period' => $period,
