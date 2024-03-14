@@ -1,4 +1,27 @@
 $(document).ready(function () {
+    // 관련게시글 영역 로드
+    relatedArticles(1);
+
+    // AJAX 요청 함수
+    function relatedArticles(page) {
+        var boardId = $('#relatedArticles').data('article-board-id');
+        $.ajax({
+            url: '/article/ArticleDetailController/relatedArticles',
+            type: 'GET',
+            data: {
+                page: page,
+                boardId: boardId,
+            },
+            dataType: 'json',
+            success: function (response) {
+                $('#relatedArticles').html(response.html);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error: ", error);
+            }
+        });
+    }
+
     var articleId = $('#article').data('article-id');
     var viewedArticles = localStorage.getItem('viewedArticles');
     viewedArticles = viewedArticles ? JSON.parse(viewedArticles) : {};

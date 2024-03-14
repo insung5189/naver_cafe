@@ -62,6 +62,20 @@ $(document).ready(function () {
         };
     }
 
+    $(document).on('click', '.show-reply', function () {
+        var articleId = $(this).data('article-id');
+
+        var isOpen = $('.replyToggle-' + articleId + '').is(':visible');
+        if (isOpen) {
+            $('.fa-reply-toggle-arrow-' + articleId + '').removeClass('fa-caret-up');
+            $('.fa-reply-toggle-arrow-' + articleId + '').addClass('fa-caret-down');
+        } else if (!isOpen) {
+            $('.fa-reply-toggle-arrow-' + articleId + '').removeClass('fa-caret-down');
+            $('.fa-reply-toggle-arrow-' + articleId + '').addClass('fa-caret-up');
+        }
+        $('.replyToggle-' + articleId + '').toggle(180);
+    });
+
     function updateDateVisibility() {
         if ($('#select-period').val() === 'custom' || ($('#start-date').val() && $('#end-date').val())) {
             $('.select-date').show();

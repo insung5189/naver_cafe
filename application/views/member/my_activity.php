@@ -26,8 +26,9 @@ $GLOBALS['pageResources'] = [
             </span>
             <span class="nick-and-info">
                 <div class="nick-area">
-                    <?= $member->getNickName(); ?>
-                    (
+                    <span class="nick-name-represent">
+                        <?= $member->getNickName(); ?>
+                    </span>
                     <?
                     $email = $member->getUserName();
                     list($localPart, $domainPart) = explode('@', $email);
@@ -38,8 +39,9 @@ $GLOBALS['pageResources'] = [
                     $maskedDomainPart = $maskedDomainFirstPart . '.' . implode('.', array_slice($domainParts, 1));
                     $maskedEmail = $maskedLocalPart . '@' . $maskedDomainPart;
                     ?>
-                    <?= $maskedEmail ?>
-                    )
+                    <span>
+                        <?= '(' . $maskedEmail . ')' ?>
+                    </span>
                 </div>
                 <div class="info-area">
                     <span>방문</span> <em class="count-num"><?= $member->getVisit(); ?></em> <span class="ml-17">작성글</span> <em class="count-num"><?= $articleCount; ?></em>
@@ -68,8 +70,7 @@ $GLOBALS['pageResources'] = [
                     <a href="javascript:void(0);" class="link_sort" id="my_activity_my_deleted_articles_area"><span>삭제한 게시글</span></a>
                 </div>
             </div>
-            <div id="tabContentArea">
-                <?= $initialTabContent ?>
+            <div id="tabContentArea" >
             </div>
         </div>
     </div>

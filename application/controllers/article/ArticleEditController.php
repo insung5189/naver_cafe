@@ -72,7 +72,7 @@ class ArticleEditController extends MY_Controller
             redirect('/article/articledetailcontroller/index/' . $result['articleId']);
         } else {
             $this->session->set_flashdata('error_messages', $result['errors']);
-            redirect('back');
+            redirect('/article/articleeditcontroller');
         }
     }
 }

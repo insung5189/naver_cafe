@@ -79,6 +79,7 @@ h1 {
 
 table {
     width: 100%;
+    border-spacing: 0;
 }
 
 .board-name {
@@ -140,16 +141,32 @@ table {
     font-weight: bold;
 }
 
+.show-reply {
+    color: red;
+    font-weight: bold;
+    vertical-align: top;
+}
+
 #article-row-table tbody td {
     height: 28px;
-    padding: 4px 7px;
+    padding: 5px 0px;
     border-bottom: 1px solid #f2f2f2;
+}
+
+.childTableTitleRow {
+    background: #f9f9f8;
 }
 
 .td-article {
     padding-left: 12px;
     padding-right: 18px;
     width: 510px;
+}
+
+.td-author {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .td-author,
@@ -160,8 +177,8 @@ table {
 
 .article-author-row,
 .article-title-link {
-    display: block;
-    max-width: 100%;
+    display: inline-block;
+    max-width: 85%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;

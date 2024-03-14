@@ -10,12 +10,14 @@ $GLOBALS['pageResources'] = [
             <!-- <a href="/이동_링크" class="list-article-btn">
                 이동
             </a> -->
-            <a href="/수정_링크" class="list-article-btn">
-                수정
-            </a>
-            <a href="javascript:void(0);" class="list-article-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">
-                삭제
-            </a>
+            <? if (isset($user)) : ?>
+                <a href="/수정_링크" class="list-article-btn">
+                    수정
+                </a>
+                <a href="javascript:void(0);" class="list-article-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">
+                    삭제
+                </a>
+            <? endif; ?>
         </div>
         <div class="article-top-right-btn">
             <a href="/이전글_링크" class="prev-article-btn">
@@ -26,7 +28,7 @@ $GLOBALS['pageResources'] = [
                 <i class="fa-solid fa-angle-down"></i>
                 다음글
             </a>
-            <a href="/목록_링크" class="list-article-btn">
+            <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="list-article-btn">
                 목록
             </a>
         </div>
@@ -54,6 +56,19 @@ $GLOBALS['pageResources'] = [
                 </a>
                 <div id="article" data-article-id="<?= $article->getId() ?>"></div>
                 <h1 class="article-title">
+                    <?
+                    $parentArticleDeleted = '';
+                    if ($article->getDepth() > 0 && $parentArticlesExist) {
+                        $parentArticleDeleted = '';
+                    } else if (!$parentArticlesExist) {
+                        $parentArticleDeleted = '[원글이 삭제된 답글]';
+                    } else {
+                        $parentArticleDeleted = '';
+                    }
+                    ?>
+                    <span class="parent-article-is-deleted">
+                        <?= $parentArticleDeleted ?>
+                    </span>
                     <span class="article-prefix">
                         <?= $article->getPrefix() ? '[' . htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8') . ']' : ''; ?>
                     </span>
@@ -134,7 +149,7 @@ $GLOBALS['pageResources'] = [
                         <? endif; ?>
                     </div>
                     <div class="article-viewer">
-                        <?= $article->getContent() ? htmlspecialchars($article->getContent(), ENT_QUOTES, 'UTF-8') : '내용 없음'; ?>
+                        <?= $article->getContent() ? $article->getContent() : '내용 없음'; ?>
                     </div>
 
                     <div class="article-author">
@@ -436,16 +451,20 @@ $GLOBALS['pageResources'] = [
             </div>
 
             <div class="article-bottom-btn-box">
-                <div class="article-bottom-btn-left-box">
-                    <a href="/article/articleeditcontroller" target="_blank" class="article-write">
-                        <i class="fa-solid fa-pen-clip fa-sm"></i>
-                        글쓰기
-                    </a>
 
-                    <a href="/article/articleeditcontroller?parentId=<?= $article->getId(); ?>&boardId=<?= $article->getArticleBoard()->getId(); ?>&prefix=<?= $article->getPrefix(); ?>" class="article-base-btn">답글</a>
-                    <a href="/해당_게시물_수정하기_URL" class="article-base-btn">수정</a>
-                    <a href="javascript:void(0);" class="article-base-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">삭제</a>
+                <div class="article-bottom-btn-left-box">
+                    <? if (isset($user)) : ?>
+                        <a href="/article/articleeditcontroller" target="_blank" class="article-write">
+                            <i class="fa-solid fa-pen-clip fa-sm"></i>
+                            글쓰기
+                        </a>
+
+                        <a href="/article/articleeditcontroller?parentId=<?= $article->getId(); ?>&boardId=<?= $article->getArticleBoard()->getId(); ?>&prefix=<?= $article->getPrefix(); ?>" class="article-base-btn">답글</a>
+                        <a href="/해당_게시물_수정하기_URL" class="article-base-btn">수정</a>
+                        <a href="javascript:void(0);" class="article-base-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">삭제</a>
+                    <? endif; ?>
                 </div>
+
                 <div class="article-bottom-btn-right-box">
                     <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="article-base-btn">목록</a>
                     <a href="/스크롤_맨위로_이동하기" class="article-base-btn">
@@ -456,26 +475,12 @@ $GLOBALS['pageResources'] = [
             </div>
 
             <hr class="hr-line">
-
-            <div class="related-articles">
-                <div class="related-articles-board-name">
-                    <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>">
-                        <?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?>
-                    </a>
-                </div>
-                <ul>
-                    <li>
-                        같은 게시판 관련 게시글 반복
-                    </li>
-                </ul>
-                <div class="related-articles-pagination">
-                    관련 게시글 페이지네이션 자리
-                </div>
-                <div class="board-link">
-                    <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>">
-                        전체보기(해당 게시판으로 가는 링크)
-                    </a>
-                </div>
+            <div class="related-articles-board-name">
+                <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>">
+                    <h2 class="related-board-name"><?= "'" . ($article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음') . "'" ?>게시판 글</h2>
+                </a>
+            </div>
+            <div class="related-articles" id="relatedArticles" data-article-board-id="<?= $article->getArticleBoard()->getId() ?>">
             </div>
         </div>
     </section>

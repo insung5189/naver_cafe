@@ -7,10 +7,10 @@ class MY_Controller extends CI_Controller
     {
         parent::__construct();
         $this->em = $this->doctrine->em;
-        // AJAX 요청이 아닐 때만 프로파일러를 활성화
-        if (!$this->input->is_ajax_request()) {
-            $this->output->enable_profiler(TRUE);
-        }
+        // // AJAX 요청이 아닐 때만 프로파일러를 활성화
+        // if (!$this->input->is_ajax_request()) {
+        //     $this->output->enable_profiler(TRUE);
+        // }
     }
 
     protected function setRedirectCookie($path)

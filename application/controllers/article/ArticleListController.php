@@ -22,8 +22,6 @@ class ArticleListController extends MY_Controller
         $this->layout->view('article/article_list_by_board', $page_view_data);
     }
 
-
-
     public function loadFreeBoardAjax()
     {
         // 자유게시판의 목록 로드

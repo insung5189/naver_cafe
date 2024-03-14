@@ -128,3 +128,12 @@ h1 {
     display: block;
     margin-bottom: 5px;
 }
+
+/* 이하 CK에디터 CSS */
+.ck.ck-editor {
+    max-width: 100%;
+}
+
+.ck-editor__editable {
+    min-height: 300px;
+}

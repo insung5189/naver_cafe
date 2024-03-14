@@ -140,7 +140,7 @@
                         </div>
                         <div class="user-activity" style="display:none;">
                             <? if (isset($_SESSION['user_data'])) : ?>
-                                <? $user = $_SESSION['user_data']; ?>
+                                <? $user = $memberInfo; ?>
                                 <div class="user-activity">
                                     <ul class="cafe-action-tab">
                                         <li class="cafe-info-tab">
@@ -161,18 +161,18 @@
                                                         <!-- 사용자 프로필 이미지 -->
                                                         <?
                                                         $fileUrl = "/assets/file/images/memberImgs/";
-                                                        $profileImagePath = ($user['memberFileName'] === 'default.png') ? 'defaultImg/default.png' : $user['memberFileName'];
+                                                        $profileImagePath = ($user->getMemberFileName() === 'default.png') ? 'defaultImg/default.png' : $user->getMemberFileName();
                                                         ?>
-                                                        <img src="<?= $fileUrl . $profileImagePath; ?>" width="58" height="58" alt="<?= htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?>">
+                                                        <img src="<?= $fileUrl . $profileImagePath; ?>" width="58" height="58" alt="<?= htmlspecialchars($user->getNickName(), ENT_QUOTES, 'UTF-8'); ?>">
                                                     </div>
                                                     <div class="activity-info">
                                                         <!-- 사용자 닉네임 -->
-                                                        <a href="/member/myactivitycontroller" class="member-nick-name"><?= htmlspecialchars($user['nickName'], ENT_QUOTES, 'UTF-8'); ?></a>
+                                                        <a href="/member/myactivitycontroller" class="member-nick-name"><?= htmlspecialchars($user->getNickName(), ENT_QUOTES, 'UTF-8'); ?></a>
                                                     </div>
                                                 </li>
                                                 <li class="membership-date">
                                                     <!-- 사용자 가입 날짜 -->
-                                                    <em><?= htmlspecialchars($user['create_date'], ENT_QUOTES, 'UTF-8'); ?></em> 가입
+                                                    <em><?= $user->getCreateDate()->format('Y-m-d'); ?></em> 가입
                                                 </li>
                                                 <li>
                                                     <a href="/member/mypagecontroller" class="edit-thumb">프로필 변경</a>
@@ -186,9 +186,9 @@
                                                 <li class="cafe-member-title">
                                                     <strong>회원 등급 :</strong>
                                                     <em class="cafe-role">
-                                                        <? if ($user['role'] === 'ROLE_MEMBER') {
+                                                        <? if ($user->getRole() === 'ROLE_MEMBER') {
                                                             echo '카페멤버';
-                                                        } else if ($user['role'] === 'ROLE_ADMIN' || $user['role'] === 'ROLE_MASTER') {
+                                                        } else if ($user->getRole() === 'ROLE_ADMIN' || $user->getRole() === 'ROLE_MASTER') {
                                                             echo '관리자';
                                                         } ?></em>
                                                 </li>
@@ -198,7 +198,7 @@
                                                             <path fill="#ADB2B2" fill-rule="evenodd" d="M6.567 1.111A1.672 1.672 0 0 0 5 0c-.722 0-1.333.467-1.567 1.111H0v10h10v-10H6.567zM5 1.111c.306 0 .556.25.556.556 0 .305-.25.555-.556.555a.557.557 0 0 1-.556-.555c0-.306.25-.556.556-.556zm0 2.222c.922 0 1.667.745 1.667 1.667S5.922 6.667 5 6.667A1.664 1.664 0 0 1 3.333 5c0-.922.745-1.667 1.667-1.667zM8.333 10H1.667v-.778C1.667 8.112 3.889 7.5 5 7.5c1.111 0 3.333.611 3.333 1.722V10z" />
                                                         </svg>
                                                         방문</strong>
-                                                    <em><?= $user['visit']; ?>회</em>
+                                                    <em><?= $user->getVisit(); ?>회</em>
                                                 </li>
                                                 <li class="articles-count">
                                                     <strong>

@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    fetchPageData(1);
+
     if (location.hash === "#mycomments") {
         $('.my-activity-list-style a').removeClass('on underline');
         $('#my_activity_my_comments_area').addClass('on underline');

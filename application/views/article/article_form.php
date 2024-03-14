@@ -1,12 +1,27 @@
 <?
 $GLOBALS['pageResources'] = [
     'css' => ['/assets/css/article/articleEdit.css',],
-    'js' => ['/assets/js/article/articleEdit.js',]
+    'js' => [
+        '/assets/js/article/articleEdit.js',
+        '/assets/lib/ckeditor5-build-classic/translations/ko.js',
+        '/assets/lib/ckeditor5-build-classic/ckeditor.js',
+        '/assets/js/article/ckeditor-init.js',
+    ]
 ];
 $user = $_SESSION['user_data'];
 ?>
 <section class="section-container">
     <div class="container">
+
+        <? if ($this->session->flashdata('error_messages')) : ?>
+            <div class="error-messages">
+                <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
+                <? foreach ($this->session->flashdata('error_messages') as $field => $error) : ?>
+                    <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
+                <? endforeach; ?>
+            </div>
+        <? endif; ?>
+        
         <form action="/article/articleeditcontroller/createArticle" method="POST">
             <div class="writingHeader">
                 <h1 class="title">카페 글쓰기</h1>

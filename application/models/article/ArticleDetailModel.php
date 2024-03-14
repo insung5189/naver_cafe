@@ -26,6 +26,19 @@ class ArticleDetailModel extends MY_Model
         return $article;
     }
 
+    public function checkParentArticlesExist($article)
+    {
+        if (!empty($article->getParent())) {
+            $articleParentId = $article->getParent()->getId();
+            $parentArticleIsExsist = (bool)$this->getArticleById($articleParentId);
+            $result = $parentArticleIsExsist;
+        } else {
+            $result = true;
+        }
+
+        return $result;
+    }
+
     public function getCommentsByArticleId($articleId, $sortOption = '', $depthOption = '', $treeOption = '')
     {
         $queryBuilder = $this->em->createQueryBuilder();
@@ -403,5 +416,57 @@ class ArticleDetailModel extends MY_Model
             ->getQuery();
 
         return $query->execute();
+    }
+
+    // 관련게시판 부모글만 불러오는 쿼리
+    public function getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.articleBoard = :boardId')
+            ->andWhere('a.isActive = 1')
+            ->andWhere('a.depth = 0')
+            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
+            ->setMaxResults($articlesPerPage)
+            ->setParameter('boardId', $boardId);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    public function getTotalArticleCount($boardId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('count(a.id)')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.articleBoard = :boardId')
+            ->andWhere('a.isActive = 1')
+            ->andWhere('a.depth = 0')
+            ->setParameter('boardId', $boardId);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getSingleScalarResult();
+    }
+
+    public function getCommentCountForArticles($articleIds)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('IDENTITY(c.article) as articleId, COUNT(c.id) as commentCount')
+            ->from('Models\Entities\Comment', 'c')
+            ->where($queryBuilder->expr()->in('c.article', ':articleIds'))
+            ->andWhere('c.isActive = 1')
+            ->groupBy('c.article')
+            ->setParameter('articleIds', $articleIds);
+
+        $results = $queryBuilder->getQuery()->getResult();
+
+        // 결과를 articleId를 키로 하는 배열로 재구성
+        $commentCounts = [];
+        foreach ($results as $result) {
+            $commentCounts[$result['articleId']] = $result['commentCount'];
+        }
+
+        return $commentCounts;
     }
 }

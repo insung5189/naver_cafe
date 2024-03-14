@@ -13,7 +13,9 @@ class ArticleListAllModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('count(a.id)')
             ->from('Models\Entities\Article', 'a')
-            ->where('a.isActive = 1');
+            ->where('a.isActive = 1')
+            ->andWhere('a.depth = 0')
+            ->orderBy('a.orderGroup', 'DESC');
 
         $query = $queryBuilder->getQuery();
         return $query->getSingleScalarResult();
@@ -68,49 +70,47 @@ class ArticleListAllModel extends MY_Model
         return $query->getOneOrNullResult();
     }
 
-    public function checkParentArticlesExist($articles)
+    public function checkChildArticlesParentExist($childArticles)
     {
         $result = [];
-        foreach ($articles as $article) {
-            $articleId = $article->getId();
-            if (!empty($article->getParent())) {
-                $articleParentId = $article->getParent()->getId();
-                $parentArticleIsExsist = (bool)$this->getArticleById($articleParentId);
-                $result[$articleId] = $parentArticleIsExsist;
-            } else {
-                // 부모 게시글이 없는 경우(최상위 게시글) 또는 게시글 자체가 존재하지 않는 경우
-                $result[$articleId] = true;
+        foreach ($childArticles as $orderGroup => $articles) {
+            foreach ($articles as $article) {
+                $articleId = $article->getId();
+                if (!empty($article->getParent())) {
+                    $articleParentId = $article->getParent()->getId();
+                    $parentArticleExists = (bool)$this->getArticleById($articleParentId);
+                    $result[$articleId] = $parentArticleExists;
+                } else {
+                    $result[$articleId] = false;
+                }
             }
         }
         return $result;
     }
 
-    // 부모글의 id를 key로 하고 자식글들을 배열에 담는 메서드(전체글보기에서 자식글이 존재하면 접었다 폈다 하기 위함.)
+    // 부모글의 orderGroup를 key로 하고 자식글들을 배열에 담는 메서드(전체글보기에서 자식글이 존재하면 접었다 폈다 하기 위함.)
     public function getChildArticles()
     {
         $childArticles = [];
 
+        // 쿼리 빌더를 사용하여 자식 게시글들을 가져오는 쿼리 구성
         $queryBuilder = $this->em->createQueryBuilder();
-        $queryBuilder->select('parent.id as parentId, article')
+        $queryBuilder->select('article')
             ->from('Models\Entities\Article', 'article')
-            ->leftJoin('article.parent', 'parent')
-            ->where('parent.id IS NOT NULL') // 부모글이 있는 자식글만 선택
-            ->andWhere('article.depth >= 1') // depth가 1 이상인 글들만 선택
-            ->orderBy('article.orderGroup', 'ASC')
-            ->addOrderBy('article.depth', 'ASC');
+            ->innerJoin('article.parent', 'parent')
+            ->where('article.depth > 0') // 자식 게시글인 것만 확보
+            ->andWhere('article.isActive = 1') // 활성화된 게시글만
+            ->orderBy('article.orderGroup', 'ASC');
 
         $results = $queryBuilder->getQuery()->getResult();
 
-        // 결과 처리
-        foreach ($results as $result) {
-            $parentId = $result['parentId'];
-            $article = $result['article'];
-
-            if (!isset($childArticles[$parentId])) {
-                $childArticles[$parentId] = [];
+        // 결과를 부모 게시글 ID별로 정리
+        foreach ($results as $article) {
+            $orderGroup = $article->getOrderGroup();
+            if (!isset($childArticles[$orderGroup])) {
+                $childArticles[$orderGroup] = [];
             }
-
-            $childArticles[$parentId][] = $article;
+            $childArticles[$orderGroup][] = $article;
         }
 
         return $childArticles;

@@ -16,14 +16,11 @@ class MyActivityController extends MY_Controller
             // 회원 정보 및 관련 데이터 로드
             $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
 
-            // '작성글' 탭의 초기 콘텐츠 로드
-            $initialTabContent = $this->loadInitialTabContent($memberId);
-
             // 페이지 데이터 준비
             $page_view_data = [
                 'title' => '나의 활동',
                 'member' => $member,
-                'initialTabContent' => $initialTabContent,
+                // 'initialTabContent' => $initialTabContent,
             ];
 
             // 뷰 로드
@@ -37,33 +34,6 @@ class MyActivityController extends MY_Controller
     /**
      * 나의활동 페이지에서 my_activity_my_articles_area.php 파일 로드하는 메서드(나의활동 초기탭)
      */
-    private function loadInitialTabContent($memberId)
-    {
-        $currentPage = $this->input->get('page', TRUE) ?? 1;
-        $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ?? 10;
-        $articlesByPage = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
-        $totalArticleCount = count($this->MyActivityModel->getArticlesByMemberId($memberId));
-        $totalPages = ceil($totalArticleCount / $articlesPerPage);
-
-        // 목록에 표시되는 게시물의 댓글 갯수 확인하기
-        $articlesByMemberId = $this->MyActivityModel->getArticlesByMemberId($memberId);
-        $articleIds = array_map(function ($article) {
-            return $article->getId();
-        }, $articlesByMemberId);
-        $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
-
-
-        $myActivityMyArticlesData = [
-            'articlesByPage' => $articlesByPage,
-            'commentCountByArticle' => $commentCountByArticle,
-            'currentPage' => $currentPage,
-            'totalPages' => $totalPages,
-            'articlesPerPage' => $articlesPerPage
-        ];
-
-        // '작성글' 탭의 콘텐츠 로드 및 반환
-        return $this->load->view('member/my_activity_my_articles_area', $myActivityMyArticlesData, TRUE);
-    }
 
     public function loadMyArticles()
     {
@@ -90,10 +60,13 @@ class MyActivityController extends MY_Controller
                 }, $articlesByMemberId);
                 $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
 
+                $parentArticlesExist = $this->MyActivityModel->checkParentArticlesExist($articlesByPage);
+
                 // 데이터를 배열로 변환
                 $myActivityMyArticlesData = [
                     'articlesByPage' => $articlesByPage,
                     'commentCountByArticle' => $commentCountByArticle,
+                    'parentArticlesExist' => $parentArticlesExist,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
                     'articlesPerPage' => $articlesPerPage
@@ -183,10 +156,13 @@ class MyActivityController extends MY_Controller
                 }, $articlesCommentedByMemberId);
                 $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
 
+                $parentArticlesExist = $this->MyActivityModel->checkParentArticlesExist($commentedArticlesByMemberIdAndPage);
+
                 // 데이터를 배열로 변환하는 로직
                 $myActivityMyCommentedArticlesData = [
                     'commentedArticlesByMemberIdAndPage' => $commentedArticlesByMemberIdAndPage,
                     'commentCountByArticle' => $commentCountByArticle,
+                    'parentArticlesExist' => $parentArticlesExist,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
                     'commentedArticlesPerPage' => $commentedArticlesPerPage
@@ -228,10 +204,13 @@ class MyActivityController extends MY_Controller
                 }, $likedArticlesByMemberId);
                 $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
 
+                $parentArticlesExist = $this->MyActivityModel->checkParentArticlesExist($likedArticlesByPage['articlesByPage']);
+
                 // 데이터를 배열로 변환
                 $myActivityMyLikedArticlesData = [
                     'likeArticlesByPage' => $likedArticlesByPage['articlesByPage'],
                     'commentCountByArticle' => $commentCountByArticle,
+                    'parentArticlesExist' => $parentArticlesExist,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
                     'likedArticlesPerPage' => $likedArticlesPerPage

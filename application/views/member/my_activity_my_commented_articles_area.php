@@ -29,6 +29,16 @@
             <tbody id="mycommented-article-tbody">
                 <? if ($commentedArticlesByMemberIdAndPage) : ?>
                     <? foreach ($commentedArticlesByMemberIdAndPage as $commentedArticle) : ?>
+                        <?
+                        $parentArticleDeleted = '';
+                        if ($commentedArticle->getDepth() > 0 && $parentArticlesExist[$commentedArticle->getId()]) {
+                            $parentArticleDeleted = '';
+                        } else if (!$parentArticlesExist[$commentedArticle->getId()]) {
+                            $parentArticleDeleted = '[원글이 삭제된 답글]';
+                        } else {
+                            $parentArticleDeleted = '';
+                        }
+                        ?>
                         <tr class="normalTableTitleRow">
 
                             <td scope="col" class="td-article">
@@ -40,6 +50,9 @@
                                 <div class="title-list">
                                     <div class="inner-title-name">
                                         <a href="/article/articledetailcontroller/index/<?= $commentedArticle->getId(); ?>" target="_blank" class="article-title-link">
+                                            <span class="parent-article-is-deleted">
+                                                <?= $parentArticleDeleted ?>
+                                            </span>
                                             <? if (!empty($commentedArticle->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($commentedArticle->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>

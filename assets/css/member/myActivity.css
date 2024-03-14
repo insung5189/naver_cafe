@@ -59,6 +59,15 @@ h1 {
     color: #000;
 }
 
+.nick-name-represent {
+    display: inline-block;
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
 .info-area {
     margin-top: 5px;
     font-size: 14px;
@@ -249,7 +258,7 @@ table {
 .article-title-link,
 .deleted-article-title-link {
     display: block;
-    max-width: 100%;
+    max-width: 85%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -260,11 +269,26 @@ table {
     text-decoration: underline;
 }
 
+.parent-article-is-deleted {
+    color: red;
+    font-weight: bold;
+}
+
+
 .td-create-date,
 .td-deleted-date,
 .td-hit,
 .td-author {
     text-align: center;
+}
+
+.article-author-row {
+    display: inline-block;
+    width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .article-absence {

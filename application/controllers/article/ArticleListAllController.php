@@ -40,15 +40,18 @@ class ArticleListAllController extends MY_Controller
                     $result = $this->ArticleListAllModel->searchArticles($keyword, $element, $period, $startDate, $endDate, $currentPage, $articlesPerPage);
 
                     if (isset($result['errors'])) {
+                        // 검색결과에 오류 발생 시
                         $errors = $result['errors'];
                         $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
                         $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
                     } else {
-                        $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 불러옴.
+                        // 검색결과에 오류 없을 때
+                        $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
                     }
                 } else {
+                    // 검색하지 않았을 때
                     $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
                     $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                     $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
@@ -56,7 +59,7 @@ class ArticleListAllController extends MY_Controller
 
                 $totalPages = ceil($totalArticleCount / $articlesPerPage);
 
-                $parentArticlesExist = $this->ArticleListAllModel->checkParentArticlesExist($articles);
+                $parentArticlesExist = $this->ArticleListAllModel->checkChildArticlesParentExist($childArticles);
 
                 // 게시글 ID 배열 생성
                 $articleIds = array_map(function ($article) {

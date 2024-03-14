@@ -13,7 +13,7 @@
                 <tr class="normalTableTitleCol">
                     <th scope="col">
                         <span class="article-title-col">제목</span>
-                        </th>
+                    </th>
                     <th scope="col">
                         <span class="article-create-date-col">작성일</span>
                     </th>
@@ -25,6 +25,16 @@
             <tbody id="myarticles-tbody">
                 <? if ($articlesByPage) : ?>
                     <? foreach ($articlesByPage as $article) : ?>
+                        <?
+                        $parentArticleDeleted = '';
+                        if ($article->getDepth() > 0 && $parentArticlesExist[$article->getId()]) {
+                            $parentArticleDeleted = '';
+                        } else if (!$parentArticlesExist[$article->getId()]) {
+                            $parentArticleDeleted = '[원글이 삭제된 답글]';
+                        } else {
+                            $parentArticleDeleted = '';
+                        }
+                        ?>
                         <tr class="normalTableTitleRow">
 
                             <td scope="col" class="td-article">
@@ -39,6 +49,9 @@
                                 <div class="title-list">
                                     <div class="inner-title-name">
                                         <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" target="_blank" class="article-title-link">
+                                            <span class="parent-article-is-deleted">
+                                                <?= $parentArticleDeleted ?>
+                                            </span>
                                             <? if (!empty($article->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>

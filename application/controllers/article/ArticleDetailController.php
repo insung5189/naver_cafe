@@ -26,6 +26,8 @@ class ArticleDetailController extends MY_Controller
             return;
         }
 
+        $parentArticlesExist = $this->ArticleDetailModel->checkParentArticlesExist($article);
+
         $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId);
 
         $articleFiles = $this->ArticleDetailModel->getFilesByArticleId($articleId);
@@ -45,11 +47,11 @@ class ArticleDetailController extends MY_Controller
         $userRole = $userData['role'] ?? null;
 
         if ($publicScope === 'public') {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist);
         } else if ($publicScope === 'members' && $userData) {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist);
         } else if ($publicScope === 'admins' && $userData && ($userRole === 'ROLE_ADMIN' || $userRole === 'ROLE_MASTER')) {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist);
         } else {
             if (!$userData) {
                 $this->setRedirectCookie(current_url());
@@ -60,7 +62,7 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
-    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle)
+    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist)
     {
         $memberPrflFileUrl = "/assets/file/images/memberImgs/";
         $commentFileUrl = "/assets/file/commentFiles/img/";
@@ -70,6 +72,7 @@ class ArticleDetailController extends MY_Controller
             'article' => $article,
             'comments' => $comments,
             'user' => $user,
+            'parentArticlesExist' => $parentArticlesExist,
             'articleFilesInfo' => $articleFilesInfo,
             'likeCountByArticle' => $likeCountByArticle,
             'userLikedArticle' => $userLikedArticle,
@@ -86,6 +89,51 @@ class ArticleDetailController extends MY_Controller
             'message' => '접근 권한이 없습니다.',
         ];
         $this->layout->view('errors/error_page', $page_view_data);
+    }
+
+    // 공통 로직을 처리하는 메서드
+    public function relatedArticles()
+    {
+        if ($this->input->is_ajax_request()) {
+            try {
+                $boardId = $this->input->get('boardId', TRUE) ?? 1;
+                $articleBoard = $this->em->find('Models\Entities\ArticleBoard', $boardId);
+
+                $currentPage = $this->input->get('page', TRUE) ?? 1;
+                $relatedArticlesPerPage = 5;
+                $relatedArticles = $this->ArticleDetailModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $relatedArticlesPerPage);
+                $totalArticleCount = $this->ArticleDetailModel->getTotalArticleCount($boardId);
+                $totalPages = ceil($totalArticleCount / $relatedArticlesPerPage);
+
+                // 게시글 ID 배열 생성
+                $articleIds = array_map(function ($article) {
+                    return $article->getId();
+                }, $relatedArticles);
+
+                // 게시글별 댓글 개수 조회
+                $commentCounts = $this->ArticleDetailModel->getCommentCountForArticles($articleIds);
+
+                $relatedArticlesData = [
+                    'articleBoard' => $articleBoard,
+                    'relatedArticles' => $relatedArticles,
+                    'commentCounts' => $commentCounts,
+                    'totalArticleCountAll' => $totalArticleCount,
+                    'currentPage' => $currentPage,
+                    'totalPages' => $totalPages,
+                    'relatedArticlesPerPage' => $relatedArticlesPerPage,
+                    'errors' => $errors ?? []
+                ];
+
+                $html = $this->load->view('article/article_detail_view_related_articles', $relatedArticlesData, TRUE);
+
+                // 데이터를 JSON 형태로 반환
+                echo json_encode(['success' => true, 'html' => $html]);
+            } catch (\Exception $e) {
+                echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
+            }
+        } else {
+            show_404();
+        }
     }
 
     public function increaseHitCount()
@@ -171,16 +219,16 @@ class ArticleDetailController extends MY_Controller
             'depth' => $this->input->post('depth', TRUE),
             'file' => $_FILES['commentImage'] ?? null
         ];
-    
+
         if (empty($formData['content']) && empty($formData['file']['name'])) {
             $errorMessages = ['content & file' => '댓글 내용이나 파일을 첨부해주세요.'];
             $this->session->set_flashdata('error_messages', $errorMessages);
             redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
             return;
         }
-    
+
         $result = $this->ArticleDetailModel->processCreateComment($formData);
-    
+
         if ($result['success']) {
             redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
         } else {

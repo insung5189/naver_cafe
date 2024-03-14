@@ -6,7 +6,6 @@ class Layout
 	{
 		$this->obj = &get_instance();
 		$this->obj->load->model('member/MyActivityModel', 'MyActivityModel');
-		$this->obj->load->model('article/ArticleListAllModel', 'ArticleListAllModel');
 	}
 
 	public function view($view = "", $page_view_data = array())
@@ -15,13 +14,15 @@ class Layout
 		$page_view_data['totalMemberCount'] = $this->getTotalMemberCount();
 		$page_view_data['totalArticleCount'] = $this->getTotalArticleCount();
 
+
 		if ($memberId = $this->obj->session->userdata('user_data')['user_id'] ?? null) {
 			$activityInfo = $this->getUserActivityInfo($memberId);
-			$page_view_data = array_merge($page_view_data, $activityInfo);
+			$memberInfo = $this->getUserInfo($memberId);
+			$page_view_data = array_merge($page_view_data, $activityInfo, ['memberInfo' => $memberInfo]);
 		}
 
 		$layout_view_data = array(
-			"title" => isset($page_view_data['title']) ? $page_view_data['title'] : '기본 제목',
+			"title" => isset($page_view_data['title']) ? $page_view_data['title'] : '제목없음',
 			"contents" => $this->obj->load->view($view, $page_view_data, true),
 			'masterNickName' => $page_view_data['masterNickName'],
 			'totalMemberCount' => $page_view_data['totalMemberCount'],
@@ -55,10 +56,10 @@ class Layout
 			->from('Models\Entities\Member', 'm')
 			->where('m.isActive = 1')
 			->andwhere('m.blacklist = 0');
-	
+
 		$query = $queryBuilder->getQuery();
 		$totalMemberCount = $query->getSingleScalarResult();
-	
+
 		return $totalMemberCount;
 	}
 
@@ -68,10 +69,10 @@ class Layout
 		$queryBuilder->select('COUNT(a.id)')
 			->from('Models\Entities\Article', 'a')
 			->where('a.isActive = 1');
-	
+
 		$query = $queryBuilder->getQuery();
 		$totalArticleCount = $query->getSingleScalarResult();
-	
+
 		return $totalArticleCount;
 	}
 
@@ -84,5 +85,19 @@ class Layout
 			'articleCount' => $articleCount,
 			'commentCount' => $commentCount,
 		];
+	}
+
+	protected function getUserInfo($memberId)
+	{
+		$queryBuilder = $this->obj->doctrine->em->createQueryBuilder();
+		$queryBuilder->select('m')
+			->from('Models\Entities\Member', 'm')
+			->where('m.id = :memberId')
+			->setParameter('memberId', $memberId);
+
+		$query = $queryBuilder->getQuery();
+		$memberInfo = $query->getOneOrNullResult();
+
+		return $memberInfo;
 	}
 }

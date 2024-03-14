@@ -177,6 +177,7 @@
                                     <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
                                         <span class="left-bottom-edge"><?= $leftBottomEdge ?></span>
                                         <span class="parent-article-is-deleted">
+                                            <?=$parentArticleDeleted?>
                                         </span>
                                         <? if (!empty($article->getPrefix()) && ($articleBoard->getId() == 4 || $articleBoard->getId() == 5)) : ?>
                                             <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>

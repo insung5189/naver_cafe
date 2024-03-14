@@ -29,6 +29,16 @@
             <tbody id="myliked-articles-tbody">
                 <? if ($likeArticlesByPage) : ?>
                     <? foreach ($likeArticlesByPage as $likedArticle) : ?>
+                        <?
+                        $parentArticleDeleted = '';
+                        if ($likedArticle->getDepth() > 0 && $parentArticlesExist[$likedArticle->getId()]) {
+                            $parentArticleDeleted = '';
+                        } else if (!$parentArticlesExist[$likedArticle->getId()]) {
+                            $parentArticleDeleted = '[원글이 삭제된 답글]';
+                        } else {
+                            $parentArticleDeleted = '';
+                        }
+                        ?>
                         <tr class="normalTableTitleRow">
 
                             <td scope="col" class="td-article">
@@ -43,6 +53,9 @@
                                 <div class="title-list">
                                     <div class="inner-title-name">
                                         <a href="/article/articledetailcontroller/index/<?= $likedArticle->getId(); ?>" target="_blank" class="article-title-link">
+                                            <span class="parent-article-is-deleted">
+                                                <?= $parentArticleDeleted ?>
+                                            </span>
                                             <? if (!empty($likedArticle->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($likedArticle->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>

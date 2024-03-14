@@ -93,6 +93,10 @@ h1 {
     margin-bottom: 10px;
 }
 
+.parent-article-is-deleted {
+    color: #979797;
+}
+
 .article-title-text {
     margin-left: -3px;
 }
@@ -615,4 +619,8 @@ h1 {
 
 .signup-link-btn:hover {
     text-decoration-line: underline;
+}
+
+.related-board-name {
+    font-size: 17px;
 }

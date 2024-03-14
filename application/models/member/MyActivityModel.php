@@ -59,6 +59,37 @@ class MyActivityModel extends MY_Model
     LIMIT (최대값) OFFSET (현재세팅값)
      */
 
+
+    public function checkParentArticlesExist($articles)
+    {
+        $result = [];
+        foreach ($articles as $article) {
+            $articleId = $article->getId();
+            if (!empty($article->getParent())) {
+                $articleParentId = $article->getParent()->getId();
+                $parentArticleIsExsist = (bool)$this->getArticleById($articleParentId);
+                $result[$articleId] = $parentArticleIsExsist;
+            } else {
+                // 부모 게시글이 없는 경우(최상위 게시글) 또는 게시글 자체가 존재하지 않는 경우
+                $result[$articleId] = true;
+            }
+        }
+        return $result;
+    }
+
+    public function getArticleById($parentId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.id = :parentId')
+            ->andWhere('a.isActive = 1')
+            ->setParameter('parentId', $parentId);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getOneOrNullResult();
+    }
+
     public function getCommentsByMemberIdByPage($memberId, $currentPage, $commentsPerPage)
     {
         $queryBuilder = $this->em->createQueryBuilder();
