@@ -17,6 +17,7 @@ $(document).ready(function () {
             $('#end-date').val('');
         }
     });
+    
     // 페이지네이션 페이지 변경 처리
     $(document).on('click', '.article-board-list-page-btn', function (e) {
         e.preventDefault();

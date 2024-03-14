@@ -98,9 +98,11 @@ class ArticleDetailController extends MY_Controller
             try {
                 $boardId = $this->input->get('boardId', TRUE) ?? 1;
                 $articleBoard = $this->em->find('Models\Entities\ArticleBoard', $boardId);
-
-                $currentPage = $this->input->get('page', TRUE) ?? 1;
+                $articleId = $this->input->get('articleId', TRUE) ?? NULL;
                 $relatedArticlesPerPage = 5;
+
+                $targetPage = $this->ArticleDetailModel->findPageForCurrentArticle($boardId, $articleId, $relatedArticlesPerPage);
+                $currentPage = $this->input->get('page', TRUE) ?? $targetPage;
                 $relatedArticles = $this->ArticleDetailModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $relatedArticlesPerPage);
                 $totalArticleCount = $this->ArticleDetailModel->getTotalArticleCount($boardId);
                 $totalPages = ceil($totalArticleCount / $relatedArticlesPerPage);
@@ -119,7 +121,10 @@ class ArticleDetailController extends MY_Controller
                     'commentCounts' => $commentCounts,
                     'totalArticleCountAll' => $totalArticleCount,
                     'currentPage' => $currentPage,
+                    'targetPage' => $targetPage,
                     'totalPages' => $totalPages,
+                    'boardId' => $boardId,
+                    'articleId' => $articleId,
                     'relatedArticlesPerPage' => $relatedArticlesPerPage,
                     'errors' => $errors ?? []
                 ];

@@ -480,6 +480,8 @@ $GLOBALS['pageResources'] = [
                     <h2 class="related-board-name"><?= "'" . ($article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음') . "'" ?>게시판 글</h2>
                 </a>
             </div>
+            
+            <!-- 아래 부분에 ajax로 관련게시글 페이지네이션 목록 업데이트 -->
             <div class="related-articles" id="relatedArticles" data-article-board-id="<?= $article->getArticleBoard()->getId() ?>">
             </div>
         </div>

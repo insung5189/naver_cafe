@@ -435,6 +435,28 @@ class ArticleDetailModel extends MY_Model
         return $queryBuilder->getQuery()->getResult();
     }
 
+    public function findPageForCurrentArticle($boardId, $articleId, $articlesPerPage)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+
+        // 현재 게시글 ID보다 앞서는 게시글의 수를 세어 순서를 알아냄
+        $queryBuilder->select('COUNT(a.id) as articleOrder')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.articleBoard = :boardId')
+            ->andWhere('a.id <= :articleId') // 현재 게시글 ID 포함 이전 게시글 모두 카운트
+            ->andWhere('a.isActive = 1')
+            ->andWhere('a.depth = 0')
+            ->setParameter('boardId', $boardId)
+            ->setParameter('articleId', $articleId);
+
+        $order = $queryBuilder->getQuery()->getSingleScalarResult();
+
+        // 게시글의 순서를 바탕으로 해당 게시글이 몇 번째 페이지에 있는지 계산
+        $pageNumber = ceil($order / $articlesPerPage);
+
+        return $pageNumber;
+    }
+
     public function getTotalArticleCount($boardId)
     {
         $queryBuilder = $this->em->createQueryBuilder();

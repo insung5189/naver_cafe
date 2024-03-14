@@ -623,4 +623,114 @@ h1 {
 
 .related-board-name {
     font-size: 17px;
+    margin-bottom: 15px;
+}
+
+.related-article-list-item {
+    display: table;
+    table-layout: fixed;
+    width: 100%;
+    padding: 11px 4px 10px 4px;
+    border-top: 1px solid #f2f2f2;
+}
+
+.related-article-title-area {
+    display: table-cell;
+    width: 573px;
+    line-height: 18px;
+    font-size: 13px;
+    vertical-align: middle;
+    word-break: break-all;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.prefix {
+    color: #959595;
+    font-weight: bold;
+    margin-right: 2px;
+}
+
+.articles-comment-count {
+    color: #ff2f3b;
+    margin: 0 2px 0 2px;
+    font-weight: 700;
+}
+
+.related-article-author-area {
+    display: table-cell;
+    position: relative;
+    width: 80px;
+    padding-left: 24px;
+    font-size: 13px;
+    color: #676767;
+    text-align: left;
+    vertical-align: middle;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.related-article-date-area {
+    display: table-cell;
+    width: 100px;
+    padding-left: 16px;
+    font-size: 13px;
+    color: #676767;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.pagination-box {
+    display: flex;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 16px;
+    margin-top: 10px;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    color: #337ab7;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.pagination a.active {
+    background-color: #337ab7;
+    color: #ffffff;
+    border-color: #337ab7;
+}
+
+.pagination a:hover {
+    background-color: #286090;
+    border-color: #204d74;
+    color: #ffffff;
+}
+
+.board-link {
+    position: absolute;
+    right: 20px;
+    bottom: 60px;
+}
+
+.related-article-selected {
+    background-color: #f9f9fa;
+    font-weight: bold;
 }

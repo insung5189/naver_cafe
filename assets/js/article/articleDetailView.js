@@ -1,9 +1,20 @@
 $(document).ready(function () {
+
+    var articleId = $('#article').data('article-id');
+    var relatedArticleId = $('#relatedArticleItemLi').data('related-article-id');
+    var relatedArticleTargetPage = $('#relatedArticleTargetPage').data('target-page');
     // 관련게시글 영역 로드
-    relatedArticles(1);
+    relatedArticles(relatedArticleTargetPage, articleId);
+
+    // 페이지네이션 페이지 변경 처리
+    $(document).on('click', '.related-article-board-list-page-btn', function (e) {
+        e.preventDefault();
+        const page = $(this).data('page');
+        relatedArticles(page, articleId);
+    });
 
     // AJAX 요청 함수
-    function relatedArticles(page) {
+    function relatedArticles(page, articleId) {
         var boardId = $('#relatedArticles').data('article-board-id');
         $.ajax({
             url: '/article/ArticleDetailController/relatedArticles',
@@ -11,10 +22,17 @@ $(document).ready(function () {
             data: {
                 page: page,
                 boardId: boardId,
+                articleId: articleId
             },
             dataType: 'json',
             success: function (response) {
                 $('#relatedArticles').html(response.html);
+                $('#relatedArticles').find('.related-article-list-item').each(function () {
+                    var relatedArticleId = $(this).data('related-article-id');
+                    if (articleId === relatedArticleId) {
+                        $(this).addClass('related-article-selected');
+                    }
+                });
             },
             error: function (xhr, status, error) {
                 console.error("Error: ", error);
@@ -22,7 +40,7 @@ $(document).ready(function () {
         });
     }
 
-    var articleId = $('#article').data('article-id');
+
     var viewedArticles = localStorage.getItem('viewedArticles');
     viewedArticles = viewedArticles ? JSON.parse(viewedArticles) : {};
 
