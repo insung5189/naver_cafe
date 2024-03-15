@@ -113,11 +113,11 @@ class ArticleDetailModel extends MY_Model
     public function getFileFullPath($file)
     {
         if (in_array($file->getExt(), $this->imageExtensions)) {
-            $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'img' . DIRECTORY_SEPARATOR;
+            $basePath = '/assets/file/articleFiles/img/';
         } else if (in_array($file->getExt(), $this->documentExtensions)) {
-            $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'doc' . DIRECTORY_SEPARATOR;
+            $basePath = '/assets/file/articleFiles/doc/';
         } else {
-            $basePath = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'articleFiles' . DIRECTORY_SEPARATOR . 'others' . DIRECTORY_SEPARATOR;
+            $basePath = '/assets/file/articleFiles/others/';
         }
         return $basePath . $file->getCombinedName();
     }

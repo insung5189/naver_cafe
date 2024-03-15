@@ -217,6 +217,7 @@ h1 {
     display: flex;
     justify-content: flex-end;
     align-items: center;
+    flex-direction: column;
     position: absolute;
     top: 150%;
     right: 0px;
@@ -229,6 +230,23 @@ h1 {
     background-color: #fff;
     box-sizing: border-box;
     color: #000;
+}
+
+.file-download-link {
+    display: flex;
+    height: 32px;
+    align-items: center;
+}
+
+.article-file-list-name {
+    width: 250px;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    word-break: break-all;
+    word-wrap: break-word;
+    text-align: left;
 }
 
 .boundary-pipe {

@@ -1,5 +1,22 @@
 $(document).ready(function () {
 
+    // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
+    var formModified = false;
+
+    $('form input, form textarea, form select').change(function () {
+        formModified = true;
+    });
+
+    $(window).on('beforeunload', function () {
+        if (formModified) {
+            return '변경사항이 저장되지 않을 수 있습니다.';
+        }
+    });
+
+    $('form').submit(function () {
+        $(window).off('beforeunload');
+    });
+
     // 마이페이지 공통 이벤트 핸들러 및 함수
     $('.sort_area a').click(function () {
         $('.sort_area a').removeClass('on underline');
@@ -631,7 +648,7 @@ $(document).ready(function () {
 
         message = message.trim().replace(/, $/, '');
         newpasswordValidationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough ? 'green' : 'red');
-        newpasswordSpaceValidationMessage.html(spaceMessage).css('color',!hasInvalidChar ? 'green' : 'red');
+        newpasswordSpaceValidationMessage.html(spaceMessage).css('color', !hasInvalidChar ? 'green' : 'red');
 
         if (hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar) {
             validationResults.isValid = true;

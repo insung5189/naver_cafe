@@ -134,16 +134,17 @@ $GLOBALS['pageResources'] = [
                             <!-- 게시물 첨부파일 리스트 -->
                             <div class="article-file-list" style="display:none;">
                                 <? foreach ($articleFilesInfo as $articleFileInfo) : ?>
-                                    <span class="article-file-list-name">
-                                        <?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>
-                                    </span>
-                                    <span class="boundary-pipe">
-                                        |
-                                    </span>
-                                    <a class="article-file-download-link" href="<?= htmlspecialchars($articleFileInfo['fullPath'], ENT_QUOTES, 'UTF-8'); ?>" download="<?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        내 PC 저장
-                                    </a>
-                                    <br>
+                                    <div class="file-download-link">
+                                        <span class="article-file-list-name">
+                                            <?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>
+                                        </span>
+                                        <span class="boundary-pipe">
+                                            |
+                                        </span>
+                                        <a class="article-file-download-link" href="<?= htmlspecialchars($articleFileInfo['fullPath'], ENT_QUOTES, 'UTF-8'); ?>" download="<?= htmlspecialchars($articleFileInfo['name'], ENT_QUOTES, 'UTF-8'); ?>">
+                                            내 PC 저장
+                                        </a>
+                                    </div>
                                 <? endforeach; ?>
                             </div>
                         <? endif; ?>
@@ -480,7 +481,7 @@ $GLOBALS['pageResources'] = [
                     <h2 class="related-board-name"><?= "'" . ($article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음') . "'" ?>게시판 글</h2>
                 </a>
             </div>
-            
+
             <!-- 아래 부분에 ajax로 관련게시글 페이지네이션 목록 업데이트 -->
             <div class="related-articles" id="relatedArticles" data-article-board-id="<?= $article->getArticleBoard()->getId() ?>">
             </div>

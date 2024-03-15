@@ -129,4 +129,20 @@ class ArticleEditModel extends MY_Model
             return ['success' => false, 'errors' => ['message' => '답글 작성 중 오류 발생: ' . $e->getMessage()]];
         }
     }
+
+    public function saveFileEntity($fileData, $fileUrl)
+    {
+        $fileEntity = new \Models\Entities\File();
+        $fileEntity->setName($fileData['client_name']);
+        $fileEntity->setUuid(uniqid());
+        $fileEntity->setExt($fileData['file_ext']);
+        $fileEntity->setSize($fileData['file_size']);
+        $fileEntity->setPath($fileUrl);
+        $fileEntity->setCreateDate(new \DateTime());
+        $fileEntity->setCombinedName($fileData['raw_name'] . $fileData['file_ext']);
+        $fileEntity->setArticle(NULL);
+
+        $this->em->persist($fileEntity);
+        $this->em->flush();
+    }
 }

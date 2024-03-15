@@ -1,4 +1,21 @@
 $(document).ready(function () {
+    // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
+    var formModified = false;
+
+    $('form input, form textarea, form select').change(function () {
+        formModified = true;
+    });
+
+    $(window).on('beforeunload', function () {
+        if (formModified) {
+            return '변경사항이 저장되지 않을 수 있습니다.';
+        }
+    });
+
+    $('form').submit(function () {
+        $(window).off('beforeunload');
+    });
+    
     $('#newpassword, #newpasswordcf').on('keyup', validatePasswordAndMatch);
 
     // 비밀번호 유효성 검사 및 일치 확인

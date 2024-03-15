@@ -1,7 +1,24 @@
 $(document).ready(function () {
+
+    // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
+    var formModified = false;
+    $(document).on('change', 'form input', function () {
+        formModified = true;
+    });
+
+    $(window).on('beforeunload', function () {
+        if (formModified) {
+            return '변경사항이 저장되지 않을 수 있습니다.';
+        }
+    });
+
+    $('form').submit(function () {
+        $(window).off('beforeunload');
+    });
+
     // var boardId = new URLSearchParams(window.location.search).get('boardId'); // URL에서 boardId 가져오기
     var boardId = $('#articleContent').data('article-board-id');
-        // 초기 페이지 로드
+    // 초기 페이지 로드
     fetchArticles({
         page: 1,
         articlesPerPage: 15,
@@ -17,7 +34,7 @@ $(document).ready(function () {
             $('#end-date').val('');
         }
     });
-    
+
     // 페이지네이션 페이지 변경 처리
     $(document).on('click', '.article-board-list-page-btn', function (e) {
         e.preventDefault();

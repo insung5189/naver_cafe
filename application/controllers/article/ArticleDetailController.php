@@ -38,7 +38,7 @@ class ArticleDetailController extends MY_Controller
         foreach ($articleFiles as $file) {
             $articleFilesInfo[] = [
                 'name' => $file->getCombinedName() ?: '첨부파일없음',
-                'fullPath' => $this->ArticleDetailModel->getFileFullPath($file),
+                'fullPath' => $file->getPath(),
             ];
         }
 

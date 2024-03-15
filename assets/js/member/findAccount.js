@@ -1,5 +1,22 @@
 $(document).ready(function () {
 
+    // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
+    var formModified = false;
+
+    $('form input, form textarea, form select').change(function () {
+        formModified = true;
+    });
+
+    $(window).on('beforeunload', function () {
+        if (formModified) {
+            return '변경사항이 저장되지 않을 수 있습니다.';
+        }
+    });
+
+    $('form').submit(function () {
+        $(window).off('beforeunload');
+    });
+
     // 이름, 성 유니코드 정규검사식
     const nameRegex = /^[A-Za-z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u1E00-\u1EFF\u2C00-\u2C7F\u2D00-\u2D2F\u3000-\u303F\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE30-\uFE4F-'\s]+$/;
 

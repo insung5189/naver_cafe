@@ -1,15 +1,17 @@
 <?
 $GLOBALS['pageResources'] = [
-    'css' => ['/assets/css/article/articleEdit.css',],
+    'css' => [
+        '/assets/css/article/articleEdit.css',
+    ],
     'js' => [
         '/assets/js/article/articleEdit.js',
-        '/assets/lib/ckeditor5-build-classic/translations/ko.js',
-        '/assets/lib/ckeditor5-build-classic/ckeditor.js',
-        '/assets/js/article/ckeditor-init.js',
+        'https://cdn.ckeditor.com/ckeditor5/34.2.0/super-build/ckeditor.js',
     ]
 ];
 $user = $_SESSION['user_data'];
 ?>
+
+
 <section class="section-container">
     <div class="container">
 
@@ -21,7 +23,7 @@ $user = $_SESSION['user_data'];
                 <? endforeach; ?>
             </div>
         <? endif; ?>
-        
+
         <form action="/article/articleeditcontroller/createArticle" method="POST">
             <div class="writingHeader">
                 <h1 class="title">카페 글쓰기</h1>
@@ -54,7 +56,7 @@ $user = $_SESSION['user_data'];
                 </div>
 
                 <div class="content-box">
-                    <textarea class="article-content-area" name="content" id="contnet" cols="30" rows="10"></textarea>
+                    <textarea class="article-content-area" name="content" id="contnet" cols="0" rows="0" style="display:none;"></textarea>
                 </div>
 
                 <div class="public-scope-box">
