@@ -1,15 +1,183 @@
-<h1>Main 화면</h1>
+<?
+$GLOBALS['pageResources'] = [
+    'css' => ['/assets/css/home/dashboard.css'],
+    'js' => ['/assets/js/home/dashboard.js']
+];
+?>
 
-<?php 
-$userData = $this->session->userdata('user_data');
+<div class="main-daemoon">
+    <div class="daemoon-img">
+        <img src="https://i.imgur.com/cd5JYxY.png" alt="카페대문">
+    </div>
+    <div class="daemoom-controller">
+        <span class="toggle-daemoon"></span>
+    </div>
+</div>
 
-if (!empty($userData) && isset($userData['user_id'])): ?>
-    <!-- 로그인한 사용자에게 보여질 내용 -->
-    <p>안녕하세요, <?php echo htmlspecialchars($userData['nickName']); ?>님</p>
-    <a href="member/myPageController">마이페이지</a>
-    <a href="member/logincontroller/processLogout">로그아웃</a>
-<?php else: ?>
-    <!-- 로그인하지 않은 사용자에게 보여질 내용 -->
-    <a href="member/signupcontroller">회원가입</a>
-    <a href="member/logincontroller">로그인</a>
-<?php endif; ?>
+<div class="main-contents-area">
+    <div class="article-list-all-view">
+        <div class="list-title">
+            <h3 class="list-title-text">
+                <a href="/article/articlelistallcontroller">
+                    전체글보기
+                </a>
+            </h3>
+            <span class="more-btn">
+                <a class="more-link" href="더보기 링크">
+                    <span>더보기</span>
+                    <span><i class="fa-solid fa-chevron-right fa-xs"></i></span>
+                </a>
+            </span>
+        </div>
+        <ul class="album-box">
+            <? foreach ($articleListAllArticles as $articleListAllArticle) : ?>
+                <li class="album-box-li">
+                    <dl>
+                        <dt class="article-list-all-photo-box">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>">
+                                <img src="<?= $articleListAllimgfileUrls[$articleListAllArticle->getId()] ?? '기본 이미지 경로' ?>" alt="" class="article-list-all-img">
+                            </a>
+                        </dt>
+                        <dd class="article-list-all-title-box">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>">
+                                <span class="article-list-all-title-box-text">
+                                    <?= $articleListAllArticle->getTitle() ?>
+                                </span>
+                                <? $commentCount = $articleListAllcommentCounts[$articleListAllArticle->getId()] ?? 0; ?>
+                                <? if ($commentCount !== 0) : ?>
+                                    <span class="article-list-all-comment-count">
+                                        <?= '[' . $commentCount . ']' ?>
+                                    </span>
+                                <? endif; ?>
+                            </a>
+                        </dd>
+                        <dd>
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>">
+                                <span class="article-list-all-author-box-text">
+                                    <?= $articleListAllArticle->getMember()->getNickName() ?>
+                                </span>
+                            </a>
+                        </dd>
+                        <dd>
+                            <div class="article-list-all-date-and-hit">
+                                <span class="article-list-all-date">
+                                    <?= $articleListAllArticle->getModifyDate() ? $articleListAllArticle->getModifyDate()->format('Y.m.d') : $articleListAllArticle->getCreateDate()->format('Y.m.d'); ?>
+                                </span>
+                                ㆍ
+                                <span class="article-list-all-hit">
+                                    조회 <?= $articleListAllArticle ? $articleListAllArticle->getHit() : 0; ?>
+                                </span>
+                            </div>
+                        </dd>
+                    </dl>
+                </li>
+            <? endforeach; ?>
+        </ul>
+    </div>
+
+    <div class="main-free-board-and-qna-board">
+        <div class="main-free-board">
+            <div class="list-title">
+                <h3 class="list-title-text">
+                    <a href="/article/articlelistcontroller/index/1">
+                        자유게시판
+                    </a>
+                </h3>
+                <span class="more-btn">
+                    <a class="more-link" href="/article/articlelistcontroller/index/1">
+                        <span>더보기</span>
+                        <span><i class="fa-solid fa-chevron-right fa-xs"></i></span>
+                    </a>
+                </span>
+            </div>
+            <ul class="main-free-board-ul">
+                <? foreach ($freeBoardArticles as $freeBoardArticle) : ?>
+                    <a href="/article/articledetailcontroller/index/<?= $freeBoardArticle->getId() ?>">
+                        <li class="main-free-board-li">
+                            <div class="main-free-board-card-area">
+                                <div class="main-free-board-card-info">
+                                    <div class="main-free-board-card-title">
+                                        <?= $freeBoardArticle->getTitle() ?>
+                                    </div>
+                                    <div class="main-free-board-card-content">
+                                        <?= $freeBoardArticle->getContent() ?>
+                                    </div>
+                                    <div class="main-free-board-card-author">
+                                        <?= $freeBoardArticle->getMember()->getNickName() ?>
+                                    </div>
+                                    <div class="main-free-board-card-date-and-hit">
+                                        <span class="main-free-board-card-date">
+                                            <?= $freeBoardArticle->getModifyDate() ? $freeBoardArticle->getModifyDate()->format('Y.m.d') : $freeBoardArticle->getCreateDate()->format('Y.m.d'); ?>
+                                        </span>
+                                        <span class="main-free-board-card-hit">
+                                            조회 <?= $freeBoardArticle ? $freeBoardArticle->getHit() : 0; ?>
+                                        </span>
+                                    </div>
+                                </div>
+                                <? if (isset($freeBoardArticlesimgfileUrls[$freeBoardArticle->getId()])) : ?>
+                                    <div class="main-free-board-card-img-box">
+                                        <img src="<?= $freeBoardArticlesimgfileUrls[$freeBoardArticle->getId()] ?? '기본 이미지 경로' ?>" alt="" class="main-free-board-card-img">
+                                    </div>
+                                <? endif; ?>
+                            </div>
+                        </li>
+                    </a>
+                <? endforeach; ?>
+            </ul>
+        </div>
+        <div class="main-qna-board">
+            <div class="list-title">
+                <h3 class="list-title-text">
+                    <a href="/article/articlelistcontroller/index/5">
+                        질문/답변게시판
+                    </a>
+                </h3>
+                <span class="more-btn">
+                    <a class="more-link" href="/article/articlelistcontroller/index/5">
+                        <span>더보기</span>
+                        <span><i class="fa-solid fa-chevron-right fa-xs"></i></span>
+                    </a>
+                </span>
+            </div>
+            <table class="main-qna-board-table">
+                <colgroup>
+                    <col>
+                    <col width="80">
+                </colgroup>
+                <tbody>
+                    <? foreach ($qnaBoardArticles as $qnaBoardArticle) : ?>
+
+                        <?
+                        $styleAttributes = '';
+                        if ($qnaBoardArticle->getDepth() > 0) {
+                            $parentArticleDeleted = '';
+                            $paddingVal = $qnaBoardArticle->getDepth() * 35;
+                            $styleAttributes = 'style="padding-left:' . $paddingVal . 'px;"';
+                        } 
+                        ?>
+                        <tr>
+                            <td class="main-qna-board-title" <?= $styleAttributes ?>>
+                                <? if ($qnaBoardArticle->getDepth() == 0) : ?>
+                                    <span>ㆍ</span>
+                                <? elseif ($qnaBoardArticle->getDepth() > 0) : ?>
+                                    <span>┗</span>
+                                <? endif; ?>
+                                <?= $qnaBoardArticle->getTitle() ?>
+                                <? $commentCount = $commentCounts[$qnaBoardArticle->getId()] ?? 0; ?>
+                                <? if ($commentCount !== 0) : ?>
+                                    <span class="article-list-all-comment-count">
+                                        <?= '[' . $commentCount . ']' ?>
+                                    </span>
+                                <? endif; ?>
+                            </td>
+                            <td class="main-qna-board-hit">
+                                <?= $qnaBoardArticle->getHit() ?>
+                            </td>
+                        </tr>
+                    <? endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>

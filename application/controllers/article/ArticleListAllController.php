@@ -45,19 +45,22 @@ class ArticleListAllController extends MY_Controller
                         $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
                         $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
+                        $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
                     } else {
                         // 검색결과에 오류 없을 때
                         $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
+                        $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
                     }
                 } else {
                     // 검색하지 않았을 때
                     $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
                     $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                     $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
+                    $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
                 }
 
-                $totalPages = ceil($totalArticleCount / $articlesPerPage);
+                $totalPages = ceil($totalArticleCountForPaginaion / $articlesPerPage);
 
                 $parentArticlesExist = $this->ArticleListAllModel->checkChildArticlesParentExist($childArticles);
 

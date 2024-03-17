@@ -14,7 +14,19 @@ class ArticleListAllModel extends MY_Model
         $queryBuilder->select('count(a.id)')
             ->from('Models\Entities\Article', 'a')
             ->where('a.isActive = 1')
-            ->andWhere('a.depth = 0')
+            ->orderBy('a.orderGroup', 'DESC');
+
+        $query = $queryBuilder->getQuery();
+        return $query->getSingleScalarResult();
+    }
+
+    public function getTotalArticleCountForPagination()
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('count(a.id)')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1')
+            ->andWhere(('a.depth = 0'))
             ->orderBy('a.orderGroup', 'DESC');
 
         $query = $queryBuilder->getQuery();

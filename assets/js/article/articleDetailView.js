@@ -3,7 +3,7 @@ $(document).ready(function () {
     // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
     var formModified = false;
 
-    $('form input[type="file"], form textarea, form select').change(function () {
+    $('body').on('keyup change', 'form input[type="file"], form textarea, form select', function () {
         formModified = true;
     });
 
@@ -13,7 +13,7 @@ $(document).ready(function () {
         }
     });
 
-    $('form').submit(function () {
+    $('body').on('submit', 'form', function () {
         $(window).off('beforeunload');
     });
 
@@ -80,7 +80,7 @@ $(document).ready(function () {
     }
 
     // 링크복사 클릭 이벤트
-    $('#articleLink').click(function () {
+    $(document).on('click', '#articleLink', function () {
         var textToCopy = window.location.href;
 
         var tempElement = $('<textarea>').val(textToCopy).appendTo('body').select();
@@ -91,7 +91,7 @@ $(document).ready(function () {
     });
 
     // 첨부파일 토글 버튼 클릭 이벤트
-    $('.file-array-toggle').click(function () {
+    $(document).on('click', '.file-array-toggle', function () {
         var session = $(this).data('session');
         if (session) {
             $('.article-file-list').slideToggle(100);
@@ -101,7 +101,7 @@ $(document).ready(function () {
         }
     });
 
-    $('.article-delete-btn').on('click', function () {
+    $(document).on('click', '.article-delete-btn', function () {
         var articleId = $(this).data('delete-article-id');
 
         if (confirm('이 글을 삭제하시겠습니까?')) {
@@ -127,7 +127,7 @@ $(document).ready(function () {
         }
     });
 
-    $('#articleLikeBtn').on('click', function () {
+    $(document).on('click', '#articleLikeBtn', function () {
         var articleId = $('#article').data('article-id');
 
         $.ajax({
@@ -165,7 +165,7 @@ $(document).ready(function () {
     // 댓글 관련 js
 
     // 등록순 버튼 클릭 이벤트
-    $('#sort-asc-btn').click(function (e) {
+    $(document).on('click', '#sort-asc-btn', function (e) {
         e.preventDefault();
         var depthOption = $('#depthOptionCheckbox').is(':checked') ? 'ASC' : '';
         var treeOption = $('#treeOptionCheckbox').is(':checked') ? 'enabled' : 'disabled';
@@ -173,7 +173,7 @@ $(document).ready(function () {
     });
 
     // 최신순 버튼 클릭 이벤트
-    $('#sort-desc-btn').click(function (e) {
+    $(document).on('click', '#sort-desc-btn', function (e) {
         e.preventDefault();
         var depthOption = $('#depthOptionCheckbox').is(':checked') ? 'ASC' : '';
         var treeOption = $('#treeOptionCheckbox').is(':checked') ? 'enabled' : 'disabled';
@@ -181,7 +181,7 @@ $(document).ready(function () {
     });
 
     // Depth 옵션 체크박스 상태 변경 이벤트
-    $('#depthOptionCheckbox').change(function () {
+    $(document).on('change', '#depthOptionCheckbox', function () {
         // 현재 활성화된 정렬 옵션 확인
         var sortOption = $('#sort-asc-btn').hasClass('sort-btn-active') ? 'ASC' : 'DESC';
         var depthOption = $('#depthOptionCheckbox').is(':checked') ? 'ASC' : '';
@@ -190,7 +190,7 @@ $(document).ready(function () {
     });
 
     // Tree 옵션 체크박스 상태 변경 이벤트
-    $('#treeOptionCheckbox').change(function () {
+    $(document).on('change', '#treeOptionCheckbox', function () {
         // 현재 활성화된 정렬 옵션 확인 및 depthOption 상태 확인
         var sortOption = $('#sort-asc-btn').hasClass('sort-btn-active') ? 'ASC' : 'DESC';
         var depthOption = $('#depthOptionCheckbox').is(':checked') ? 'ASC' : '';
@@ -234,7 +234,7 @@ $(document).ready(function () {
     }
 
     // 댓글 수정/삭제 토글 버튼 클릭 이벤트
-    $('body').on('click', '.comment-edit-delete-toggle', function (e) {
+    $(document).on('click', '.comment-edit-delete-toggle', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -261,7 +261,7 @@ $(document).ready(function () {
     });
 
     // 댓글 텍스트 갯수 제한 및 카운팅
-    $('body').on('input', '.comment-text-area', function () {
+    $(document).on('input', '.comment-text-area', function () {
         var currentLength = $(this).val().length;
         const textMaxLength = 3000;
         if (currentLength > 0) {
@@ -298,7 +298,7 @@ $(document).ready(function () {
     // 답글 관련 js
 
     // 답글 작성 토글 버튼 클릭 이벤트
-    $('body').on('click', '.create-comment-reply-btn', function (e) {
+    $(document).on('click', '.create-comment-reply-btn', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -311,7 +311,7 @@ $(document).ready(function () {
     });
 
     // 답글 작성 닫기 버튼 클릭 이벤트
-    $('body').on('click', '.cancel-comment-reply-btn', function (e) {
+    $(document).on('click', '.cancel-comment-reply-btn', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -323,13 +323,13 @@ $(document).ready(function () {
     });
 
     // 답글 text-area 가변적 높이조절 
-    $('body').on('input', '.comment-text-area-reply', function () {
+    $(document).on('input', '.comment-text-area-reply', function () {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
     });
 
     // 답글 텍스트 갯수 제한 및 카운팅
-    $('body').on('input', '.comment-text-area-reply', function () {
+    $(document).on('input', '.comment-text-area-reply', function () {
         var commentReplyId = $(this).data('comment-reply-id');
         var currentLength = $(this).val().length;
         const textMaxLength = 3000;
@@ -345,7 +345,7 @@ $(document).ready(function () {
     });
 
     // 답글 파일등록 미리보기
-    $('body').on('change', '[data-comment-image-reply-id]', function () {
+    $(document).on('change', '[data-comment-image-reply-id]', function () {
         var commentReplyId = $(this).data('comment-image-reply-id');
         if (this.files && this.files[0]) {
             var reader = new FileReader();
@@ -362,7 +362,7 @@ $(document).ready(function () {
     });
 
     // 답글 첨부이미지 리셋
-    $('body').on('click', '[data-img-preview-reply-id]', function () {
+    $(document).on('click', '[data-img-preview-reply-id]', function () {
         var commentReplyId = $(this).data('img-preview-reply-id');
         $(this).empty();
         $('[data-comment-image-reply-id="' + commentReplyId + '"]').val('');
@@ -372,7 +372,7 @@ $(document).ready(function () {
     // 댓/답글 수정 js
 
     // 댓/답글 수정 폼 토글
-    $('body').on('click', '[data-edited-comment-id]', function () {
+    $(document).on('click', '[data-edited-comment-id]', function () {
         var commentId = $(this).data('edited-comment-id');
         var existingImageUrl = $(this).data('comment-image-url');
 
@@ -394,7 +394,7 @@ $(document).ready(function () {
         });
     });
 
-    $('body').on('click', '[data-comment-edited-cancel-id]', function () {
+    $(document).on('click', '[data-comment-edited-cancel-id]', function () {
         var commentId = $(this).data('comment-edited-cancel-id');
         $('#comment-' + commentId + ' .comment-author-action-box').show();
         $('#comment-' + commentId + ' .comment-content-area').show();
@@ -402,7 +402,7 @@ $(document).ready(function () {
     });
 
     // 댓글/답글 수정
-    $('.comment-edited-form-box form').on('submit', function (e) {
+    $(document).on('submit', '.comment-edited-form-box form', function (e) {
         e.preventDefault();
 
         var form = $(this);
@@ -450,7 +450,7 @@ $(document).ready(function () {
     });
 
     // 이미지 첨부 input 변경 시 미리보기 생성
-    $('body').on('change', '[data-comment-image-edit-id]', function () {
+    $(document).on('change', '[data-comment-image-edit-id]', function () {
         var reader = new FileReader();
         var commentEditId = $(this).data('comment-image-edit-id');
         var previewContainer = $('[data-img-preview-edit-id="' + commentEditId + '"]');
@@ -468,7 +468,7 @@ $(document).ready(function () {
     });
 
     // 수정할 댓/답글 첨부이미지 리셋
-    $('body').on('click', '[data-img-preview-edit-id]', function () {
+    $(document).on('click', '[data-img-preview-edit-id]', function () {
         var commentEditId = $(this).data('img-preview-edit-id');
         // 첨부파일 input 선택자 수정
         var fileInput = $('[data-comment-image-edit-id="' + commentEditId + '"]');
@@ -477,7 +477,7 @@ $(document).ready(function () {
     });
 
     // 수정할 댓/답글 text-area 가변적 높이조절 
-    $('body').on('input', '.comment-text-area-edit', function () {
+    $(document).on('input', '.comment-text-area-edit', function () {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
     });
@@ -485,7 +485,7 @@ $(document).ready(function () {
 
 
     // 수정할 댓/답글 텍스트 갯수 제한 및 카운팅
-    $('body').on('input', '.comment-text-area-edit', function () {
+    $(document).on('input', '.comment-text-area-edit', function () {
         var commentEditId = $(this).data('comment-edit-id');
         var currentLength = $(this).val().length;
         const textMaxLength = 3000;
@@ -501,7 +501,7 @@ $(document).ready(function () {
     });
 
     // 댓글/답글 삭제
-    $('body').on('click', '[data-delete-comment-id]', function () {
+    $(document).on('click', '[data-delete-comment-id]', function () {
         var deleteCommentId = $(this).data('delete-comment-id');
         if (confirm('댓글을 삭제하시겠습니까?')) {
             $.ajax({
@@ -523,6 +523,16 @@ $(document).ready(function () {
                 }
             });
         }
+    });
+
+    $(document).on('click', '#scrollTopBtn', function () {
+        $('html, body').animate({ scrollTop: 0 }, 0);
+        return false;
+    });
+
+        $(document).on('click', '.article-edit-btn', function () {
+        var articleId = $(this).data('article-id');
+        window.location.href = '/article/articleeditcontroller/editForm/' + articleId;
     });
 
 });

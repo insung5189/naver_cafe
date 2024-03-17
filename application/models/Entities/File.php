@@ -145,7 +145,7 @@ class File
 
     /**
      * @ORM\ManyToOne(targetEntity="Article")
-     * @ORM\JoinColumn(name="article_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="article_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $article;
 

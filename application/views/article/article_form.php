@@ -5,7 +5,7 @@ $GLOBALS['pageResources'] = [
     ],
     'js' => [
         '/assets/js/article/articleEdit.js',
-        'https://cdn.ckeditor.com/ckeditor5/34.2.0/super-build/ckeditor.js',
+        '/assets/lib/ckeditor5-41.2.0-88lvg7urv137/build/ckeditor.js',
     ]
 ];
 $user = $_SESSION['user_data'];
@@ -24,17 +24,24 @@ $user = $_SESSION['user_data'];
             </div>
         <? endif; ?>
 
-        <form action="/article/articleeditcontroller/createArticle" method="POST">
+        <form id="articleForm" action="/article/articleeditcontroller/createArticle" method="POST" enctype="multipart/form-data">
             <div class="writingHeader">
                 <h1 class="title">카페 글쓰기</h1>
-                <input class="form-btn-box btn-box submit-btn" type="submit" value="등록">
+                <input class="form-btn-box btn-box submit-btn" type="submit" value="<?= $isEdit ? '수정' : '등록' ?>">
             </div>
             <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
             <input type="hidden" name="parentId" value="<?= isset($parentArticle) ? $parentArticle->getId() : ''; ?>">
             <input type="hidden" name="depth" value="<?= isset($parentArticle) ? $parentArticle->getDepth() + 1 : 0; ?>">
             <input type="hidden" name="orderGroup" value="<?= isset($parentArticle) ? $parentArticle->getOrderGroup() : ''; ?>">
-            <input type="hidden" id="parentBoardId" value="<?= isset($parentArticle) ? $parentArticle->getArticleBoard()->getId() : ''; ?>">
+            <input type="hidden" name="parentBoardId" id="parentBoardId" value="<?= isset($parentArticle) ? $parentArticle->getArticleBoard()->getId() : ''; ?>">
             <input type="hidden" id="parentPrefix" value="<?= isset($parentArticle) ? $parentArticle->getPrefix() : ''; ?>">
+            <input type="hidden" id="isEdit" name="isEdit" value="<?= isset($isEdit) ? htmlspecialchars($isEdit) : false; ?>">
+            <input type="hidden" id="existingArticleContent" value="<?= isset($existingArticleContent) ? htmlspecialchars($existingArticleContent) : ''; ?>">
+            <input type="hidden" id="currentBoardId" value="<?= isset($currentBoardId) ? $currentBoardId : ''; ?>">
+            <input type="hidden" id="currentPrefix" value="<?= isset($currentPrefix) ? $currentPrefix : ''; ?>">
+            <? if ($isEdit) : ?>
+                <input type="hidden" name="articleId" value="<?= isset($article) ? $article->getId() : null ?>">
+            <? endif; ?>
             <div class="editer-box">
                 <div class="select-box">
                     <div class="board-select-box">
@@ -52,7 +59,19 @@ $user = $_SESSION['user_data'];
                     </div>
                 </div>
                 <div class="title-box">
-                    <input class="custom-input" id="title" placeholder="제목을 입력해 주세요" required name="title" type="text">
+                    <input class="custom-input" id="title" placeholder="제목을 입력해 주세요" required name="title" type="text" value="<?= $isEdit ? $article->getTitle() : null ?>">
+                </div>
+
+                <div>
+                    <input type="file" id="fileInput" name="file">
+                    <div class="file-upload-instructions">
+                        <p><strong>파일 업로드 안내:</strong></p>
+                        <ul>
+                            <li>허용되는 파일 확장자: <em>gif, jpg, png, jpeg, webp, bmp, pdf, doc, docx, xls, xlsx, ppt, pptx, txt, hwp</em></li>
+                            <li>최대 파일 크기: <em>20MB</em></li>
+                            <li>파일을 선택하면, 자동으로 업로드됩니다.</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="content-box">
@@ -73,6 +92,7 @@ $user = $_SESSION['user_data'];
                         </label>
                     <?php endif; ?>
                 </div>
+
             </div>
         </form>
     </div>

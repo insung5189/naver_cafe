@@ -207,6 +207,7 @@ h1 {
     justify-content: flex-end;
     align-items: center;
     gap: 1%;
+    margin-bottom: 10px;
 }
 
 .file-array-count-num {
@@ -261,6 +262,18 @@ h1 {
 
 .article-file-download-link:hover {
     text-decoration: underline;
+}
+
+.article-viewer {
+    width: 100%;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.article-viewer img {
+    max-width: 600px;
+    max-height: 600px;
+    object-fit: scale-down;
 }
 
 .article-author {

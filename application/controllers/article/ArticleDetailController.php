@@ -282,30 +282,36 @@ class ArticleDetailController extends MY_Controller
 
     public function editComment($commentId)
     {
-        $formData = [
-            'content' => $this->input->post('commentEditContent', TRUE),
-            'articleId' => $this->input->post('articleId', TRUE),
-            'memberId' => $this->input->post('memberId', TRUE),
-            'file' => $_FILES['commentImage'] ?? null
-        ];
+        if ($this->input->is_ajax_request()) {
+            $formData = [
+                'content' => $this->input->post('commentEditContent', TRUE),
+                'articleId' => $this->input->post('articleId', TRUE),
+                'memberId' => $this->input->post('memberId', TRUE),
+                'file' => $_FILES['commentImage'] ?? null
+            ];
 
-        if (!isset($_SESSION['user_data'])) {
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-            return;
-        }
+            if (!isset($_SESSION['user_data'])) {
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+                $this->setRedirectCookie(current_url());
+                redirect('/member/logincontroller');
+                return;
+            }
 
-        if (empty($formData['content']) && empty($formData['file']['name'])) {
-            echo json_encode(['success' => false, 'message' => '댓글 내용이나 파일을 첨부해주세요.']);
-            return;
-        }
+            if (empty($formData['content']) && empty($formData['file']['name'])) {
+                echo json_encode(['success' => false, 'message' => '댓글 내용이나 파일을 첨부해주세요.']);
+                return;
+            }
 
-        // 모델의 댓글 수정 메서드 호출
-        $result = $this->ArticleDetailModel->processEditComment($commentId, $formData);
+            // 모델의 댓글 수정 메서드 호출
+            $result = $this->ArticleDetailModel->processEditComment($commentId, $formData);
 
-        if ($result['success']) {
-            echo json_encode($result);
+            if ($result['success']) {
+                echo json_encode($result);
+            } else {
+                echo json_encode(['success' => false, 'message' => $result['message']]);
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => $result['message']]);
+            show_404();
         }
     }
 

@@ -55,7 +55,7 @@ class Likes
 
     /**
      * @ORM\ManyToOne(targetEntity="Article")
-     * @ORM\JoinColumn(name="article_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="article_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $article;
 
@@ -71,7 +71,7 @@ class Likes
 
     /**
      * @ORM\ManyToOne(targetEntity="Comment")
-     * @ORM\JoinColumn(name="comment_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="comment_id", referencedColumnName="id", onDelete="CASCADE")
      */
     private $comment;
 
@@ -87,7 +87,7 @@ class Likes
 
     /**
      * @ORM\ManyToOne(targetEntity="Member")
-     * @ORM\JoinColumn(name="member_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="member_id", referencedColumnName="id", onDelete="SET NULL")
      */
     private $member;
 

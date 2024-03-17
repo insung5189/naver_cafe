@@ -1,0 +1,223 @@
+.main-daemoon {
+    width: 860px;
+    border-color: #eee;
+    box-sizing: border-box;
+    border-style: solid;
+    border-width: 4px;
+}
+
+.daemoom-controller {
+    cursor: pointer;
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 11px;
+    margin-bottom: 12px;
+    margin-top: 12px;
+}
+
+.main-contents-area {
+    width: 100%;
+    margin-top: 24px;
+}
+
+.list-title {
+    color: #333;
+    border-bottom: 1px solid #666;
+    height: 30px;
+}
+
+.list-title-text {
+    float: left;
+    font-size: 16px;
+}
+
+.list-title-text:hover {
+    text-decoration: underline;
+}
+
+.more-btn {
+    float: right;
+}
+
+.more-link {
+    display: inline-block;
+    padding-top: 2px;
+    color: #999;
+    font-size: 12px;
+}
+
+.more-link span:first-child:hover {
+    text-decoration: underline;
+}
+
+.album-box {
+    padding-top: 16px;
+    width: 105%;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.album-box-li {
+    overflow: hidden;
+    width: 132px;
+    min-height: 238px;
+    margin-right: 12px;
+    vertical-align: top;
+    font-size: 13px;
+}
+
+.article-list-all-img {
+    width: 130px;
+    height: 130px;
+}
+
+.article-list-all-title-box-text {
+    max-width: 100px;
+    display: inline-block;
+    height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: sub;
+    white-space: nowrap;
+    word-wrap: break-word;
+    word-break: break-word;
+    font-weight: bold;
+    padding-top: 8px;
+}
+
+.article-list-all-comment-count {
+    color: #ff2f3b;
+    margin: 0 2px 0 2px;
+    font-weight: 700;
+}
+
+.article-list-all-author-box-text {
+    display: inline-block;
+    height: 26px;
+    padding-top: 6px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: sub;
+    white-space: nowrap;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.article-list-all-date-and-hit {
+    color: #999;
+}
+
+.main-free-board-and-qna-board {
+    display: flex;
+    justify-content: space-between;
+    gap: 3%;
+}
+
+.main-free-board,
+.main-qna-board {
+    width: 50%;
+}
+
+.main-free-board-li {
+    display: block;
+    padding: 15px 0;
+    min-height: 127px;
+    box-sizing: border-box;
+    border-bottom: 1px solid #eeeeef;
+}
+
+.main-free-board-card-area {
+    display: flex;
+    position: relative;
+    width: 100%;
+}
+
+.main-free-board-card-info {
+    display: inline-block;
+    max-width: 100%;
+    min-width: 70%;
+    table-layout: fixed;
+}
+
+.main-free-board-card-title {
+    display: block;
+    width: 100%;
+    font-size: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.main-free-board-card-content {
+    display: block;
+    width: 100%;
+    height: 22px;
+    margin-top: 4px;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.main-free-board-card-author {
+    display: block;
+    width: 30%;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.main-free-board-card-date-and-hit {
+    margin-top: 3px;
+}
+
+.main-free-board-card-date {
+    margin-right: 16px;
+    color: #999;
+}
+
+.main-free-board-card-hit {
+    color: #999;
+}
+
+.main-free-board-card-img-box {
+    display: inline;
+}
+
+.main-free-board-card-img {
+    width: 96px;
+    height: 96px;
+    padding-left: 16px;
+}
+
+.main-qna-board-table {
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.main-qna-board-table td {
+    width: 100%;
+}
+
+.main-qna-board-table td {
+    height: 28px;
+    padding: 4px 7px;
+    border-bottom: 1px solid #f2f2f2;
+    border-bottom-color: #f2f2f2;
+}
+
+.main-qna-board-title {
+    overflow: hidden;
+    padding-right: 18px;
+}
+
+.main-qna-board-hit {
+    text-align: right;
+}
+
+figure img {
+    width: 0;
+}

@@ -10,10 +10,12 @@ $GLOBALS['pageResources'] = [
             <!-- <a href="/이동_링크" class="list-article-btn">
                 이동
             </a> -->
-            <? if (isset($user)) : ?>
-                <a href="/수정_링크" class="list-article-btn">
+            <? if (isset($user) && ($user['user_id'] == $article->getMember()->getId())) : ?>
+                <a href="javascript:void(0);" class="list-article-btn article-edit-btn" data-article-id="<?= $article->getId(); ?>">
                     수정
                 </a>
+            <? endif; ?>
+            <? if (isset($user) && ($user['user_id'] == $article->getMember()->getId() || $user['role'] == 'ROLE_MASTER' || $user['role'] == 'ROLE_ADMIN')) : ?>
                 <a href="javascript:void(0);" class="list-article-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">
                     삭제
                 </a>
@@ -152,7 +154,6 @@ $GLOBALS['pageResources'] = [
                     <div class="article-viewer">
                         <?= $article->getContent() ? $article->getContent() : '내용 없음'; ?>
                     </div>
-
                     <div class="article-author">
                         <a class="article-author-link" href="/작성자의_활동내역_링크">
                             <!-- 사용자 프로필 이미지 -->
@@ -460,15 +461,25 @@ $GLOBALS['pageResources'] = [
                             글쓰기
                         </a>
 
-                        <a href="/article/articleeditcontroller?parentId=<?= $article->getId(); ?>&boardId=<?= $article->getArticleBoard()->getId(); ?>&prefix=<?= $article->getPrefix(); ?>" class="article-base-btn">답글</a>
-                        <a href="/해당_게시물_수정하기_URL" class="article-base-btn">수정</a>
-                        <a href="javascript:void(0);" class="article-base-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">삭제</a>
+                        <a href="/article/articleeditcontroller?parentId=<?= $article->getId(); ?>&boardId=<?= $article->getArticleBoard()->getId(); ?>&prefix=<?= $article->getPrefix(); ?>" class="article-base-btn">
+                            답글
+                        </a>
+                    <? endif; ?>
+                    <? if (isset($user) && ($user['user_id'] == $article->getMember()->getId())) : ?>
+                        <a href="javascript:void(0);" class="article-base-btn article-edit-btn" data-article-id="<?= $article->getId(); ?>">
+                            수정
+                        </a>
+                    <? endif; ?>
+                    <? if (isset($user) && ($user['user_id'] == $article->getMember()->getId() || $user['role'] == 'ROLE_MASTER' || $user['role'] == 'ROLE_ADMIN')) : ?>
+                        <a href="javascript:void(0);" class="article-base-btn article-delete-btn" data-delete-article-id="<?= $article->getId(); ?>">
+                            삭제
+                        </a>
                     <? endif; ?>
                 </div>
 
                 <div class="article-bottom-btn-right-box">
                     <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="article-base-btn">목록</a>
-                    <a href="/스크롤_맨위로_이동하기" class="article-base-btn">
+                    <a href="javascript:void(0);" id="scrollTopBtn" class="article-base-btn">
                         <i class="fa-solid fa-caret-up"></i>
                         TOP
                     </a>
