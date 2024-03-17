@@ -112,8 +112,8 @@ $(document).ready(function () {
                 data: { articleId: articleId },
                 success: function (response) {
                     if (response.success) {
-                        alert('글이 성공적으로 삭제되었습니다.\n글삭제후 리다이렉션처리 고민해서 적용해야 함.');
-                        location.reload();
+                        alert('글이 성공적으로 삭제되었습니다.');
+                        window.location.href = '/article/articlelistcontroller/index/' + response.articleboardId;
                     } else {
                         alert('글 삭제에 실패했습니다. 다시 시도해주세요.');
                     }
@@ -530,7 +530,7 @@ $(document).ready(function () {
         return false;
     });
 
-        $(document).on('click', '.article-edit-btn', function () {
+    $(document).on('click', '.article-edit-btn', function () {
         var articleId = $(this).data('article-id');
         window.location.href = '/article/articleeditcontroller/editForm/' + articleId;
     });

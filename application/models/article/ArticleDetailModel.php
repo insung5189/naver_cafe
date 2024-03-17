@@ -418,6 +418,21 @@ class ArticleDetailModel extends MY_Model
         return $query->execute();
     }
 
+    public function getBoardIdByArticleId($articleId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+
+        $query = $queryBuilder->select('IDENTITY(a.articleBoard) as id')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.id = :articleId')
+            ->setParameter('articleId', $articleId)
+            ->getQuery();
+
+        $boardId = $query->getOneOrNullResult();
+
+        return $boardId ? $boardId['id'] : 1;
+    }
+
     // 관련게시판 부모글만 불러오는 쿼리
     public function getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage)
     {

@@ -342,9 +342,10 @@ class ArticleDetailController extends MY_Controller
 
         if (!empty($articleId)) {
             $result = $this->ArticleDetailModel->processDeleteArticle($articleId);
+            $boardId = $this->ArticleDetailModel->getBoardIdByArticleId($articleId);
 
             if ($result) {
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'articleboardId' => $boardId]);
             } else {
                 echo json_encode(['success' => false, 'message' => '게시글 삭제 실패']);
             }
