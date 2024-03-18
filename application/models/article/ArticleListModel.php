@@ -273,4 +273,18 @@ class ArticleListModel extends MY_Model
 
         return $errors;
     }
+
+    public function isBookmarkedByMember($memberId, $boardId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('count(bmk.boardBookmarkId)')
+            ->from('Models\Entities\BoardBookmark', 'bmk')
+            ->where('bmk.member = :memberId')
+            ->andWhere('bmk.articleBoard = :boardId')
+            ->setParameter('memberId', $memberId)
+            ->setParameter('boardId', $boardId);
+
+        $count = $queryBuilder->getQuery()->getSingleScalarResult();
+        return $count > 0;
+    }
 }

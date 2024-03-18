@@ -1,0 +1,388 @@
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1 {
+    font-size: 2em !important;
+    margin-bottom: 0.67em !important;
+}
+
+.section-container {
+    display: flex;
+}
+
+.container {
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 820px;
+    margin: 0 auto;
+    background-color: #fff;
+    width: 820px;
+}
+
+.title {
+    margin-bottom: 10px;
+}
+
+.page-guide {
+    font-size: 1rem !important;
+    line-height: 1rem !important;
+    margin: 16px 0 !important;
+}
+
+.prfl-box {
+    display: flex;
+}
+
+.profile-img {
+    margin-right: 17px
+}
+
+.profile-img img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.nick-and-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.nick-area {
+    margin-top: 14px;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 29px;
+    color: #000;
+}
+
+.nick-name-represent {
+    display: inline-block;
+    max-width: 40%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: top;
+}
+
+.info-area {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #999;
+}
+
+.count-num {
+    padding-left: 3px;
+    color: #000;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.ml-17 {
+    margin-left: 17px;
+}
+
+
+.my-activity-list-style {
+    display: flex;
+    justify-content: space-between;
+    padding: 29px 0 10px;
+    height: 25px;
+    border-bottom: 2px solid;
+    margin-bottom: 10px;
+}
+
+.my-activity-list-style span:hover {
+    text-decoration: underline;
+}
+
+.my_activity_sort_area-left {
+    display: flex;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 2%;
+}
+
+.my_activity_sort_area-left a:first-child {
+    margin-left: 0;
+}
+
+.my_activity_sort_area-left a {
+    margin-left: 16px;
+    text-decoration: none;
+}
+
+.my_activity_sort_area-right {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+}
+
+.my_activity_sort_area-right a:first-child {
+    margin-left: 0;
+}
+
+.my_activity_sort_area-right a {
+    margin-left: 16px;
+    text-decoration: none;
+    position: relative;
+}
+
+.link_sort span {
+    display: inline-block;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.on span {
+    font-weight: 700;
+    color: #03c75a;
+}
+
+.underline span::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #03c75a;
+}
+
+
+/* 작성글 CSS 시작 */
+
+table {
+    width: 100%;
+}
+
+.prefix,
+.deleted-article-prefix {
+    color: #959595;
+    font-weight: bold;
+    margin-right: 2px;
+}
+
+#myArticlesThead th,
+#myArticlesDeletedThead th,
+#myCommentsThead th,
+#myCommentedArticleThead th {
+    display: table-cell;
+    border-bottom: 1px solid #f2f2f2;
+    padding-bottom: 13px;
+}
+
+#myarticles-tbody td,
+#myarticles-deleted-tbody td,
+#mycomments-tbody td,
+#mycommented-article-tbody td,
+#myliked-articles-tbody td {
+    height: 28px;
+    padding: 4px 7px;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.check-box-cell,
+.article-num-cell,
+.title-list,
+.deleted-title-list,
+.comment-content-list {
+    display: table-cell;
+    padding: 0 7px 0 0;
+    vertical-align: middle;
+    color: #333;
+    line-height: 18px;
+}
+
+.check-box-cell {
+    width: 16px;
+}
+
+.check-box-comment-cell {
+    vertical-align: top;
+}
+
+.td-comment-img {
+    vertical-align: top;
+}
+
+.link-to-commented-article {
+    display: block;
+    overflow: hidden;
+    width: 72px;
+    height: 72px;
+    border: 0.5px solid rgba(0, 0, 0, .06);
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.link-to-commented-article-contents:hover {
+    text-decoration: underline;
+}
+
+.comment-create-date,
+.article-title-for-comment {
+    margin-top: 6px;
+    color: #878787;
+}
+
+.articles-comment-count {
+    color: #ff2f3b;
+    margin: 0 2px 0 2px;
+    font-weight: 700;
+}
+
+.article-title-for-comment {
+    margin-top: 6px;
+}
+
+.article-num-cell {
+    text-align: center;
+    width: 70px;
+}
+
+.inner-title-name,
+.inner-deleted-title-name,
+.inner-content-detail {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+    word-break: break-all;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+.article-title-link,
+.deleted-article-title-link {
+    display: block;
+    max-width: 85%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.article-title-link:hover,
+.author-name-link:hover {
+    text-decoration: underline;
+}
+
+.parent-article-is-deleted {
+    color: red;
+    font-weight: bold;
+}
+
+
+.td-create-date,
+.td-deleted-date,
+.td-hit,
+.td-author {
+    text-align: center;
+}
+
+.article-author-row {
+    display: inline-block;
+    width: 60%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.article-absence {
+    text-align: center;
+}
+
+.my-articles-control-box,
+.my-comments-control-box {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.my-commented-articles-control-box {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.input-checked-all {
+    margin: 0 0 0 11px;
+    vertical-align: middle;
+}
+
+.input-checked-all-label {
+    padding-left: 5px;
+    vertical-align: middle;
+}
+
+.my-articles-delete-and-write-btn a:last-child,
+.my-comments-delete-and-write-btn a:last-child,
+.my-commented-articles-delete-and-write-btn a:last-child {
+    margin-left: 10px;
+}
+
+.my-articles-delete-btn,
+.my-comments-delete-btn,
+.my-articles-write-btn,
+.my-liked-articles-cancel-btn {
+    min-width: 46px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 36px;
+    color: #000;
+    background-color: #eff0f2;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-weight: 700;
+    text-align: center;
+    vertical-align: top;
+}
+
+/* 작성글 페이지네이션 CSS 시작 */
+
+.pagination-box {
+    margin-top: 32px;
+    padding: 16px 0 16px;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    margin: 0 5px;
+    border: 1px solid #ddd;
+    color: #337ab7;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.pagination a.active {
+    background-color: #337ab7;
+    color: #ffffff;
+    border-color: #337ab7;
+}
+
+.pagination a:hover {
+    background-color: #286090;
+    border-color: #204d74;
+    color: #ffffff;
+}
+
+/* 작성글 페이지네이션 CSS 끝 */
+
+/* 작성글 CSS 끝 */

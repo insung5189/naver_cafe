@@ -15,10 +15,12 @@ class MypageController extends MY_Controller
 
         if ($memberId) {
             $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
+            $articleCount = count($this->MypageModel->getArticlesByMemberId($memberId));
 
             $page_view_data = [
                 'title' => '마이페이지',
                 'member' => $member,
+                'articleCount' => $articleCount,
             ];
             $this->layout->view('member/my_page', $page_view_data);
         } else {

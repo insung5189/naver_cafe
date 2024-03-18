@@ -450,7 +450,7 @@ button {
     line-height: 24px;
 }
 
-.board-instructions li {
+.book-mark-board-none {
     padding-bottom: 6px;
 }
 
@@ -538,4 +538,8 @@ button {
 .tag-detail {
     margin: 16px 0 16px 8px;
     overflow: hidden;
+}
+
+#dynamicContent {
+    width: 860px;
 }

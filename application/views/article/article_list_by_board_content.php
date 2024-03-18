@@ -1,6 +1,14 @@
 <!-- article_list_by_content.php -->
 <div class="container">
-    <h1 class="title"><?= $articleBoard->getBoardName() ? htmlspecialchars($articleBoard->getBoardName(), ENT_QUOTES, 'UTF-8') : '⚠️ 게시판정보 불러오기 실패'; ?></h1>
+    <div>
+        <h1 class="title"><?= $articleBoard->getBoardName() ? htmlspecialchars($articleBoard->getBoardName(), ENT_QUOTES, 'UTF-8') : '⚠️ 게시판정보 불러오기 실패'; ?></h1>
+        <? if (isset($articleBoard) && isset($_SESSION['user_data'])) : ?>
+            <a id="boardBookMarkBtn" href="javascript:void(0);" data-article-board="<?= $articleBoard->getId() ?>" data-member-id="<?= $_SESSION['user_data']['user_id'] ?>" data-member-bookmarking-this-board="<?= $isBookmarked ? '1' : '0' ?>">
+                <i class="fa-<?= $isBookmarked ? 'solid' : 'regular' ?> fa-star fa-2xl" style="color: lightgreen;"></i>
+            </a>
+        <? endif; ?>
+    </div>
+
     <p class="page-guide"><?= $boardGuide ?></p>
 
     <? if (!empty($errors)) : ?>
@@ -177,7 +185,7 @@
                                     <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
                                         <span class="left-bottom-edge"><?= $leftBottomEdge ?></span>
                                         <span class="parent-article-is-deleted">
-                                            <?=$parentArticleDeleted?>
+                                            <?= $parentArticleDeleted ?>
                                         </span>
                                         <? if (!empty($article->getPrefix()) && ($articleBoard->getId() == 4 || $articleBoard->getId() == 5)) : ?>
                                             <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>

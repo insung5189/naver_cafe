@@ -144,7 +144,7 @@
 
                                 <div class="board-name">
                                     <div class="inner-board-name">
-                                        <a href="/해당게시판 링크" class="board-link"><?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?></a>
+                                        <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="board-link"><?= $article->getArticleBoard() ? htmlspecialchars($article->getArticleBoard()->getBoardName(), ENT_QUOTES, 'UTF-8') : '게시판 없음'; ?></a>
                                     </div>
                                 </div>
 
@@ -173,7 +173,15 @@
 
                             <td scope="col" class="td-author">
                                 <div class="author-name">
-                                    <a href="/해당 작성자 활동내역" class="author-name-link">
+                                    <?
+                                    $rquserId = '';
+                                    if ($article->getMember()->getId() === "58") {
+                                        $rquserId = 'manager';
+                                    } else {
+                                        $rquserId = $article->getMember()->getId();
+                                    }
+                                    ?>
+                                    <a href="/member/userActivityController/index/<?= $rquserId ?>" class="author-name-link">
                                         <span class="article-author-row"><?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자미상'; ?></span>
                                     </a>
                                 </div>

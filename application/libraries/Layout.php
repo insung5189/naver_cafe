@@ -18,7 +18,8 @@ class Layout
 		if ($memberId = $this->obj->session->userdata('user_data')['user_id'] ?? null) {
 			$activityInfo = $this->getUserActivityInfo($memberId);
 			$memberInfo = $this->getUserInfo($memberId);
-			$page_view_data = array_merge($page_view_data, $activityInfo, ['memberInfo' => $memberInfo]);
+			$favoriteBoards = $this->getFavoriteBoards($memberId); // 즐겨찾기 게시판 정보 조회
+			$page_view_data = array_merge($page_view_data, $activityInfo, ['memberInfo' => $memberInfo, 'favoriteBoards' => $favoriteBoards]);
 		}
 
 		$layout_view_data = array(
@@ -78,11 +79,11 @@ class Layout
 
 	protected function getUserActivityInfo($memberId)
 	{
-		$articleCount = count($this->obj->MyActivityModel->getArticlesByMemberId($memberId));
+		$articleCountLayout = count($this->obj->MyActivityModel->getArticlesByMemberId($memberId));
 		$commentCount = count($this->obj->MyActivityModel->getCommentsByMemberId($memberId));
 
 		return [
-			'articleCount' => $articleCount,
+			'articleCountLayout' => $articleCountLayout,
 			'commentCount' => $commentCount,
 		];
 	}
@@ -99,5 +100,19 @@ class Layout
 		$memberInfo = $query->getOneOrNullResult();
 
 		return $memberInfo;
+	}
+
+	protected function getFavoriteBoards($memberId)
+	{
+		$queryBuilder = $this->obj->doctrine->em->createQueryBuilder();
+		$queryBuilder->select('ab', 'bb')
+			->from('Models\Entities\BoardBookmark', 'bb')
+			->innerJoin('bb.articleBoard', 'ab')
+			->where('bb.member = :memberId')
+			->setParameter('memberId', $memberId);
+
+		$favoriteBoards = $queryBuilder->getQuery()->getResult();
+
+		return $favoriteBoards;
 	}
 }

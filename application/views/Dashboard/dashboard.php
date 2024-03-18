@@ -34,12 +34,12 @@ $GLOBALS['pageResources'] = [
                 <li class="album-box-li">
                     <dl>
                         <dt class="article-list-all-photo-box">
-                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
                                 <img src="<?= $articleListAllimgfileUrls[$articleListAllArticle->getId()] ?? '기본 이미지 경로' ?>" alt="" class="article-list-all-img">
                             </a>
                         </dt>
                         <dd class="article-list-all-title-box">
-                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
                                 <span class="article-list-all-title-box-text">
                                     <?= $articleListAllArticle->getTitle() ?>
                                 </span>
@@ -52,7 +52,7 @@ $GLOBALS['pageResources'] = [
                             </a>
                         </dd>
                         <dd>
-                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
                                 <span class="article-list-all-author-box-text">
                                     <?= $articleListAllArticle->getMember()->getNickName() ?>
                                 </span>
@@ -92,7 +92,7 @@ $GLOBALS['pageResources'] = [
             </div>
             <ul class="main-free-board-ul">
                 <? foreach ($freeBoardArticles as $freeBoardArticle) : ?>
-                    <a href="/article/articledetailcontroller/index/<?= $freeBoardArticle->getId() ?>">
+                    <a href="/article/articledetailcontroller/index/<?= $freeBoardArticle->getId() ?>" class="article-link">
                         <li class="main-free-board-li">
                             <div class="main-free-board-card-area">
                                 <div class="main-free-board-card-info">
@@ -139,12 +139,8 @@ $GLOBALS['pageResources'] = [
                     </a>
                 </span>
             </div>
-            <table class="main-qna-board-table">
-                <colgroup>
-                    <col>
-                    <col width="80">
-                </colgroup>
-                <tbody>
+            <div class="main-qna-board-table">
+                <div>
                     <? foreach ($qnaBoardArticles as $qnaBoardArticle) : ?>
 
                         <?
@@ -153,30 +149,36 @@ $GLOBALS['pageResources'] = [
                             $parentArticleDeleted = '';
                             $paddingVal = $qnaBoardArticle->getDepth() * 35;
                             $styleAttributes = 'style="padding-left:' . $paddingVal . 'px;"';
-                        } 
+                        }
                         ?>
-                        <tr>
-                            <td class="main-qna-board-title" <?= $styleAttributes ?>>
-                                <? if ($qnaBoardArticle->getDepth() == 0) : ?>
-                                    <span>ㆍ</span>
-                                <? elseif ($qnaBoardArticle->getDepth() > 0) : ?>
-                                    <span>┗</span>
-                                <? endif; ?>
-                                <?= $qnaBoardArticle->getTitle() ?>
-                                <? $commentCount = $commentCounts[$qnaBoardArticle->getId()] ?? 0; ?>
-                                <? if ($commentCount !== 0) : ?>
-                                    <span class="article-list-all-comment-count">
-                                        <?= '[' . $commentCount . ']' ?>
-                                    </span>
-                                <? endif; ?>
-                            </td>
-                            <td class="main-qna-board-hit">
-                                <?= $qnaBoardArticle->getHit() ?>
-                            </td>
-                        </tr>
+
+                        <div class="main-qna-board-row">
+                            <div class="main-qna-board-title" <?= $styleAttributes ?>>
+                                <a href="/article/articledetailcontroller/index/<?= $qnaBoardArticle->getId() ?>" class="article-link">
+                                    <? if ($qnaBoardArticle->getDepth() == 0) : ?>
+                                        <span>ㆍ</span>
+                                    <? elseif ($qnaBoardArticle->getDepth() > 0) : ?>
+                                        <span>┗</span>
+                                    <? endif; ?>
+                                    <?= $qnaBoardArticle->getTitle() ?>
+                                    <? $commentCount = $commentCounts[$qnaBoardArticle->getId()] ?? 0; ?>
+                                    <? if ($commentCount !== 0) : ?>
+                                        <span class="article-list-all-comment-count">
+                                            <?= '[' . $commentCount . ']' ?>
+                                        </span>
+                                    <? endif; ?>
+                                </a>
+                            </div>
+                            <div class="main-qna-board-hit">
+                                <a href="/article/articledetailcontroller/index/<?= $qnaBoardArticle->getId() ?>" class="article-link">
+                                    <?= $qnaBoardArticle->getHit() ?>
+                                </a>
+                            </div>
+                        </div>
+
                     <? endforeach; ?>
-                </tbody>
-            </table>
+                </div>
+            </div>
         </div>
     </div>
 

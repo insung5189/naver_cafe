@@ -91,9 +91,19 @@ $GLOBALS['pageResources'] = [
                             <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $profileImageName; ?>" alt="<?= htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
                         </div>
                         <div class="author-prfl-info">
-                            <div class="author-prfl-nickname">
-                                <?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
-                            </div>
+                            <?
+                            $rquserId = '';
+                            if ($article->getMember()->getId() === "58") {
+                                $rquserId = 'manager';
+                            } else {
+                                $rquserId = $article->getMember()->getId();
+                            }
+                            ?>
+                            <a href="/member/userActivityController/index/<?= $rquserId ?>">
+                                <div class="author-prfl-nickname">
+                                    <?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
+                                </div>
+                            </a>
                             <div class="article-detail-info">
                                 <span class="article-date">
                                     <?= $article->getModifyDate() ? $article->getModifyDate()->format('Y.m.d H:i') : $article->getCreateDate()->format('Y.m.d H:i'); ?>
@@ -155,7 +165,7 @@ $GLOBALS['pageResources'] = [
                         <?= $article->getContent() ? $article->getContent() : '내용 없음'; ?>
                     </div>
                     <div class="article-author">
-                        <a class="article-author-link" href="/작성자의_활동내역_링크">
+                        <a class="article-author-link" href="/member/userActivityController/index/<?= $rquserId ?>">
                             <!-- 사용자 프로필 이미지 -->
                             <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $profileImageName; ?>" alt="<?= htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
                             <span class="author-prfl-nickname-box">
@@ -246,19 +256,20 @@ $GLOBALS['pageResources'] = [
                                                 ? $comment->getMember()->getMemberFileName()
                                                 : 'defaultImg/default.png';
                                             ?>
-                                            <a href="/작성자의_활동내역_링크">
+                                            <a class="user-activity-link" href="/member/userActivityController/index/<?= $rquserId ?>">
                                                 <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $commmentsProfileImageName; ?>" alt="<?= htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
-                                            </a>
-                                            <div class="comment-content-each">
-                                                <div class="comment-author">
-                                                    <?= $comment->getMember() ? htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
-                                                </div>
-                                                <? if ($comment->getMember()->getNickName() === $article->getMember()->getNickName()) : ?>
-                                                    <div class="is-article-author">
-                                                        작성자
+
+                                                <div class="comment-content-each">
+                                                    <div class="comment-author">
+                                                        <?= $comment->getMember() ? htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
                                                     </div>
-                                                <? endif; ?>
-                                            </div>
+                                                    <? if ($comment->getMember()->getNickName() === $article->getMember()->getNickName()) : ?>
+                                                        <div class="is-article-author">
+                                                            작성자
+                                                        </div>
+                                                    <? endif; ?>
+                                                </div>
+                                            </a>
                                         </div>
                                         <? if (isset($user) && is_array($user) && isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()) : ?>
                                             <div class="comment-edit-delete-btn">

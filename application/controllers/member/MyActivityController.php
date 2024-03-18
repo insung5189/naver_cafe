@@ -10,17 +10,20 @@ class MyActivityController extends MY_Controller
     public function index()
     {
         $userData = $this->session->userdata('user_data');
+
         $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
 
         if ($memberId) {
             // 회원 정보 및 관련 데이터 로드
             $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
+            $articleCount = count($this->MyActivityModel->getArticlesByMemberId($memberId));
 
             // 페이지 데이터 준비
             $page_view_data = [
                 'title' => '나의 활동',
                 'member' => $member,
-                // 'initialTabContent' => $initialTabContent,
+                'articleCount' => $articleCount,
             ];
 
             // 뷰 로드

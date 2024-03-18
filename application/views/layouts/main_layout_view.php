@@ -85,14 +85,15 @@
                                             </a>
                                         </li>
                                         <li class="cafe-manager">
-                                            <a href="/카페매니저의_카페활동내역">
+                                            <a href="/member/userActivityController/index/manager" id="managersActivity">
                                                 <div class="manager-info">
                                                     <div class="manager-name hover-underline"><?= htmlspecialchars($masterNickName, ENT_QUOTES, 'UTF-8'); ?></div>
                                                 </div>
                                             </a>
                                             <em class="ico-manager">매니저</em>
                                             <div class="cafe-open-date">
-                                                <a href="/카페연혁페이지_선택사항">2024.01.08. 개설</a>
+                                                <!-- <a href="#">2024.01.08. 개설</a> -->
+                                                <span>2024.01.08. 개설</span>
                                             </div>
                                             <div class="cafe-description-link">
                                                 <a href="/home/layoutcontroller/cafeInfo">카페소개</a>
@@ -208,7 +209,7 @@
                                                             </svg>
                                                             내가 쓴 게시글</a>
                                                     </strong>
-                                                    <em><?= $articleCount; ?>개</em>
+                                                    <em><?= $articleCountLayout; ?>개</em>
                                                 </li>
                                                 <li class="comments-count">
                                                     <strong>
@@ -261,22 +262,56 @@
 
                     <div class="board-container">
                         <div class="board-header">
-                            <div class="favorite-board">
-                                <h3>
+                            <? if (isset($_SESSION['user_data'])) : ?>
+                                <div class="favorite-board">
+                                    <h3>
+                                        <a href="javascript:void(0);" class="toggle-favorite-board" title="즐겨찾는 게시판">
+                                            <span>⭐</span>
+                                            즐겨찾는 게시판
+                                        </a>
+                                    </h3>
                                     <a href="javascript:void(0);" class="toggle-favorite-board" title="즐겨찾는 게시판">
-                                        <span>⭐</span>
-                                        즐겨찾는 게시판
+                                        <p class="up-and-down-btn"></p>
                                     </a>
-                                </h3>
-                                <a href="javascript:void(0);" class="toggle-favorite-board" title="즐겨찾는 게시판">
-                                    <p class="up-and-down-btn"></p>
-                                </a>
-                            </div>
-                            <ul class="board-instructions" style="display:none;">
-                                <li>
-                                    <span>게시판 상단의 아이콘을 클릭하시면 추가됩니다.</span>
-                                </li>
-                            </ul>
+                                </div>
+                                <? if (!$favoriteBoards) : ?>
+                                    <ul class="board-instructions" style="display:none;">
+                                        <li class="book-mark-board-none">
+                                            <span>게시판 상단의 아이콘을 클릭하시면 추가됩니다.</span>
+                                        </li>
+                                    </ul>
+                                <? else : ?>
+                                    <ul class="board-instructions" style="display:none;">
+                                        <? foreach ($favoriteBoards as $favoriteBoard) : ?>
+                                            <?
+                                            $boardName = '';
+                                            $boardId = '';
+                                            if ($favoriteBoard->getArticleBoard()->getId() == 1) {
+                                                $boardName = '📋자유게시판';
+                                                $boardId = 'freeBoardBookMarked';
+                                            } else if ($favoriteBoard->getArticleBoard()->getId() == 2) {
+                                                $boardName = '🙋‍♂️건의게시판';
+                                                $boardId = 'suggestedBoardBookMarked';
+                                            } else if ($favoriteBoard->getArticleBoard()->getId() == 3) {
+                                                $boardName = '👄아무말게시판';
+                                                $boardId = 'wordVomitBoardBookMarked';
+                                            } else if ($favoriteBoard->getArticleBoard()->getId() == 4) {
+                                                $boardName = '💡지식공유';
+                                                $boardId = 'knowledgeSharingBoardBookMarked';
+                                            } else if ($favoriteBoard->getArticleBoard()->getId() == 5) {
+                                                $boardName = '❓질문/답변게시판';
+                                                $boardId = 'qnaBoardBookMarked';
+                                            }
+                                            ?>
+                                            <li class="book-marked-board">
+                                                <a href="/article/articlelistcontroller/index/<?= $favoriteBoard->getArticleBoard()->getId() ?>" class="board-url" id="<?= $boardId ?>" data-board-id="<?= $favoriteBoard->getArticleBoard()->getId() ?>">
+                                                    <?= $boardName ?>
+                                                </a>
+                                            </li>
+                                        <? endforeach; ?>
+                                    </ul>
+                                <? endif; ?>
+                            <? endif; ?>
                             <ul class="board-list">
                                 <li>
                                     <a href="/article/articlelistallcontroller" id="allArticleBoard" data-board-id="6">📃전체글보기</a>

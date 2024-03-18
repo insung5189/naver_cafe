@@ -1,5 +1,38 @@
 $(document).ready(function () {
 
+    $(document).on('click', '#boardBookMarkBtn', function () {
+        var boardId = $(this).data('article-board');
+        var memberId = $(this).data('member-id');
+        var isBookmarked = $(this).data('member-bookmarking-this-board');
+
+        $.ajax({
+            url: '/article/articlelistcontroller/processBookMark',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                boardId: boardId,
+                memberId: memberId,
+                isBookmarked: isBookmarked
+            },
+            success: function (response) {
+                if (response.success) {
+                    if (response.isBookmarked) {
+                        $('#boardBookMarkBtn').find('.fa-star').removeClass('fa-regular').addClass('fa-solid');
+                        alert('게시판이 즐겨찾기에 추가되었습니다.');
+                    } else {
+                        $('#boardBookMarkBtn').find('.fa-star').removeClass('fa-solid').addClass('fa-regular');
+                        alert('즐겨찾기가 해제되었습니다.');
+                    }
+                } else {
+                    alert(response.message || '오류가 발생했습니다.');
+                }
+            },
+            error: function (xhr, status, error) {
+                alert('오류가 발생했습니다.');
+            }
+        });
+    });
+
     // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
     var formModified = false;
     $(document).on('change', 'form input', function () {
@@ -16,7 +49,6 @@ $(document).ready(function () {
         $(window).off('beforeunload');
     });
 
-    // var boardId = new URLSearchParams(window.location.search).get('boardId'); // URL에서 boardId 가져오기
     var boardId = $('#articleContent').data('article-board-id');
     // 초기 페이지 로드
     fetchArticles({

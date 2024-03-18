@@ -69,6 +69,7 @@
 .article-list-all-img {
     width: 130px;
     height: 130px;
+    object-fit: contain;
 }
 
 .article-list-all-title-box-text {
@@ -79,8 +80,6 @@
     text-overflow: ellipsis;
     vertical-align: sub;
     white-space: nowrap;
-    word-wrap: break-word;
-    word-break: break-word;
     font-weight: bold;
     padding-top: 8px;
 }
@@ -163,7 +162,7 @@
 
 .main-free-board-card-author {
     display: block;
-    width: 30%;
+    width: 115px;
     margin-top: 4px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -191,33 +190,50 @@
     width: 96px;
     height: 96px;
     padding-left: 16px;
+    object-fit: contain;
 }
 
-.main-qna-board-table {
+
+.main-qna-board-table tr {
     word-wrap: break-word;
     word-break: break-word;
 }
 
-.main-qna-board-table td {
-    width: 100%;
-}
-
-.main-qna-board-table td {
-    height: 28px;
+.main-qna-board-row {
+    display: flex;
+    width: 98%;
     padding: 4px 7px;
+    height: 30px;
     border-bottom: 1px solid #f2f2f2;
-    border-bottom-color: #f2f2f2;
+    line-height: 32px;
 }
 
 .main-qna-board-title {
+    flex-grow: 1;
     overflow: hidden;
-    padding-right: 18px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .main-qna-board-hit {
+    flex-basis: 50px;
+    /* 조회수가 차지할 공간의 너비를 설정 */
     text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-left: 10px;
+    /* 제목과 조회수 사이의 간격 조정 */
 }
 
-figure img {
+figure img,
+figure iframe,
+figure table,
+figure {
     width: 0;
 }
+
+.article-link:hover {
+    text-decoration: underline;
+}
+
+.article-link img {}

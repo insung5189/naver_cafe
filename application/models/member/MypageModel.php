@@ -8,6 +8,19 @@ class MypageModel extends MY_Model
         parent::__construct();
     }
 
+    public function getArticlesByMemberId($memberId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.member = :memberId')
+            ->andWhere('a.isActive = 1')
+            ->setParameter('memberId', $memberId);
+
+        $query = $queryBuilder->getQuery();
+        return $query->getResult();
+    }
+
     public function updateProfile($formData)
     {
         $errors = ['errors' => []];

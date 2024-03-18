@@ -11,14 +11,28 @@ class ArticleListController extends MY_Controller
     public function index($boardId)
     {
         $keyword = $this->input->get('keyword', TRUE) ?? '';
-        // $boardId = $this->input->get('boardId', TRUE);
+
+        $boardNames = [
+            1 => '자유게시판',
+            2 => '건의게시판',
+            3 => '아무말게시판',
+            4 => '지식공유',
+            5 => '질문/답변게시판',
+        ];
+
+        if (!empty($keyword)) {
+            $title = '검색 결과';
+        } elseif (array_key_exists($boardId, $boardNames)) {
+            $title = $boardNames[$boardId];
+        } else {
+            $title = '잘못된 접근';
+        }
 
         $page_view_data = [
-            'title' => !empty($keyword) ? '검색 결과' : '전체글보기',
+            'title' => $title,
             'boardId' => $boardId
         ];
 
-        // 데이터와 함께 뷰 로드
         $this->layout->view('article/article_list_by_board', $page_view_data);
     }
 
@@ -55,8 +69,15 @@ class ArticleListController extends MY_Controller
     {
         if ($this->input->is_ajax_request()) {
             try {
-                $boardId = $this->input->get('boardId', TRUE) ?? 1;
-                $articleBoard = $this->em->find('Models\Entities\ArticleBoard', $boardId);
+
+                $memberId = $this->session->userdata('user_data') ? $this->session->userdata('user_data')['user_id'] : NULL;
+                $boardId = $this->input->get('boardId', TRUE) ?? NULL;
+
+                if (isset($memberId) && isset($boardId)) {
+                    $isBookmarked = $this->ArticleListModel->isBookmarkedByMember($memberId, $boardId);
+                } else {
+                    $isBookmarked = FALSE;
+                }
 
                 if ($boardId === "1") {
                     $title = '자유게시판';
@@ -74,9 +95,9 @@ class ArticleListController extends MY_Controller
                     $title = '질문/답변게시판';
                     $boardGuide = '개발 관련 질문을 자유롭게 해주세요.';
                 } else {
-                    $title = '잘못된 접근';
-                    $boardGuide = '기존의 게시판 이외의 게시판으로 접근하셨습니다.';
+                    return;
                 }
+                $articleBoard = $this->em->find('Models\Entities\ArticleBoard', $boardId);
 
                 $currentPage = $this->input->get('page', TRUE) ?? 1;
                 $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ? (int)$this->input->get('articlesPerPage') : 15;
@@ -130,6 +151,8 @@ class ArticleListController extends MY_Controller
                     'period' => $period,
                     'startDate' => $startDate,
                     'endDate' => $endDate,
+                    'isBookmarked' => $isBookmarked,
+                    // 'likes' => $likes, 각 게시글의 좋아요 수 확인 후 입력예정
                     'errors' => $errors ?? []
                 ];
 
@@ -139,6 +162,48 @@ class ArticleListController extends MY_Controller
                 echo json_encode(['success' => true, 'html' => $html]);
             } catch (\Exception $e) {
                 echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
+            }
+        } else {
+            show_404();
+        }
+    }
+
+    public function processBookMark()
+    {
+        if ($this->input->is_ajax_request()) {
+            $boardId = $this->input->post('boardId');
+            $memberId = $this->input->post('memberId');
+            $isBookmarked = $this->input->post('isBookmarked');
+
+            $board = $this->em->find('Models\Entities\ArticleBoard', $boardId);
+            $member = $this->em->find('Models\Entities\Member', $memberId);
+
+            if ($board && $member) {
+                $bookmark = $this->em->getRepository('Models\Entities\BoardBookmark')->findOneBy([
+                    'articleBoard' => $board,
+                    'member' => $member
+                ]);
+
+                if ($bookmark) {
+                    $this->em->remove($bookmark);
+                    $message = '즐겨찾기가 해제되었습니다.';
+                    $isBookmarked = false;
+                } else {
+                    // 즐겨찾기 추가
+                    $newBookmark = new Models\Entities\BoardBookmark();
+                    $newBookmark->setArticleBoard($board);
+                    $newBookmark->setMember($member);
+                    $newBookmark->setCreateDate(new \DateTime());
+
+                    $this->em->persist($newBookmark);
+                    $message = '게시판이 즐겨찾기에 추가되었습니다.';
+                    $isBookmarked = true;
+                }
+
+                $this->em->flush();
+                echo json_encode(['success' => true, 'message' => $message, 'isBookmarked' => $isBookmarked]);
+            } else {
+                echo json_encode(['success' => false, 'message' => '게시판 또는 사용자를 찾을 수 없습니다.']);
             }
         } else {
             show_404();

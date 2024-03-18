@@ -1,28 +1,42 @@
 <div>
     <ul id="relatedArticlesList">
         <? foreach ($relatedArticles as $relatedArticle) : ?>
-            <a href="/article/articledetailcontroller/index/<?= $relatedArticle->getId(); ?>" class="article-title-link">
+            <span>
                 <li class="related-article-list-item" id="relatedArticleItemLi" data-related-article-id="<?= $relatedArticle->getId(); ?>">
-                    <div class="related-article-title-area">
-                        <? if (!empty($relatedArticle->getPrefix()) && ($articleBoard->getId() == 4 || $articleBoard->getId() == 5)) : ?>
-                            <span class="prefix">[<?= htmlspecialchars($relatedArticle->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
-                        <? endif; ?>
-                        <?= $relatedArticle->getTitle() ? htmlspecialchars($relatedArticle->getTitle(), ENT_QUOTES, 'UTF-8') : '제목 없음'; ?>
-                        <? $commentCount = $commentCounts[$relatedArticle->getId()] ?? 0; ?>
-                        <? if ($commentCount !== 0) : ?>
-                            <span class="articles-comment-count">
-                                <?= '[' . $commentCount . ']' ?>
-                            </span>
-                        <? endif; ?>
-                    </div>
-                    <div class="related-article-author-area">
-                        <?= $relatedArticle->getMember() ? htmlspecialchars($relatedArticle->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
-                    </div>
-                    <div class="related-article-date-area">
-                        <?= $relatedArticle->getModifyDate() ? $relatedArticle->getModifyDate()->format('Y.m.d') : $relatedArticle->getCreateDate()->format('Y.m.d'); ?>
-                    </div>
+                    <a href="/article/articledetailcontroller/index/<?= $relatedArticle->getId(); ?>">
+                        <div class="related-article-title-area">
+                            <? if (!empty($relatedArticle->getPrefix()) && ($articleBoard->getId() == 4 || $articleBoard->getId() == 5)) : ?>
+                                <span class="prefix">[<?= htmlspecialchars($relatedArticle->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
+                            <? endif; ?>
+                            <?= $relatedArticle->getTitle() ? htmlspecialchars($relatedArticle->getTitle(), ENT_QUOTES, 'UTF-8') : '제목 없음'; ?>
+                            <? $commentCount = $commentCounts[$relatedArticle->getId()] ?? 0; ?>
+                            <? if ($commentCount !== 0) : ?>
+                                <span class="articles-comment-count">
+                                    <?= '[' . $commentCount . ']' ?>
+                                </span>
+                            <? endif; ?>
+                        </div>
+                    </a>
+                    <?
+                    $rquserId = '';
+                    if ($relatedArticle->getMember()->getId() === "58") {
+                        $rquserId = 'manager';
+                    } else {
+                        $rquserId = $relatedArticle->getMember()->getId();
+                    }
+                    ?>
+                    <a href="/member/userActivityController/index/<?= $rquserId ?>" class="article-title-link">
+                        <div class="related-article-author-area">
+                            <?= $relatedArticle->getMember() ? htmlspecialchars($relatedArticle->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자 닉네임 없음'; ?>
+                        </div>
+                    </a>
+                    <a href="/article/articledetailcontroller/index/<?= $relatedArticle->getId(); ?>">
+                        <div class="related-article-date-area">
+                            <?= $relatedArticle->getModifyDate() ? $relatedArticle->getModifyDate()->format('Y.m.d') : $relatedArticle->getCreateDate()->format('Y.m.d'); ?>
+                        </div>
+                    </a>
                 </li>
-            </a>
+            </span>
         <? endforeach; ?>
     </ul>
 </div>

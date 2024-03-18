@@ -24,6 +24,12 @@ h1 {
 
 .title {
     margin-bottom: 10px;
+    display: inline-block;
+}
+
+.fa-star {
+    vertical-align: text-top;
+    margin-left: 9px;
 }
 
 .page-guide {
