@@ -77,12 +77,6 @@ $(document).ready(function () {
         }
     }
 
-
-
-
-
-
-
     /* 프로필 사진 변경 이벤트 핸들러 및 함수 */
 
     // 초기 사용자의 프로필 사진 경로 저장
@@ -145,7 +139,6 @@ $(document).ready(function () {
             }
         }
     }
-
 
 
 

@@ -91,7 +91,9 @@ class MainModel extends MY_Model
             $images = $xpath->query('//figure[contains(@class, "image")]/img');
 
             if ($images->length > 0) {
-                $firstImgSrc = $images->item(0)->getAttribute('src');
+                /** @var DOMElement $firstImg */
+                $firstImg = $images->item(0);
+                $firstImgSrc = $firstImg->getAttribute('src');
                 // 게시글의 ID를 키로 사용하여 이미지 URL을 저장합니다.
                 $firstImagePaths[$article->getId()] = $firstImgSrc;
             }

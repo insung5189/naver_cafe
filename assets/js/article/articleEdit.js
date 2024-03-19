@@ -284,6 +284,9 @@ $(document).ready(function () {
                 if (response.success) {
                     alert('게시글이 성공적으로 등록되었습니다.');
                     window.location.href = response.redirectUrl;
+                } else if (response.loginRequired) {
+                    alert(response.message);
+                    window.location.href = response.loginUrl;
                 } else if (response.invalidBoardSelection) {
                     alert('오류발생: ' + response.message);
                     const boardSelect = $('#board-select');

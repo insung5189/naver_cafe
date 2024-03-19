@@ -292,7 +292,7 @@ class ArticleDetailController extends MY_Controller
 
             if (!isset($_SESSION['user_data'])) {
                 echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-                $this->setRedirectCookie(current_url());
+                $this->setRedirectCookie('/article/articledetailcontroller/index/' . $formData['articleId']);
                 redirect('/member/logincontroller');
                 return;
             }
@@ -317,8 +317,11 @@ class ArticleDetailController extends MY_Controller
 
     public function deleteComment($commentId)
     {
+        $articleId = $this->input->post('articleId', TRUE);
         if (!isset($_SESSION['user_data'])) {
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            $this->setRedirectCookie('/article/articledetailcontroller/index/' . $articleId);
+            $loginUrl = site_url('/member/logincontroller');
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
             return;
         }
 
@@ -338,19 +341,30 @@ class ArticleDetailController extends MY_Controller
 
     public function deleteArticle()
     {
-        $articleId = $this->input->post('articleId');
+        if ($this->input->is_ajax_request()) {
+            $articleId = $this->input->post('articleId');
 
-        if (!empty($articleId)) {
-            $result = $this->ArticleDetailModel->processDeleteArticle($articleId);
-            $boardId = $this->ArticleDetailModel->getBoardIdByArticleId($articleId);
+            if (!isset($_SESSION['user_data'])) {
+                $this->setRedirectCookie('/article/articledetailcontroller/index/' . $articleId);
+                $loginUrl = site_url('/member/logincontroller');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
+                return;
+            }
 
-            if ($result) {
-                echo json_encode(['success' => true, 'articleboardId' => $boardId]);
+            if (!empty($articleId)) {
+                $result = $this->ArticleDetailModel->processDeleteArticle($articleId);
+                $boardId = $this->ArticleDetailModel->getBoardIdByArticleId($articleId);
+
+                if ($result) {
+                    echo json_encode(['success' => true, 'articleboardId' => $boardId]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => '게시글 삭제 실패']);
+                }
             } else {
-                echo json_encode(['success' => false, 'message' => '게시글 삭제 실패']);
+                echo json_encode(['success' => false, 'message' => '']);
             }
         } else {
-            echo json_encode(['success' => false, 'message' => '']);
+            show_404();
         }
     }
 }

@@ -270,55 +270,73 @@ class MyActivityController extends MY_Controller
 
     public function myActivityArticlesSoftDelete()
     {
-        if (!isset($_SESSION['user_data'])) {
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-            return;
-        }
+        if ($this->input->is_ajax_request()) {
+            if (!isset($_SESSION['user_data'])) {
+                $this->setRedirectCookie('/member/myactivitycontroller');
+                $loginUrl = site_url('/member/logincontroller');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
+                return;
+            }
 
-        $memberId = $_SESSION['user_data']['user_id'];
-        $articleIds = $this->input->post('articles');
+            $memberId = $_SESSION['user_data']['user_id'];
+            $articleIds = $this->input->post('articles');
 
-        if (!empty($articleIds) && is_array($articleIds)) {
-            $result = $this->MyActivityModel->softDeleteArticles($memberId, $articleIds);
-            echo json_encode($result);
+            if (!empty($articleIds) && is_array($articleIds)) {
+                $result = $this->MyActivityModel->softDeleteArticles($memberId, $articleIds);
+                echo json_encode($result);
+            } else {
+                echo json_encode(['success' => false, 'message' => '선택된 게시글이 없습니다.']);
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => '선택된 게시글이 없습니다.']);
+            show_404();
         }
     }
 
     public function myActivityCommentsSoftDelete()
     {
-        if (!isset($_SESSION['user_data'])) {
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-            return;
-        }
+        if ($this->input->is_ajax_request()) {
+            if (!isset($_SESSION['user_data'])) {
+                $this->setRedirectCookie('/member/myactivitycontroller');
+                $loginUrl = site_url('/member/logincontroller');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
+                return;
+            }
 
-        $memberId = $_SESSION['user_data']['user_id'];
-        $commentIds = $this->input->post('comments');
+            $memberId = $_SESSION['user_data']['user_id'];
+            $commentIds = $this->input->post('comments');
 
-        if (!empty($commentIds) && is_array($commentIds)) {
-            $result = $this->MyActivityModel->softDeleteComments($memberId, $commentIds);
-            echo json_encode($result);
+            if (!empty($commentIds) && is_array($commentIds)) {
+                $result = $this->MyActivityModel->softDeleteComments($memberId, $commentIds);
+                echo json_encode($result);
+            } else {
+                echo json_encode(['success' => false, 'message' => '선택된 댓글이 없습니다.']);
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => '선택된 댓글이 없습니다.']);
+            show_404();
         }
     }
 
     public function myActivityArticlesLikedCancel()
     {
-        if (!isset($_SESSION['user_data'])) {
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
-            return;
-        }
+        if ($this->input->is_ajax_request()) {
+            if (!isset($_SESSION['user_data'])) {
+                $this->setRedirectCookie('/member/myactivitycontroller');
+                $loginUrl = site_url('/member/logincontroller');
+                echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
+                return;
+            }
 
-        $memberId = $_SESSION['user_data']['user_id'];
-        $articleIds = $this->input->post('articles');
+            $memberId = $_SESSION['user_data']['user_id'];
+            $articleIds = $this->input->post('articles');
 
-        if (!empty($articleIds) && is_array($articleIds)) {
-            $result = $this->MyActivityModel->cancelArticleLikes($memberId, $articleIds);
-            echo json_encode($result);
+            if (!empty($articleIds) && is_array($articleIds)) {
+                $result = $this->MyActivityModel->cancelArticleLikes($memberId, $articleIds);
+                echo json_encode($result);
+            } else {
+                echo json_encode(['success' => false, 'message' => '좋아요를 취소할 글을 선택해주세요.']);
+            }
         } else {
-            echo json_encode(['success' => false, 'message' => '좋아요를 취소할 글을 선택해주세요.']);
+            show_404();
         }
     }
 }

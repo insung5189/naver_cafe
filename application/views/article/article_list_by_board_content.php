@@ -205,7 +205,15 @@
 
                         <td scope="col" class="td-author">
                             <div class="author-name">
-                                <a href="/해당 작성자 활동내역" class="author-name-link">
+                                <?
+                                $rquserId = '';
+                                if ($article->getMember()->getId() === "58") {
+                                    $rquserId = 'manager';
+                                } else {
+                                    $rquserId = $article->getMember()->getId();
+                                }
+                                ?>
+                                <a href="/member/userActivityController/index/<?= $rquserId ?>" class="author-name-link">
                                     <span class="article-author-row"><?= $article->getMember() ? htmlspecialchars($article->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : '작성자미상'; ?></span>
                                 </a>
                             </div>

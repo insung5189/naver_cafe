@@ -244,4 +244,31 @@ class MypageModel extends MY_Model
         }
         return true;
     }
+
+    public function updateProfileImage($formData)
+    {
+        $errors = ['errors' => []];
+
+        if (!empty($errors['errors'])) {
+            return ['success' => false, 'errors' => $errors['errors']];
+        }
+
+        try {
+            $member = $this->em->getRepository('Models\Entities\Member')->find($formData['memberId']);
+            if (!$member) {
+                return ['success' => false, 'errors' => ['UserNotFound' => '사용자를 찾을 수 없습니다.']];
+            }
+
+            // 회원 정보 업데이트
+            $member->setNickName($formData['nickName']);
+
+            $this->em->persist($member);
+            $this->em->flush();
+
+            return ['success' => true, 'errors' => []];
+        } catch (\Exception $e) {
+            log_message('error', '회원정보 변경 실패: ' . $e->getMessage());
+            return ['success' => false, 'errors' => ['Exception' => '회원정보 변경 중 오류가 발생했습니다.']];
+        }
+    }
 }

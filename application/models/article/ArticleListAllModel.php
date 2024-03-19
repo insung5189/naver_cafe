@@ -137,8 +137,8 @@ class ArticleListAllModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
-            ->where('a.isActive = 1');
-
+            ->where('a.isActive = 1')
+            ->andWhere('a.depth = 0');
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {
             // 요소별 검색 (예: 제목, 작성자 등)

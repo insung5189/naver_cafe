@@ -36,9 +36,9 @@ $GLOBALS['pageResources'] = [
 
                     <div data-member-img-src="<?= $fileUrl . $profileImagePath; ?>"></div>
                     <form id="prfl-img-form" action="">
-                        <label class="prfl-img-edit" for="member-prfl-img-edit">
+                        <!-- <label class="prfl-img-edit" for="member-prfl-img-edit">
                             <input type="file" name="member-prfl-img" id="member-prfl-img-edit" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" hidden>
-                        </label>
+                        </label> -->
                     </form>
                 </span>
                 <span class="nick-and-info">
@@ -62,7 +62,7 @@ $GLOBALS['pageResources'] = [
                         <span>방문</span> <em class="count-num"><?= $member->getVisit(); ?></em> <span class="ml-17">작성글</span> <em class="count-num"><?= $articleCount; ?></em>
                     </div>
                     <div id="member-prfl-file-info"></div>
-                    <a href="javascript:void(0);" id="member-prfl-file-remove">이미지 삭제</a>
+                    <!-- <a href="javascript:void(0);" id="member-prfl-file-remove">이미지 삭제</a> -->
                 </span>
 
             </div>

@@ -22,14 +22,14 @@ $GLOBALS['pageResources'] = [
             <? endif; ?>
         </div>
         <div class="article-top-right-btn">
-            <a href="/이전글_링크" class="prev-article-btn">
+            <!-- <a href="/이전글_링크" class="prev-article-btn">
                 <i class="fa-solid fa-angle-up"></i>
                 이전글
             </a>
             <a href="/다음글_링크" class="next-article-btn">
                 <i class="fa-solid fa-angle-down"></i>
                 다음글
-            </a>
+            </a> -->
             <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="list-article-btn">
                 목록
             </a>

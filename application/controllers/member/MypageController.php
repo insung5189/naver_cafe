@@ -29,6 +29,27 @@ class MypageController extends MY_Controller
         }
     }
 
+    public function index2()
+    {
+        $userData = $this->session->userdata('user_data');
+        $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
+        if ($memberId) {
+            $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
+            $articleCount = count($this->MypageModel->getArticlesByMemberId($memberId));
+
+            $page_view_data = [
+                'title' => '마이페이지',
+                'member' => $member,
+                'articleCount' => $articleCount,
+            ];
+            $this->layout->view('member/my_page_copy', $page_view_data);
+        } else {
+            $page_view_data['title'] = '오류 발생';
+            $this->layout->view('errors/error_page', $page_view_data);
+        }
+    }
+
     public function processUpdateProfile()
     {
         $formData = [
@@ -84,5 +105,68 @@ class MypageController extends MY_Controller
     {
         $page_view_data['title'] = '비밀번호 변경완료';
         $this->layout->view('member/modify_password_done', $page_view_data);
+    }
+
+    public function processUpdateProfileImage()
+    {
+
+        $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'memberImgs' . DIRECTORY_SEPARATOR;
+        $config['allowed_types'] = 'jpg|jpeg|png|bmp';
+        $config['max_size'] = '51200';
+        $config['encrypt_name'] = TRUE; // 파일명 암호화
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('member-prfl-img')) {
+            echo json_encode(['success' => false, 'errors' => [$this->upload->display_errors()]]);
+        } else {
+            $uploadData = $this->upload->data();
+            $filePath = $uploadData['file_name'];
+
+            // DB에 파일 경로 저장 로직 (예: 회원 정보 업데이트)
+            $result = $this->MypageModel->updateProfileImage($this->input->post('memberId'), $filePath);
+
+            if ($result) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'errors' => ['프로필 이미지 업데이트 실패']]);
+            }
+        }
+    }
+
+
+    // 기존 회원가입 과정의 로직에서 가져옴
+    private function processProfileImage(&$formData, &$errorData)
+    {
+        $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'memberImgs' . DIRECTORY_SEPARATOR;
+        $config['allowed_types'] = 'jpg|jpeg|png|bmp';
+        $config['max_size'] = '51200';
+
+        $this->load->library('upload', $config);
+
+        if (isset($_FILES['file']) && $_FILES['file']['name'] != '') {
+            if ($this->upload->do_upload('file')) {
+                $uploadData = $this->upload->data();
+                $originalName = trim(pathinfo($uploadData['client_name'], PATHINFO_FILENAME));
+                $fileExt = $uploadData['file_ext'];
+                $uploadDate = date('Ymd');
+                $uuid = uniqid();
+                $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}"; // 새 파일명 생성 => {원본파일명}-{파일등록일}-{uuid}.{확장자}
+
+                rename($uploadData['full_path'], $uploadData['file_path'] . $newFileName);
+
+                $formData['memberFilePath'] = $config['upload_path'] . $newFileName;
+                $formData['memberFileName'] = $newFileName;
+            } else {
+                $errorData['errors']['file'] = $this->upload->display_errors('', '');
+            }
+        } else if (!isset($_FILES['file']) || $_FILES['file']['name'] == '') {
+            $defaultImagePath = $config['upload_path'] . 'defaultImg' . DIRECTORY_SEPARATOR . 'default.png';
+            $defaultImageName = 'default.png';
+            $formData['memberFilePath'] = $defaultImagePath;
+            $formData['memberFileName'] = $defaultImageName;
+        } else {
+            $errorData['errors']['file'] = $this->upload->display_errors('', '');
+        }
     }
 }

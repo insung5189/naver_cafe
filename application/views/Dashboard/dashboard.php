@@ -23,7 +23,7 @@ $GLOBALS['pageResources'] = [
                 </a>
             </h3>
             <span class="more-btn">
-                <a class="more-link" href="더보기 링크">
+                <a class="more-link" href="/article/articlelistallcontroller">
                     <span>더보기</span>
                     <span><i class="fa-solid fa-chevron-right fa-xs"></i></span>
                 </a>

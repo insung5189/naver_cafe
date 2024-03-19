@@ -17,11 +17,6 @@ $(document).ready(function () {
         $(window).off('beforeunload');
     });
 
-    // 초기 페이지 로드
-    fetchArticles({
-        page: 1,
-        articlesPerPage: 15
-    });
 
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {

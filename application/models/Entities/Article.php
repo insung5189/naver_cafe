@@ -248,7 +248,7 @@ class Article
     {
         $this->createDate = new DateTime();
         $this->isActive = true;
-        $this->hit = 1;
+        $this->hit = 0;
     }
 
     /**

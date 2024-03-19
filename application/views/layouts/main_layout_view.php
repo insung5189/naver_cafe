@@ -50,14 +50,14 @@
         </header>
 
         <main>
-            <div class="search-box-main">
-                <form action="/article/articlelistallcontroller/search" method="GET" class="search-form-main">
+            <!-- <div class="search-box-main">
+                <form action="/article/articlelistallcontroller" method="GET" class="search-form-main">
                     <div class="search-keyword-main">
                         <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-search-input-main" required>
                         <button type="submit" class="search-btn-main">검색</button>
                     </div>
                 </form>
-            </div>
+            </div> -->
             <div class="content-wrap">
                 <div class="menu-bar">
 
@@ -106,7 +106,7 @@
                                     <ul>
                                         <li class="member-count-invited">
                                             <strong>카페멤버수</strong>
-                                            <a href="/가입한_회원목록">
+                                            <a href="#">
                                                 <img src="https://ssl.pstatic.net/static/cafe/cafe_pc/svg/ico_member.svg" alt="멤버수">
                                                 <em class="cafe-mem-numb"><?= htmlspecialchars($totalMemberCount, ENT_QUOTES, 'UTF-8'); ?></em>
                                             </a>

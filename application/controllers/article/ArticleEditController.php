@@ -61,6 +61,14 @@ class ArticleEditController extends MY_Controller
             return;
         }
 
+        $currentUserId = $this->session->userdata('user_data')['user_id'];
+
+        if ($article->getMember()->getId() != $currentUserId) {
+            $this->session->set_flashdata('error_message', '접근 권한이 없습니다.');
+            redirect('/');
+            return;
+        }
+
         $boards = $this->em->getRepository('Models\Entities\ArticleBoard')->findBy(['isDeleted' => 0], ['createDate' => 'DESC']);
 
         $boards = array_filter($boards, function ($board) {
@@ -102,9 +110,9 @@ class ArticleEditController extends MY_Controller
         }
 
         if (!$this->session->userdata('user_data')) {
-            $this->setRedirectCookie(current_url());
-            redirect('/member/logincontroller');
-            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.']);
+            $this->setRedirectCookie('/article/articleeditcontroller');
+            $loginUrl = site_url('/member/logincontroller');
+            echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
             return;
         }
 
@@ -203,10 +211,10 @@ class ArticleEditController extends MY_Controller
                 ]);
             } else {
                 // 모델의 실패처리결과 표시
-                echo json_encode(['success' => false, 'message' => $e->getMessage(), 'errors' => $result['errors']]);
+                echo json_encode(['success' => false, 'message' => $result['message'], 'errors' => $result['errors']]);
             }
         } catch (\Exception $e) {
-            // 모델에서 예외가 발생한 경우
+            // 컨트롤러에서 예외가 발생한 경우
             echo json_encode(['success' => false, 'message' => $e->getMessage(), 'errors' => ['message' => $e->getMessage()]]);
             return;
         }

@@ -1,4 +1,22 @@
 $(document).ready(function () {
+
+    // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
+    var formModified = false;
+
+    $(document).on('change', 'form input', function () {
+        formModified = true;
+    });
+
+    $(window).on('beforeunload', function () {
+        if (formModified) {
+            return '변경사항이 저장되지 않을 수 있습니다.';
+        }
+    });
+
+    $('form').submit(function () {
+        $(window).off('beforeunload');
+    });
+
     // 카페정보/나의활동 탭 토글
     function switchTab(activeTabClass, inactiveTabClass, showSelector, hideSelector) {
         $(inactiveTabClass + ' button').css({
@@ -58,49 +76,39 @@ $(document).ready(function () {
     //     fetchArticleBoard(1, boardId);
     // });
 
-    function fetchArticleBoard(page, boardId) {
-        var loadBoardMethod = '';
-
-        switch (boardId) {
-            case 1:
-                loadBoardMethod = 'loadFreeBoard';
-                break;
-            case 2:
-                loadBoardMethod = 'loadSuggestedBoard';
-                break;
-            case 3:
-                loadBoardMethod = 'loadWordVomitBoard';
-                break;
-            case 4:
-                loadBoardMethod = 'loadKnowledgeSharingBoard';
-                break;
-            case 5:
-                loadBoardMethod = 'loadQnaBoard';
-                break;
-            default:
-                console.log('잘못된 요청입니다.');
-                return;
-        }
+    // AJAX 요청 함수
+    function fetchArticles(data) {
         $.ajax({
-            url: '/article/ArticleListController/' + loadBoardMethod,
+            url: '/article/ArticleListAllController/fetchArticles',
             type: 'GET',
-            data:
-            {
-                page: page,
-                boardId: boardId
-            },
+            data: data,
             dataType: 'json',
             success: function (response) {
-                // 성공 시 페이지 콘텐츠 업데이트
-                $('#dynamicContent').html(response.html);
+                $('#articleContent').html(response.html);
+                updateDateVisibility();
             },
             error: function (xhr, status, error) {
-                // 요청에 실패했을 때 실행되는 함수
-                console.error("Error: " + error);
-                console.log(error);
-                alert("게시판 컨텐츠를 불러오는데 실패했습니다.");
+                console.error("Error: ", error);
             }
         });
     }
+
+    // 검색 조건 수집 함수
+    function collectSearchConditions(page) {
+        return {
+            page: page,
+            articlesPerPage: $('#articlesPerPage').val(),
+            keyword: $('#searchForm input[name="keyword"]').val(),
+            element: $('#searchForm select[name="element"]').val(),
+            period: $('#searchForm select[name="period"]').val(),
+            startDate: $('#start-date').val(),
+            endDate: $('#end-date').val()
+        };
+    }
+    // 검색 폼 제출 처리
+    $(document).on('submit', '.search-form-main', function (e) {
+        e.preventDefault();
+        fetchArticles(collectSearchConditions(1)); // 검색 실행 시 1페이지로 리셋
+    });
 
 });

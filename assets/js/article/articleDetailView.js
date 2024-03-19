@@ -114,6 +114,9 @@ $(document).ready(function () {
                     if (response.success) {
                         alert('글이 성공적으로 삭제되었습니다.');
                         window.location.href = '/article/articlelistcontroller/index/' + response.articleboardId;
+                    } else if (response.loginRequired) {
+                        alert(response.message);
+                        window.location.href = response.loginUrl;
                     } else {
                         alert('글 삭제에 실패했습니다. 다시 시도해주세요.');
                     }
@@ -503,18 +506,23 @@ $(document).ready(function () {
     // 댓글/답글 삭제
     $(document).on('click', '[data-delete-comment-id]', function () {
         var deleteCommentId = $(this).data('delete-comment-id');
+        var articleId = $('#article').data('article-id');
         if (confirm('댓글을 삭제하시겠습니까?')) {
             $.ajax({
                 url: '/article/articledetailcontroller/deleteComment/' + deleteCommentId,
                 type: 'POST',
                 data: {
-                    deleteCommentId: deleteCommentId
+                    deleteCommentId: deleteCommentId,
+                    articleId: articleId
                 },
                 success: function (response) {
                     var data = JSON.parse(response);
                     if (data.success) {
                         alert(data.message);
                         $('#comment-' + deleteCommentId).remove();
+                    } else if (data.loginRequired) {
+                        alert(data.message);
+                        window.location.href = data.loginUrl;
                     } else {
                         alert(data.message);
                     }

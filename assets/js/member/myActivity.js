@@ -1,22 +1,5 @@
 $(document).ready(function () {
 
-    // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
-    var formModified = false;
-
-    $(document).on('change', 'input[type="checkbox"]', function () {
-        formModified = true;
-    });
-
-    $(window).on('beforeunload', function () {
-        if (formModified) {
-            return '변경사항이 저장되지 않을 수 있습니다.';
-        }
-    });
-
-    $('form').submit(function () {
-        $(window).off('beforeunload');
-    });
-
     fetchPageData(1);
 
     if (location.hash === "#mycomments") {
@@ -122,10 +105,12 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: { articles: selectedArticles },
                     success: function (response) {
-                        // response.message를 사용하여 서버로부터 받은 메시지를 사용자에게 보여줌
-                        alert(response.message);
                         if (response.success) {
+                            alert(response.message);
                             location.reload();
+                        } else if (response.loginRequired) {
+                            alert(response.message);
+                            window.location.href = response.loginUrl;
                         }
                     },
                     error: function () {
@@ -153,9 +138,12 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: { comments: selectedComments },
                     success: function (response) {
-                        alert(response.message);
                         if (response.success) {
+                            alert(response.message);
                             location.reload();
+                        } else if (response.loginRequired) {
+                            alert(response.message);
+                            window.location.href = response.loginUrl;
                         }
                     },
                     error: function () {
@@ -183,9 +171,12 @@ $(document).ready(function () {
                     dataType: 'json',
                     data: { articles: selectedArticles },
                     success: function (response) {
-                        alert(response.message);
                         if (response.success) {
+                            alert(response.message);
                             location.reload();
+                        } else if (response.loginRequired) {
+                            alert(response.message);
+                            window.location.href = response.loginUrl;
                         }
                     },
                     error: function () {
