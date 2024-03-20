@@ -1,5 +1,15 @@
 $(document).ready(function () {
 
+    $(window).on('popstate', function (e) {
+        if (e.originalEvent.state) {
+            fetchArticles(e.originalEvent.state);
+        } else {
+            // 초기 상태나 상태가 없는 경우의 처리
+            fetchArticles(collectSearchConditions(1));
+        }
+    });
+    console.log("현재 히스토리 상태 : ", history.state);
+
     $(document).on('click', '#boardBookMarkBtn', function () {
         var boardId = $(this).data('article-board');
         var memberId = $(this).data('member-id');
@@ -34,12 +44,6 @@ $(document).ready(function () {
     });
 
     var boardId = $('#articleContent').data('article-board-id');
-    // 초기 페이지 로드
-    fetchArticles({
-        page: 1,
-        articlesPerPage: 15,
-        boardId: boardId
-    });
 
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {
@@ -79,6 +83,8 @@ $(document).ready(function () {
             success: function (response) {
                 $('#articleContent').html(response.html);
                 updateDateVisibility();
+                const queryString = $.param(data);
+                window.history.pushState(data, "", "?" + queryString);
             },
             error: function (xhr, status, error) {
                 console.error("Error: ", error);

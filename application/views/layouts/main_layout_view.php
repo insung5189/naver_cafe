@@ -50,14 +50,14 @@
         </header>
 
         <main>
-            <!-- <div class="search-box-main">
+            <div class="search-box-main">
                 <form action="/article/articlelistallcontroller" method="GET" class="search-form-main">
                     <div class="search-keyword-main">
                         <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-search-input-main" required>
                         <button type="submit" class="search-btn-main">검색</button>
                     </div>
                 </form>
-            </div> -->
+            </div>
             <div class="content-wrap">
                 <div class="menu-bar">
 

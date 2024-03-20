@@ -25,15 +25,18 @@ $GLOBALS['pageResources'] = [
             <?
             $commentImageName = $comment->getCommentFileName() ? htmlspecialchars($comment->getCommentFileName(), ENT_QUOTES, 'UTF-8') : '';
             $styleAttributes = '';
+            $isNewCommentBadge = false;
 
             if ($comment->getDepth() > 0) {
-                $styleAttributes .= 'padding-left: 50px;';
+                $paddingVal = $comment->getDepth() * 30;
+                $styleAttributes .= 'padding-left:' . $paddingVal . 'px;"';
             }
 
+            // 댓글이 새로 작성되면 1분동안 빨간색 뱃지를 표시함.
             $interval = date_diff($comment->getCreateDate(), new DateTime());
 
             if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
-                $styleAttributes .= ' background-color: #ffffe0;';
+                $isNewCommentBadge = true;
             }
 
             $styleAttribute = !empty($styleAttributes) ? 'style="' . $styleAttributes . '"' : '';
@@ -59,6 +62,11 @@ $GLOBALS['pageResources'] = [
                                     작성자
                                 </div>
                             <? endif; ?>
+                            <? if ($isNewCommentBadge) : ?>
+                                <div class="is-new-comment">
+                                    N
+                                </div>
+                            <? endif; ?>
                         </div>
                     </div>
                     <? if (isset($user) && is_array($user) && isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()) : ?>
@@ -81,11 +89,11 @@ $GLOBALS['pageResources'] = [
                 </div>
 
                 <div class="comment-content-area">
-                    <p>
+                    <div>
                         <span id="comment-content-<?= $comment->getId() ?>" class="comment-content-box">
                             <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
                         </span>
-                    </p>
+                    </div>
                     <!-- 댓글 컨텐츠 이미지 -->
 
                     <div id="comment-content-img-<?= $comment->getId(); ?>">

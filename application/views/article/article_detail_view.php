@@ -30,7 +30,7 @@ $GLOBALS['pageResources'] = [
                 <i class="fa-solid fa-angle-down"></i>
                 다음글
             </a> -->
-            <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="list-article-btn">
+            <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="list-article-btn history-back">
                 목록
             </a>
         </div>
@@ -234,17 +234,18 @@ $GLOBALS['pageResources'] = [
                                 <?
                                 $commentImageName = $comment->getCommentFileName() ? htmlspecialchars($comment->getCommentFileName(), ENT_QUOTES, 'UTF-8') : '';
                                 $styleAttributes = '';
+                                $isNewCommentBadge = false;
 
                                 if ($comment->getDepth() > 0) {
                                     $paddingVal = $comment->getDepth() * 30;
                                     $styleAttributes .= 'padding-left:' . $paddingVal . 'px;"';
                                 }
 
-                                // 댓글이 새로 작성되면 1분동안 배경색을 노란색으로 표시함.
+                                // 댓글이 새로 작성되면 1분동안 빨간색 뱃지를 표시함.
                                 $interval = date_diff($comment->getCreateDate(), new DateTime());
 
                                 if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
-                                    $styleAttributes .= ' background-color: #ffffe0;';
+                                    $isNewCommentBadge = true;
                                 }
 
                                 $styleAttribute = !empty($styleAttributes) ? 'style="' . $styleAttributes . '"' : '';
@@ -277,6 +278,11 @@ $GLOBALS['pageResources'] = [
                                                             작성자
                                                         </div>
                                                     <? endif; ?>
+                                                    <? if ($isNewCommentBadge) : ?>
+                                                        <div class="is-new-comment">
+                                                            N
+                                                        </div>
+                                                    <? endif; ?>
                                                 </div>
                                             </a>
                                         </div>
@@ -300,11 +306,11 @@ $GLOBALS['pageResources'] = [
                                     </div>
 
                                     <div class="comment-content-area">
-                                        <p>
+                                        <div>
                                             <span id="comment-content-<?= $comment->getId() ?>" class="comment-content-box">
                                                 <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                             </span>
-                                        </p>
+                                        </div>
                                         <!-- 댓글 컨텐츠 이미지 -->
 
                                         <div id="comment-content-img-<?= $comment->getId(); ?>">
@@ -377,6 +383,8 @@ $GLOBALS['pageResources'] = [
                                             <form action="/article/articledetailcontroller/editComment/<?= $comment->getId(); ?>" method="POST" enctype="multipart/form-data" data-update-comment-id="<?= $comment->getId(); ?>">
                                                 <input type="hidden" name="articleId" value="<?= $article->getId(); ?>">
                                                 <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
+                                                <input type="hidden" name="existingImagePath" value="<?= $comment->getCommentFilePath() ?>" class="existing-image-path">
+                                                <input type="hidden" name="existingImageName" value="<?= $comment->getCommentFileName() ?>" class="existing-image-name">
 
                                                 <div class="comment-writer">
 
@@ -498,7 +506,9 @@ $GLOBALS['pageResources'] = [
                 </div>
 
                 <div class="article-bottom-btn-right-box">
-                    <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="article-base-btn">목록</a>
+                    <a href="javascript:void(0);" class="article-base-btn history-back">
+                        목록
+                    </a>
                     <a href="javascript:void(0);" id="scrollTopBtn" class="article-base-btn">
                         <i class="fa-solid fa-caret-up"></i>
                         TOP

@@ -1,9 +1,14 @@
 $(document).ready(function () {
+    
+    window.addEventListener('popstate', function (event) {
+        console.log('현재 상태:', event.state);
+        // event.state를 사용해 페이지 콘텐츠를 업데이트하는 로직을 구현합니다.
+    });
 
     // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
     var formModified = false;
 
-    $(document).on('change', 'form input', function () {
+    $(document).on('change', '.custom-search-input-main', function () {
         formModified = true;
     });
 

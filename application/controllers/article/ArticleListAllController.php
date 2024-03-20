@@ -160,7 +160,16 @@ class ArticleListAllController extends MY_Controller
                 echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
             }
         } else {
-            show_404();
+            $this->loadErrorView();
         }
+    }
+
+    public function loadErrorView()
+    {
+        $page_view_data = [
+            'title' => '잘못된 접근입니다.',
+            'message' => '정상적인 경로로 접근해주세요.',
+        ];
+        $this->layout->view('errors/error_page', $page_view_data);
     }
 }

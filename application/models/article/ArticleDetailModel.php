@@ -278,7 +278,7 @@ class ArticleDetailModel extends MY_Model
 
             // 저장된 답글의 고유 식별 정보를 기반으로 답글 조회
             // 댓글, 답글 저장 후 해당 위치로 스크롤 하기 위해서 해시값을 추가하려는데 동시에 여러 댓글이 등록될 수 있으니 고유값으로 구분하기 위함.
-            $newReply = $this->em->getRepository(Models\Entities\Comment::class)->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
+            $newReply = $this->em->getRepository('Models\Entities\Comment')->findOneBy(['uniqueIdentifier' => $uniqueIdentifier]);
 
             return ['success' => true, 'commentId' => $newReply->getId()];
         } catch (\Exception $e) {
@@ -333,42 +333,50 @@ class ArticleDetailModel extends MY_Model
             return ['success' => false, 'errors' => $errorData['errors']];
         }
 
-        $queryBuilder = $this->em->createQueryBuilder();
-        $query = $queryBuilder->update('Models\Entities\Comment', 'c')
-            ->set('c.content', ':content')
-            ->set('c.modifyDate', ':modifyDate')
-            ->where('c.id = :commentId')
-            ->andWhere('c.member = :memberId')
-            ->andWhere('c.article = :articleId')
-            ->setParameter('content', $formData['content'])
-            ->setParameter('modifyDate', new \DateTime())
-            ->setParameter('commentId', $commentId)
-            ->setParameter('memberId', $formData['memberId'])
-            ->setParameter('articleId', $formData['articleId']);
-
-        if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
-            $query->set('c.commentFilePath', ':commentFilePath')
-                ->set('c.commentFileName', ':commentFileName')
-                ->setParameter('commentFilePath', $formData['commentFilePath'])
-                ->setParameter('commentFileName', $formData['commentFileName']);
-        } else {
-            $query->set('c.commentFilePath', ':commentFilePath')
-                ->set('c.commentFileName', ':commentFileName')
-                ->setParameter('commentFilePath', NULL)
-                ->setParameter('commentFileName', NULL);
-        }
-
         try {
+            $queryBuilder = $this->em->createQueryBuilder();
+            $query = $queryBuilder->update('Models\Entities\Comment', 'c')
+                ->set('c.content', ':content')
+                ->set('c.modifyDate', ':modifyDate')
+                ->where('c.id = :commentId')
+                ->andWhere('c.member = :memberId')
+                ->andWhere('c.article = :articleId')
+                ->setParameter('content', $formData['content'])
+                ->setParameter('modifyDate', new \DateTime())
+                ->setParameter('commentId', $commentId)
+                ->setParameter('memberId', $formData['memberId'])
+                ->setParameter('articleId', $formData['articleId']);
+
+            if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
+                $query->set('c.commentFilePath', ':commentFilePath')
+                    ->set('c.commentFileName', ':commentFileName')
+                    ->setParameter('commentFilePath', $formData['commentFilePath'])
+                    ->setParameter('commentFileName', $formData['commentFileName']);
+            } else {
+                // 새로운 이미지 정보가 없는 경우, 기존 이미지 정보를 확인
+                $existingImagePath = isset($formData['existingImagePath']) ? $formData['existingImagePath'] : NULL;
+                $existingImageName = isset($formData['existingImageName']) ? $formData['existingImageName'] : NULL;
+
+                // 기존 이미지 정보가 있으면 사용, 없으면 NULL로 설정
+                $query->set('c.commentFilePath', ':commentFilePath')
+                    ->set('c.commentFileName', ':commentFileName')
+                    ->setParameter('commentFilePath', $existingImagePath)
+                    ->setParameter('commentFileName', $existingImageName);
+            }
+
             $result = $query->getQuery()->execute();
 
             if ($result > 0) {
-                $response = ['success' => true, 'message' => '댓글이 수정되었습니다.'];
+                $updatedComment = $this->em->find('Models\Entities\Comment', $commentId);
 
-                if (!empty($formData['commentFilePath']) && !empty($formData['commentFileName'])) {
-                    $response['commentFilePath'] = $formData['commentFilePath'];
-                    $response['commentFileName'] = $formData['commentFileName'];
-                }
-                $response['content'] = $formData['content'];
+                // 성공 응답에 댓글의 최신 내용과 이미지 파일 이름 포함
+                $response = [
+                    'success' => true,
+                    'message' => '댓글이 수정되었습니다.',
+                    'content' => $updatedComment->getContent() ?? '',
+                    'commentFileName' => $updatedComment->getCommentFileName() ?? ''
+                ];
+
                 return $response;
             } else {
                 return ['success' => false, 'message' => '댓글 수정 권한이 없거나 댓글이 존재하지 않습니다.'];

@@ -1,10 +1,38 @@
 $(document).ready(function () {
 
+    console.log("현재 히스토리 상태 : ", history.state);
+
+    $('.history-back').on('click', function (e) {
+        e.preventDefault(); 
+
+        if (history.state) {
+            // 저장된 상태가 있는 경우, 이전 상태로 돌아갑니다.
+            var state = history.state;
+            var boardId = state.boardId;
+            // 목록 페이지 URL 구성 (예: 게시판 ID를 기반으로 URL 설정)
+            var listUrl = '/article/articlelistcontroller/index/' + boardId + '?page=' + state.page;
+
+            window.location.href = listUrl;
+        } else {
+            // 기본 목록 페이지로 이동
+            window.location.href = '/article/articlealllistcontroller';
+        }
+    });
+
     $('.comment-content-box').each(function () {
         var trimmedText = $(this).text().trimStart();
 
         $(this).text(trimmedText);
     });
+
+    function trimCommentContent() {
+        $('.comment-content-box').each(function () {
+            var trimmedText = $(this).text().trimStart();
+            $(this).text(trimmedText);
+        });
+    }
+
+    trimCommentContent();
 
     // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
     var formModified = false;
@@ -228,9 +256,11 @@ $(document).ready(function () {
                     if (sortOption == 'ASC') {
                         $('#sort-asc-btn').removeClass('sort-btn-deactivate').addClass('sort-btn-active');
                         $('#sort-desc-btn').removeClass('sort-btn-active').addClass('sort-btn-deactivate');
+                        trimCommentContent();
                     } else { // DESC
                         $('#sort-desc-btn').removeClass('sort-btn-deactivate').addClass('sort-btn-active');
                         $('#sort-asc-btn').removeClass('sort-btn-active').addClass('sort-btn-deactivate');
+                        trimCommentContent();
                     }
                 } else {
                     alert(response.error || '댓글 목록을 불러오는 데 실패했습니다.');
@@ -482,6 +512,9 @@ $(document).ready(function () {
         // 첨부파일 input 선택자 수정
         var fileInput = $('[data-comment-image-edit-id="' + commentEditId + '"]');
         fileInput.replaceWith(fileInput.val('').clone(true));
+        // 기존 댓글의 이미지파일 정보를 담고 있는 input태그의 값을 초기화
+        $('form[data-update-comment-id="' + commentEditId + '"] .existing-image-path').val('');
+        $('form[data-update-comment-id="' + commentEditId + '"] .existing-image-name').val('');
         $('.img-preview-wrap').remove(); // 미리보기 이미지 삭제
     });
 

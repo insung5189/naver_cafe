@@ -22,7 +22,7 @@ class ArticleDetailController extends MY_Controller
 
         $article = $this->ArticleDetailModel->getArticleById($articleId);
         if (!$article) {
-            show_404();
+            $this->loadErrorView();
             return;
         }
 
@@ -82,11 +82,11 @@ class ArticleDetailController extends MY_Controller
         $this->layout->view('article/article_detail_view', $page_view_data);
     }
 
-    private function loadErrorView()
+    public function loadErrorView()
     {
         $page_view_data = [
-            'title' => '오류 발생',
-            'message' => '접근 권한이 없습니다.',
+            'title' => '잘못된 접근입니다.',
+            'message' => '게시글이 존재하지 않거나 삭제되었습니다.',
         ];
         $this->layout->view('errors/error_page', $page_view_data);
     }
@@ -137,7 +137,7 @@ class ArticleDetailController extends MY_Controller
                 echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
             }
         } else {
-            show_404();
+            $this->loadErrorView();
         }
     }
 
@@ -287,6 +287,8 @@ class ArticleDetailController extends MY_Controller
                 'content' => $this->input->post('commentEditContent', TRUE),
                 'articleId' => $this->input->post('articleId', TRUE),
                 'memberId' => $this->input->post('memberId', TRUE),
+                'existingImagePath' => $this->input->post('existingImagePath', TRUE),
+                'existingImageName' => $this->input->post('existingImageName', TRUE),
                 'file' => $_FILES['commentImage'] ?? null
             ];
 
@@ -311,7 +313,7 @@ class ArticleDetailController extends MY_Controller
                 echo json_encode(['success' => false, 'message' => $result['message']]);
             }
         } else {
-            show_404();
+            $this->loadErrorView();
         }
     }
 
@@ -364,7 +366,7 @@ class ArticleDetailController extends MY_Controller
                 echo json_encode(['success' => false, 'message' => '']);
             }
         } else {
-            show_404();
+            $this->loadErrorView();
         }
     }
 }

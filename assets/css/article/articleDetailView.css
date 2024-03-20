@@ -430,6 +430,21 @@ h1 {
     border-radius: 30px;
 }
 
+.is-new-comment {
+    width: 13px;
+    height: 14px;
+    font-size: 9px;
+    text-align: center;
+    line-height: 15px;
+    vertical-align: middle;
+    font-weight: 700;
+    color: #ffffff;
+    border: 1px solid red;
+    border-radius: 50%;
+    background: red;
+    margin-left: 5px;
+}
+
 .comment-content-area {
     margin-left: 66px;
     margin-top: -20px;

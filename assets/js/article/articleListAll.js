@@ -1,5 +1,34 @@
 $(document).ready(function () {
 
+    $(window).on('popstate', function (e) {
+        if (e.originalEvent.state) {
+            fetchArticles(e.originalEvent.state);
+        } else {
+            // 초기 상태나 상태가 없는 경우의 처리
+            fetchArticles(collectSearchConditions(1));
+        }
+    });
+    console.log("현재 히스토리 상태 : ", history.state);
+
+    $(document).on('click', '.article-title-link', function (e) {
+        e.preventDefault();
+
+        var state = {
+            page: $('#currentPage').val(),
+            boardId: $('#articleContent').data('article-board-id'),
+        };
+
+        var articleUrl = $(this).attr('href'); // 게시글 상세보기 URL
+
+        // 특정 키와 함께 현재 상태를 저장
+        history.pushState(state, '', articleUrl);
+
+        console.log("현재 히스토리 상태 : ", history.state);
+
+        // 게시글 상세보기 페이지로 이동
+        window.location.href = articleUrl;
+    });
+
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {
             $('.select-date').show(100);
@@ -37,6 +66,11 @@ $(document).ready(function () {
             success: function (response) {
                 $('#articleContent').html(response.html);
                 updateDateVisibility();
+                // window.history.pushState(data, "", "?page=" + data.page + "&articlesPerPage=" + data.articlesPerPage + "&keyword=" + encodeURIComponent(data.keyword));
+                const queryString = $.param(data);
+
+                // 현재 상태와 함께 history에 저장
+                window.history.pushState(data, "", "?" + queryString);
             },
             error: function (xhr, status, error) {
                 console.error("Error: ", error);
