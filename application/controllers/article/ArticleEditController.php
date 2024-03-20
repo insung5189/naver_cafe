@@ -105,7 +105,7 @@ class ArticleEditController extends MY_Controller
     public function createArticle()
     {
         if (!$this->input->is_ajax_request()) {
-            echo json_encode(['success' => false, 'errors' => ['잘못된 요청입니다.']]);
+            redirect('/');
             return;
         }
 

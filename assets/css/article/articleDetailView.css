@@ -441,6 +441,7 @@ h1 {
     word-break: break-all;
     word-wrap: break-word;
     vertical-align: top;
+    white-space: pre-line;
 }
 
 .comment-content-area img {

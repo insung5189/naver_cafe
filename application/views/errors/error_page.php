@@ -7,9 +7,9 @@ $GLOBALS['pageResources'] = [
 <section class="section-container">
     <div class="container">
         <h1 class="title">
-            <i class="fa-solid fa-triangle-exclamation"></i> 잘못된 접근입니다.
+            <i class="fa-solid fa-triangle-exclamation"></i> <?= $title ?>
         </h1>
-        <p class="page-guide">죄송합니다. 이 페이지에 접근할 권한이 없습니다.</p>
+        <p class="page-guide"><?= $message ?></p>
         <div class="btn-box flex-end">
             <a href="/member/logincontroller" class="btn btn-primary">로그인 페이지로 이동</a>
             <a href="/" class="btn btn-secondary">메인 페이지로 이동</a>

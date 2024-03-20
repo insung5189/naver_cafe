@@ -16,16 +16,8 @@ $GLOBALS['pageResources'] = [
                 <span class="required-field">*</span><span class="page-guide"> 는 필수 입력사항 입니다.</span>
             </p>
         </div>
-        <? if (!empty($errors)) : ?>
-            <div class="error-messages">
-                <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
-                <? foreach ($errors as $field => $error) : ?>
-                    <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
-                <? endforeach; ?>
-            </div>
-        <? endif; ?>
 
-        <form method="POST" action="/member/SignupController/processMemberSignup" enctype="multipart/form-data" class="sign-up-form">
+        <form method="POST" action="javascript:void(0);" enctype="multipart/form-data" class="sign-up-form">
             <div class="form-box">
                 <!-- 카페 설명 -->
                 <div class="field-box">
@@ -111,7 +103,7 @@ $GLOBALS['pageResources'] = [
                     </div>
 
                     <div class="input-box">
-                        <span class="description pl-5 caption"> * 영문, 숫자, 특수문자를 포함한 8자 이상</span>
+                        <span class="description pl-5 caption"> * 영문, 숫자, 특수문자를 포함한 8자 이상 (사용할 수 없는 문자: 공백, #, %, &, =, ', ", ?, ~, \, /)</span>
                     </div>
 
                 </div>

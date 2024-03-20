@@ -236,9 +236,11 @@ $GLOBALS['pageResources'] = [
                                 $styleAttributes = '';
 
                                 if ($comment->getDepth() > 0) {
-                                    $styleAttributes .= 'padding-left: 50px;';
+                                    $paddingVal = $comment->getDepth() * 30;
+                                    $styleAttributes .= 'padding-left:' . $paddingVal . 'px;"';
                                 }
 
+                                // 댓글이 새로 작성되면 1분동안 배경색을 노란색으로 표시함.
                                 $interval = date_diff($comment->getCreateDate(), new DateTime());
 
                                 if ($interval->i < 1 && $interval->h == 0 && $interval->days == 0) {
@@ -255,8 +257,15 @@ $GLOBALS['pageResources'] = [
                                             $commmentsProfileImageName = $comment->getMember() && $comment->getMember()->getMemberFileName() !== 'default.png'
                                                 ? $comment->getMember()->getMemberFileName()
                                                 : 'defaultImg/default.png';
+
+                                            $rqCommentuserId = '';
+                                            if ($comment->getMember()->getId() === "58") {
+                                                $rqCommentuserId = 'manager';
+                                            } else {
+                                                $rqCommentuserId = $comment->getMember()->getId();
+                                            }
                                             ?>
-                                            <a class="user-activity-link" href="/member/userActivityController/index/<?= $rquserId ?>">
+                                            <a class="user-activity-link" href="/member/userActivityController/index/<?= $rqCommentuserId ?>">
                                                 <img class="prfl-img-thumb" src="<?= $memberPrflFileUrl . $commmentsProfileImageName; ?>" alt="<?= htmlspecialchars($comment->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') . '프로필이미지'; ?>">
 
                                                 <div class="comment-content-each">

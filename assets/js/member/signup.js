@@ -37,12 +37,11 @@ $(document).ready(function () {
     $('#nickName').on('keyup', resetNicknameValidation);
     $('#password1, #password2').on('keyup', validatePasswordAndMatch);
     $('#phone').on('keyup', validatePhone);
-    $('#firstName').on('keyup', validateFirstName);
-    $('#lastName').on('keyup', validateLastName);
+    // $('#firstName').on('keyup', validateFirstName);
+    // $('#lastName').on('keyup', validateLastName);
     $('#gender').change(validateGenderSelect);
     $('#birth').on('keyup', validateBirthDate);
     $('#birth').on('blur', validateBirthDate);
-    $('form').on('submit', submitFormValidation);
 
     function duplicateEmail() {
         const userName = $('#userName').val();
@@ -74,6 +73,7 @@ $(document).ready(function () {
         if (response.isDuplicate) {
             alert('이미 사용 중인 이메일입니다.');
             $('#email-duplication-check-message').text('❌ 이미 사용 중인 이메일입니다.').css('color', 'red');
+            $('#isUserNameChecked').val('false');
             return false;
         } else {
             if (confirm('사용 가능한 이메일입니다.\n확인 버튼을 누르시면 해당 이메일을 사용하며 \n수정이 불가능합니다.')) {
@@ -117,6 +117,7 @@ $(document).ready(function () {
         if (response.isDuplicate) {
             alert('이미 사용 중인 닉네임입니다.');
             $('#nickname-duplication-check-message').text('❌ 이미 사용 중인 닉네임입니다.').css('color', 'red');
+            $('#isNickNameChecked').val('false');
             return false;
         } else {
             if (confirm('사용 가능한 닉네임입니다.\n확인 버튼을 누르시면 해당 닉네임을 사용하며 \n수정이 불가능합니다.')) {
@@ -185,6 +186,7 @@ $(document).ready(function () {
             $('#duplicateEmail').val('중복확인');
             $('#userName').attr('readonly', false);
             $('#duplicateEmail').attr('disabled', false);
+            $('#email-duplication-check-message').text('');
             alert('⚠ 중복확인 후 입력값 수정을 시도하셨습니다.\n아이디 중복확인을 다시 시도해주세요.');
         }
     }
@@ -195,22 +197,30 @@ $(document).ready(function () {
         const email = emailInput.val();
         const emailValidationMessage = $('#email-duplication-check-message');
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        const emailDuplicationCheck = $('#isUserNameChecked');
 
         const leadingOrTrailingWhitespacePattern = /^\s+|\s+$/;
 
-        if (leadingOrTrailingWhitespacePattern.test(email)) {
-            emailValidationMessage.text('❌ 이메일 주소의 시작이나 끝에 공백을 포함할 수 없습니다.');
-            emailValidationMessage.css('color', 'red');
-            return false;
-        } else if (!emailPattern.test(email)) {
-            emailValidationMessage.text('❌ 올바른 이메일 형식이 아닙니다.');
-            emailValidationMessage.css('color', 'red');
-            return false;
-        } else {
-            emailValidationMessage.text('✔️ 올바른 이메일 형식입니다.');
-            emailValidationMessage.css('color', 'green');
+        if (emailDuplicationCheck.val() !== 'true') {
+            if (leadingOrTrailingWhitespacePattern.test(email)) {
+                emailValidationMessage.text('❌ 이메일 주소의 시작이나 끝에 공백을 포함할 수 없습니다.');
+                emailValidationMessage.css('color', 'red');
+                return false;
+            } else if (!emailPattern.test(email)) {
+                emailValidationMessage.text('❌ 올바른 이메일 형식이 아닙니다.');
+                emailValidationMessage.css('color', 'red');
+                return false;
+            } else {
+                emailValidationMessage.text('✔️ 올바른 이메일 형식입니다.');
+                emailValidationMessage.css('color', 'green');
+                return true;
+            }
+        } else if (emailDuplicationCheck.val() === 'true') {
+            emailValidationMessage.text('');
+            $('#email-duplication-check-message').text('✔️ 사용 가능한 이메일입니다.').css('color', 'green');
             return true;
         }
+
     }
 
     // 비밀번호 유효성 검사 및 일치 확인
@@ -222,32 +232,37 @@ $(document).ready(function () {
     // 비밀번호 유효성 검사 keyup
     function validatePassword() {
         const password = $('#password1').val();
+        const email = $('#userName').val(); // 이메일 값 가져오기
         const validationMessage = $('#password-validation-message');
 
         // 조건 검사
         const hasLetter = /[a-zA-Z]/.test(password);
         const hasDigit = /\d/.test(password);
-        const hasSpecialChar = /[!@#$%^&*()\-_=+\[\]{}|;:'",<.>/?]/.test(password);
+        // 허용하는 특수문자 중 시스템 예약문자와 URL에 안전하지 않은 문자, 공백, ~, \, /를 제외
+        const hasSpecialChar = /[!@#$%^*()\-_+=\[\]{}|;:'",.<>?]/.test(password);
         const isLongEnough = password.length >= 8;
-        const hasInvalidChar = /[^a-zA-Z0-9!@#$%^&*()\-_=+\[\]{}|;:'",<.>/?]/.test(password);
+        // 허용하지 않는 문자 포함: 시스템 예약문자, URL에 안전하지 않은 문자, 공백, ~, \, /
+        const hasInvalidChar = /[\'"&?=#%\s~\\/]/.test(password);
+        const isNotEmail = password !== email;
 
-        // 상세한 조건 불충족 메시지 초기화
         let message = '';
 
-        // 조건별 메시지 추가
-        message += hasLetter ? '✔️ 영문, ' : '❌ 영문, ';
-        message += hasDigit ? '✔️ 숫자, ' : '❌ 숫자, ';
-        message += hasSpecialChar ? '✔️ 특수문자, ' : '❌ 특수문자, ';
-        message += isLongEnough ? '✔️ 8자 이상 ' : '❌ 8자 이상 ';
-        message += !hasInvalidChar ? '' : '<br>❌ 유효하지 않은 문자 포함(공백, 허용되지 않는 특수문자 등)';
-
-        message = message.trim().replace(/, $/, '');
-        validationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar ? 'green' : 'red');
-        if (hasLetter && hasDigit && hasSpecialChar && hasSpecialChar && isLongEnough && !hasInvalidChar) {
-            return true;
+        if (!isNotEmail) {
+            message = '❌ 비밀번호는 이메일과 같을 수 없습니다.';
+        } else if (hasInvalidChar) {
+            message = '❌ 유효하지 않은 문자 포함(공백, #, %, &, =, \', ", ? 등)';
         } else {
-            return false;
+            // 나머지 조건별 메시지 추가
+            message += hasLetter ? '✔️ 영문, ' : '❌ 영문, ';
+            message += hasDigit ? '✔️ 숫자, ' : '❌ 숫자, ';
+            message += hasSpecialChar ? '✔️ 특수문자, ' : '❌ 특수문자, ';
+            message += isLongEnough ? '✔️ 8자 이상 ' : '❌ 8자 이상 ';
         }
+
+        // 메시지 표시
+        message = message.trim().replace(/, $/, '');
+        validationMessage.html(message).css('color', hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar && isNotEmail ? 'green' : 'red');
+        return hasLetter && hasDigit && hasSpecialChar && isLongEnough && !hasInvalidChar && isNotEmail;
     }
 
     // 비밀번호 일치 확인 keyup
@@ -307,6 +322,7 @@ $(document).ready(function () {
             $('#duplicateNickname').val('중복확인');
             $('#nickName').attr('readonly', false);
             $('#duplicateNickname').attr('disabled', false);
+            $('#nickname-duplication-check-message').text('');
             alert('⚠ 중복확인 후 입력값 수정을 시도하셨습니다.\n닉네임 중복확인을 다시 시도해주세요.');
         }
     }
@@ -315,33 +331,41 @@ $(document).ready(function () {
     function validateNickname() {
         const nicknameInput = $('#nickName').val();
         const nicknameValidationMessage = $('#nickname-duplication-check-message');
+        const nickNameDuplicationCheck = $('#isNickNameChecked');
 
-        // 길이 검사
-        const lengthCheck = nicknameInput.length >= 2 && nicknameInput.length <= 10;
-        const hasKoreanOrEnglish = /[가-힣a-zA-Z]+/.test(nicknameInput);
-        const hasInvalidCharacter = /[^가-힣a-zA-Z0-9]/.test(nicknameInput);
+        if (nickNameDuplicationCheck.val() !== 'true') {
+            // 길이 검사
+            const lengthCheck = nicknameInput.length >= 2 && nicknameInput.length <= 10;
+            const hasKoreanOrEnglish = /[가-힣a-zA-Z]+/.test(nicknameInput);
+            const hasInvalidCharacter = /[^가-힣a-zA-Z0-9]/.test(nicknameInput);
 
-        // 상세 메시지 생성
-        let message = '';
+            // 상세 메시지 생성
+            let message = '';
 
-        // 길이 조건
-        message += lengthCheck ? '✔️ 2~10글자(필수)<br>' : '❌ 2~10글자(필수)<br>';
+            // 길이 조건
+            message += lengthCheck ? '✔️ 2~10글자(필수)<br>' : '❌ 2~10글자(필수)<br>';
 
-        // 문자 유형 조건
-        if (hasKoreanOrEnglish && !hasInvalidCharacter) {
-            message += '✔️ 한글 또는 영문 대소문자(필수)<br>✔️ 숫자(선택)<br>';
-        } else {
-            if (!hasKoreanOrEnglish) {
-                message += '❌ 한글 또는 영문 대소문자(필수)<br>✔️ 숫자(선택)<br>';
+            // 문자 유형 조건
+            if (hasKoreanOrEnglish && !hasInvalidCharacter) {
+                message += '✔️ 한글 또는 영문 대소문자(필수)<br>';
+            } else {
+                if (!hasKoreanOrEnglish) {
+                    message = '❌ 한글 또는 영문 대소문자(필수)';
+                }
+                if (hasInvalidCharacter) {
+                    message = '❌ 유효하지 않은 문자 포함<br>';
+                }
             }
-            if (hasInvalidCharacter) {
-                message = '❌ 유효하지 않은 문자 포함<br>';
-            }
+
+            // 메시지 출력
+            nicknameValidationMessage.html(message).css('color', lengthCheck && hasKoreanOrEnglish && !hasInvalidCharacter ? 'green' : 'red');
+            return lengthCheck && hasKoreanOrEnglish && !hasInvalidCharacter;
+        } else if (nickNameDuplicationCheck.val() === 'true') {
+            nicknameValidationMessage.html('');
+            $('#nickname-duplication-check-message').text('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
+            return true;
         }
 
-        // 메시지 출력
-        nicknameValidationMessage.html(message).css('color', lengthCheck && hasKoreanOrEnglish && !hasInvalidCharacter ? 'green' : 'red');
-        return lengthCheck && hasKoreanOrEnglish && !hasInvalidCharacter;
     }
 
     // 이름 유효성 검사
@@ -383,8 +407,8 @@ $(document).ready(function () {
 
     // 성별 유효성검사
     function validateGenderSelect() {
-        const genderSelect = $('#gender'); // jQuery 객체로 select 요소 자체를 참조
-        const selectedValue = genderSelect.val(); // 선택된 값
+        const genderSelect = $('#gender');
+        const selectedValue = genderSelect.val();
         const genderValidationMessage = $('#gender-validation-message');
 
         if (selectedValue === null || selectedValue === '') {
@@ -465,6 +489,7 @@ $(document).ready(function () {
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitFormValidation(event) {
+        var isValid = true;
         if (!validateEmail()
             || !checkPasswordMatch()
             || !validatePassword()
@@ -480,47 +505,59 @@ $(document).ready(function () {
             if (!validateEmail()) {
                 scrollError('userName');
                 alert('올바른 이메일 형식이 아닙니다.');
+                isValid = false;
             }
             if (!validatePassword()) {
                 scrollError('password1');
                 alert('비밀번호는 영문, 숫자, 특수문자를 포함한 \n8자 이상이어야 합니다.');
+                isValid = false;
             }
             if (!checkPasswordMatch()) {
                 scrollError('password2');
                 alert('비밀번호가 일치하지 않습니다.');
+                isValid = false;
             }
             if (!validatePhone()) {
                 scrollError('phone');
                 alert('전화번호 형식에 맞추어서\n입력해주시기 바랍니다.');
+                isValid = false;
             }
             if (!validateNickname()) {
                 scrollError('nickName');
                 alert('닉네임 형식에 맞추어서\n입력해주시기 바랍니다.');
+                isValid = false;
             }
             if (!validateFirstName()) {
                 scrollError('firstName');
                 alert('이름(First name / Given name) 입력이 잘못되었습니다.');
+            isValid = false;
             }
             if (!validateLastName()) {
                 scrollError('lastName');
                 alert('성(Last name / Family name) 입력이 잘못되었습니다.');
+            isValid = false;
             }
             if (!validateGenderSelect()) {
                 scrollError('gender');
+                isValid = false;
             }
             if (!validateBirthDate()) {
                 scrollError('birth');
                 alert('생년월일을 다시 확인해주세요.');
+                isValid = false;
             }
             if ($('#isUserNameChecked').val() !== 'true') {
                 scrollError('userName');
                 alert('이메일 중복 확인을 해주세요.');
+                isValid = false;
             }
             if ($('#isNickNameChecked').val() !== 'true') {
                 scrollError('nickName');
                 alert('닉네임 중복 확인을 해주세요.');
+                isValid = false;
             }
         }
+        return isValid;
     }
 
     // 앵커
@@ -533,4 +570,31 @@ $(document).ready(function () {
             element.focus();
         }
     }
+
+    $(document).on('submit', '.sign-up-form', function (event) {
+        if (submitFormValidation(event)) {
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: '/member/signupcontroller/processMemberSignup',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        window.location.href = '/';
+                    } else {
+                        alert('오류발생: ' + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    alert('회원 등록 중 문제가 발생했습니다. 다시 시도해주세요.' + error);
+                }
+            });
+        }
+    });
 });

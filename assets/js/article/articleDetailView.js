@@ -1,5 +1,11 @@
 $(document).ready(function () {
 
+    $('.comment-content-box').each(function () {
+        var trimmedText = $(this).text().trimStart();
+
+        $(this).text(trimmedText);
+    });
+
     // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
     var formModified = false;
 

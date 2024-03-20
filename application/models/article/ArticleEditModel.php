@@ -27,6 +27,7 @@ class ArticleEditModel extends MY_Model
         }
     }
 
+    // 직속 자식글이 여러 개 있는 글 수정시도시 오류발생. 조건을 다르게 해야함.
     public function getParentArticleById($articleId)
     {
         $queryBuilder = $this->em->createQueryBuilder();
