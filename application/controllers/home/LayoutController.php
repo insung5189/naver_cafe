@@ -10,8 +10,9 @@ class LayoutController extends MY_Controller
     {
     }
 
-    public function cafeInfo() {
-        $page_view_data['title'] = '카페 소개';
-        $this->layout->view('cafeinfo/cafeinfo', $page_view_data);
+    public function mainSerch()
+    {
+
     }
+
 }

@@ -44,7 +44,9 @@ class ArticleListAllModel extends MY_Model
             ->setFirstResult(($currentPage - 1) * $articlesPerPage)
             ->setMaxResults($articlesPerPage);
 
-        return $queryBuilder->getQuery()->getResult();
+        $articles = $queryBuilder->getQuery()->getResult();
+
+        return $articles;
     }
 
     public function getCommentCountForArticles($articleIds)
@@ -116,7 +118,6 @@ class ArticleListAllModel extends MY_Model
 
         $results = $queryBuilder->getQuery()->getResult();
 
-        // 결과를 부모 게시글 ID별로 정리
         foreach ($results as $article) {
             $orderGroup = $article->getOrderGroup();
             if (!isset($childArticles[$orderGroup])) {
@@ -125,7 +126,35 @@ class ArticleListAllModel extends MY_Model
             $childArticles[$orderGroup][] = $article;
         }
 
-        return $childArticles;
+        // 재귀적으로 배열을 재정렬하는 로직
+        $sortedArticles = [];
+        foreach ($childArticles as $orderGroup => $articles) {
+            if (is_array($articles)) {
+                // 단일 게시글 처리
+                $sortedArticles[$orderGroup] = $articles;
+            } else {
+                // 배열 형태의 게시글 처리
+                
+                $sortedArticles[$orderGroup] = $this->sortArticlesTree($articles, $sortedArticles);
+            }
+        }
+
+        return $sortedArticles;
+    }
+
+    private function sortArticlesTree($articles, &$sortedArticles)
+    {
+        foreach ($articles as $article) {
+            // 현재 글을 1차원 배열에 추가
+            $sortedArticles[] = $article;
+
+            // 현재 글의 자식 글이 있다면 재귀적으로 처리
+            if ($article->getParent()->getId() !== null) {
+                $this->sortArticlesTree($article->getId(), $sortedArticles);
+            }
+        }
+
+        return $articles; // 재정렬된 배열을 반환해야 합니다.
     }
 
     public function searchArticles($keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
@@ -198,7 +227,29 @@ class ArticleListAllModel extends MY_Model
                 }
                 $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
             }
+        } else if (!empty($keyword) && $element === 'all') {
+            $subQuery = $this->em->createQueryBuilder()
+                ->select('IDENTITY(c.article)')
+                ->from('Models\Entities\Comment', 'c')
+                ->where('c.content LIKE :keyword')
+                ->andWhere('c.isActive = 1')
+                ->getDQL();
+
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('a.title', ':keyword'),
+                    $queryBuilder->expr()->like('a.content', ':keyword'),
+                    $queryBuilder->expr()->like('a.prefix', ':keyword'),
+                    $queryBuilder->expr()->like('ab.boardName', ':keyword'),
+                    $queryBuilder->expr()->like('m.nickName', ':keyword'),
+                    $queryBuilder->expr()->in('a.id', $subQuery)
+                )
+            )
+                ->leftJoin('a.articleBoard', 'ab')
+                ->leftJoin('a.member', 'm', 'WITH', 'm.isActive = 1 AND m.blacklist = 0')
+                ->setParameter('keyword', '%' . $keyword . '%');
         }
+
 
         // 기간 필터링 로직
         if ($period !== 'all') {
@@ -333,6 +384,27 @@ class ArticleListAllModel extends MY_Model
                 }
                 $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
             }
+        } else if (!empty($keyword) && $element === 'all') {
+            $subQuery = $this->em->createQueryBuilder()
+                ->select('IDENTITY(c.article)')
+                ->from('Models\Entities\Comment', 'c')
+                ->where('c.content LIKE :keyword')
+                ->andWhere('c.isActive = 1')
+                ->getDQL();
+
+            $queryBuilder->andWhere(
+                $queryBuilder->expr()->orX(
+                    $queryBuilder->expr()->like('a.title', ':keyword'),
+                    $queryBuilder->expr()->like('a.content', ':keyword'),
+                    $queryBuilder->expr()->like('a.prefix', ':keyword'),
+                    $queryBuilder->expr()->like('ab.boardName', ':keyword'),
+                    $queryBuilder->expr()->like('m.nickName', ':keyword'),
+                    $queryBuilder->expr()->in('a.id', $subQuery)
+                )
+            )
+                ->leftJoin('a.articleBoard', 'ab')
+                ->leftJoin('a.member', 'm', 'WITH', 'm.isActive = 1 AND m.blacklist = 0')
+                ->setParameter('keyword', '%' . $keyword . '%');
         }
 
         // 기간 필터링 로직

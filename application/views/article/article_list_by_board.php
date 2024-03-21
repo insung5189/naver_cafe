@@ -195,7 +195,7 @@ $GLOBALS['pageResources'] = [
                                     <div class="title-list">
                                         <div class="inner-title-name">
 
-                                            <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
+                                            <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" data-article-id="<?= $article->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
                                                 <span class="left-bottom-edge"><?= $leftBottomEdge ?></span>
                                                 <span class="parent-article-is-deleted">
                                                     <?= $parentArticleDeleted ?>
@@ -254,6 +254,7 @@ $GLOBALS['pageResources'] = [
                     <a href="/article/articleEditController" target="_blank" class="article-write-btn">글쓰기</a>
                 </div>
             </div>
+            <input type="hidden" id="currentPage" name="currentPage" value="<?= $currentPage ?? 1; ?>">
             <div class="pagination-box">
                 <div class="pagination">
                     <?
@@ -263,6 +264,7 @@ $GLOBALS['pageResources'] = [
                     }
                     ?>
                 </div>
+
             </div>
             <div class="search-box">
                 <form id="searchForm" class="search-form">
@@ -284,7 +286,7 @@ $GLOBALS['pageResources'] = [
                             <input type="date" name="endDate" class="date-input" placeholder="종료 날짜" id="end-date" value="<?= htmlspecialchars($endDate); ?>">
                         </div>
 
-                        <select name="element" class="custom-input">
+                        <select name="element" class="custom-input" id="element">
                             <option value="article-comment" <?= ($element === 'article-comment') ? 'selected' : ''; ?>>게시글 + 댓글</option>
                             <option value="title" <?= ($element === 'title') ? 'selected' : ''; ?>>제목</option>
                             <option value="author" <?= ($element === 'author') ? 'selected' : ''; ?>>글작성자</option>
@@ -295,7 +297,7 @@ $GLOBALS['pageResources'] = [
                     </div>
 
                     <div class="search-keyword">
-                        <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
+                        <input type="text" name="keyword" id="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
                         <button type="submit" class="search-btn">검색</button>
                     </div>
 

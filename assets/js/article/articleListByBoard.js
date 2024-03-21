@@ -1,15 +1,5 @@
 $(document).ready(function () {
 
-    $(window).on('popstate', function (e) {
-        if (e.originalEvent.state) {
-            fetchArticles(e.originalEvent.state);
-        } else {
-            // 초기 상태나 상태가 없는 경우의 처리
-            fetchArticles(collectSearchConditions(1));
-        }
-    });
-    console.log("현재 히스토리 상태 : ", history.state);
-
     $(document).on('click', '#boardBookMarkBtn', function () {
         var boardId = $(this).data('article-board');
         var memberId = $(this).data('member-id');
@@ -83,8 +73,9 @@ $(document).ready(function () {
             success: function (response) {
                 $('#articleContent').html(response.html);
                 updateDateVisibility();
-                const queryString = $.param(data);
-                window.history.pushState(data, "", "?" + queryString);
+                saveCurrentState();
+                window.history.pushState(data, '', window.location.pathname + '?' + $.param(data));
+                console.log("ajax요청 후 업데이트 된 히스토리 상태(게시판별 보기) : ", history.state);
             },
             error: function (xhr, status, error) {
                 console.error("Error: ", error);
@@ -98,9 +89,9 @@ $(document).ready(function () {
             page: page,
             boardId: boardId,
             articlesPerPage: $('#articlesPerPage').val(),
-            keyword: $('#searchForm input[name="keyword"]').val(),
-            element: $('#searchForm select[name="element"]').val(),
-            period: $('#searchForm select[name="period"]').val(),
+            keyword: $('#keyword').val(),
+            element: $('#element').val(),
+            period: $('#select-period').val(),
             startDate: $('#start-date').val(),
             endDate: $('#end-date').val()
         };
@@ -116,4 +107,33 @@ $(document).ready(function () {
 
     // 페이지 로드 시 .select-date 요소의 초기 상태 업데이트
     updateDateVisibility();
+
+    // 뒤로가기의 대상이 해당 페이지라면 게시글 상세페이지로 접근하기 전 세팅되었던 페이지의 세팅을 출력함.
+    window.onpopstate = function (event) {
+        if (event.state) {
+            fetchArticles(event.state);
+        }
+    };
+
+    console.log("초기 페이지의 히스토리 상태 : ", history.state);
+
+    // 게시글 목록으로 돌아가기 기능을 위해 로컬스토리지에 히스토리 상태를 저장 후 활용
+    function saveCurrentState() {
+        var state = {
+            page: $('#currentPage').val(),
+            boardId: boardId,
+            articlesPerPage: $('#articlesPerPage').val(),
+            keyword: $('#keyword').val(),
+            element: $('#element').val(),
+            period: $('#select-period').val(),
+            startDate: $('#start-date').val(),
+            endDate: $('#end-date').val()
+        };
+        localStorage.setItem('articleListState', JSON.stringify(state));
+    }
+
+    $(document).on('click', '.article-title-link', function () {
+        saveCurrentState();
+    });
+
 });

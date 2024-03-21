@@ -51,8 +51,14 @@
 
         <main>
             <div class="search-box-main">
-                <form action="/article/articlelistallcontroller" method="GET" class="search-form-main">
+                <form action="/mainController/mainSearch" method="GET" class="search-form-main">
                     <div class="search-keyword-main">
+                        <input type="hidden" name="period" value="all">
+                        <input type="hidden" name="element" value="all">
+                        <input type="hidden" name="page" value="1">
+                        <input type="hidden" name="articlesPerPage" value="15">
+                        <input type="hidden" name="startDate" value="">
+                        <input type="hidden" name="endDate" value="">
                         <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-search-input-main" required>
                         <button type="submit" class="search-btn-main">검색</button>
                     </div>
@@ -96,7 +102,7 @@
                                                 <span>2024.01.08. 개설</span>
                                             </div>
                                             <div class="cafe-description-link">
-                                                <a href="/home/layoutcontroller/cafeInfo">카페소개</a>
+                                                <a href="/maincontroller/cafeInfo">카페소개</a>
                                             </div>
                                         </li>
                                     </ul>

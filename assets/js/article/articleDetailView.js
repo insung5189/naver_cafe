@@ -1,24 +1,5 @@
 $(document).ready(function () {
 
-    console.log("현재 히스토리 상태 : ", history.state);
-
-    $('.history-back').on('click', function (e) {
-        e.preventDefault(); 
-
-        if (history.state) {
-            // 저장된 상태가 있는 경우, 이전 상태로 돌아갑니다.
-            var state = history.state;
-            var boardId = state.boardId;
-            // 목록 페이지 URL 구성 (예: 게시판 ID를 기반으로 URL 설정)
-            var listUrl = '/article/articlelistcontroller/index/' + boardId + '?page=' + state.page;
-
-            window.location.href = listUrl;
-        } else {
-            // 기본 목록 페이지로 이동
-            window.location.href = '/article/articlealllistcontroller';
-        }
-    });
-
     $('.comment-content-box').each(function () {
         var trimmedText = $(this).text().trimStart();
 
@@ -580,6 +561,33 @@ $(document).ready(function () {
     $(document).on('click', '.article-edit-btn', function () {
         var articleId = $(this).data('article-id');
         window.location.href = '/article/articleeditcontroller/editForm/' + articleId;
+    });
+
+
+
+    console.log("현재 히스토리 상태 : ", history.state);
+
+
+    // 로컬스토리지에 저장된 게시글 목록 세팅을 articleListState 라는 key값으로 불러옴(페이징, 검색여부, 게시글 출력수 등)
+    var savedState = localStorage.getItem('articleListState');
+    var state = JSON.parse(savedState);
+
+    $(document).on('click', '.show-list', function () {
+        var boardId = $(this).data('article-board-id');
+        if (state) {
+            if (state.boardId === 'all') {
+                window.location.href = '/article/articlelistallcontroller?page=' + state.page + '&articlesPerPage=' + state.articlesPerPage + '&keyword=' + state.keyword + '&element=' + state.element + '&period=' + state.period + '&startDate=' + state.startDate + '&endDate=' + state.endDate;
+            } else if (state.boardId === 'mainsearch') {
+                window.location.href = '/maincontroller/mainsearch?page=' + state.page + '&articlesPerPage=' + state.articlesPerPage + '&keyword=' + state.keyword + '&element=' + state.element + '&period=' + state.period + '&startDate=' + state.startDate + '&endDate=' + state.endDate;
+            } else if (state.boardId === 'main') {
+                window.location.href = '/article/articlelistcontroller/index/' + boardId;
+            } else if (state.boardId === 1 || state.boardId === 2 || state.boardId === 3 || state.boardId === 4 || state.boardId === 5) {
+                window.location.href = '/article/articlelistcontroller/index/' + state.boardId + '?page=' + state.page + '&articlesPerPage=' + state.articlesPerPage + '&keyword=' + state.keyword + '&element=' + state.element + '&period=' + state.period + '&startDate=' + state.startDate + '&endDate=' + state.endDate;
+            }
+        } else if (!state) {
+            window.location.href = '/article/articlelistcontroller/index/' + boardId;
+        }
+
     });
 
 });

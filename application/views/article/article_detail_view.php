@@ -30,7 +30,7 @@ $GLOBALS['pageResources'] = [
                 <i class="fa-solid fa-angle-down"></i>
                 다음글
             </a> -->
-            <a href="/article/articlelistcontroller/index/<?= $article->getArticleBoard()->getId() ?>" class="list-article-btn history-back">
+            <a href="javascript:void(0);" class="list-article-btn show-list" data-article-board-id="<?= $article->getArticleBoard()->getId(); ?>">
                 목록
             </a>
         </div>
@@ -506,7 +506,7 @@ $GLOBALS['pageResources'] = [
                 </div>
 
                 <div class="article-bottom-btn-right-box">
-                    <a href="javascript:void(0);" class="article-base-btn history-back">
+                    <a href="javascript:void(0);" class="article-base-btn show-list" data-article-board-id="<?= $article->getArticleBoard()->getId(); ?>">
                         목록
                     </a>
                     <a href="javascript:void(0);" id="scrollTopBtn" class="article-base-btn">

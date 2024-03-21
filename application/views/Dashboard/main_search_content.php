@@ -1,13 +1,4 @@
-<?
-$GLOBALS['pageResources'] = [
-    'css' => ['/assets/css/article/articleListAll.css'],
-    'js' => ['/assets/js/article/articleListAll.js']
-];
-?>
-
-<!-- article_list_all.php -->
-<section class="section-container" id="articleContent">
-    <!-- article_list_all_content.php -->
+    <!-- main_search_content.php -->
     <div class="container">
         <h1 class="title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h1>
 
@@ -24,73 +15,14 @@ $GLOBALS['pageResources'] = [
         <? if (!empty($keyword) && !empty($period) || !empty($startDate) || !empty($endDate)) : ?>
             <div class="search-summary">
                 <?php
-                $searchSummary = '검색 조건: ';
-                $conditions = [];
+                echo '검색 조건: <br>';
 
                 if (!empty($keyword)) {
-                    $conditions[] = "'{$keyword}' 키워드로 ";
+                    echo htmlspecialchars("'{$keyword}' 키워드로 ", ENT_QUOTES, 'UTF-8') . '<br>';
                 }
 
-                if (!empty($element) && $element !== 'all') {
-                    switch ($element) {
-                        case 'title':
-                            $elementText = '제목';
-                            break;
-                        case 'author':
-                            $elementText = '글작성자';
-                            break;
-                        case 'comment':
-                            $elementText = '댓글내용';
-                            break;
-                        case 'commentAuthor':
-                            $elementText = '댓글작성자';
-                            break;
-                        case 'article-comment':
-                            $elementText = '게시글 + 댓글';
-                            break;
-                        default:
-                            $elementText = $element;
-                    }
-                    $conditions[] = "검색 범위: {$elementText}";
-                } else if (!empty($element) && $element === 'all') {
-                    $conditions[] = "검색 범위: {'전체'}";
-                }
-
-                if (!empty($period) && $period !== 'all') {
-                    switch ($period) {
-                        case '1day':
-                            $periodText = '최근 1일';
-                            break;
-                        case '1week':
-                            $periodText = '최근 1주';
-                            break;
-                        case '1month':
-                            $periodText = '최근 1개월';
-                            break;
-                        case '6months':
-                            $periodText = '최근 6개월';
-                            break;
-                        case '1year':
-                            $periodText = '최근 1년';
-                            break;
-                        case 'custom':
-                            $today = new DateTime();
-                            if (empty($startDate) && empty($endDate)) {
-                                $periodText = "{$today->format('Y-m-d')}(사용자 지정 기간이 지정되지 않았습니다.)";
-                            } else {
-                                $startDateText = !empty($startDate) ? $startDate : '오늘';
-                                $endDateText = !empty($endDate) ? $endDate : '오늘';
-                                $periodText = "{$startDateText}부터 {$endDateText}까지";
-                            }
-                            break;
-                        default:
-                            $periodText = $period;
-                    }
-                    $conditions[] = "기간: {$periodText}";
-                }
-
-                $searchSummary .= implode(', ', $conditions);
-                echo $searchSummary;
+                echo "검색 범위: 전체(게시글 제목, 내용, 게시판, 댓글내용, 작성자, 말머리)" . '<br>';
+                echo "기간: 전체";
                 ?>
             </div>
         <? endif; ?>
@@ -160,7 +92,7 @@ $GLOBALS['pageResources'] = [
 
                                 <div class="title-list">
                                     <div class="inner-title-name">
-                                        <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
+                                        <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" data-article-id="<?= $article->getId(); ?>" class="article-title-link">
                                             <? if (!empty($article->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>
@@ -241,7 +173,7 @@ $GLOBALS['pageResources'] = [
 
                                         <div class="title-list">
                                             <div class="inner-title-name">
-                                                <a href="/article/articledetailcontroller/index/<?= $childArticle->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
+                                                <a href="/article/articledetailcontroller/index/<?= $childArticle->getId(); ?>" data-article-id="<?= $childArticle->getId(); ?>" class="article-title-link" <?= $styleAttributes ?>>
                                                     <span class="left-bottom-edge"><?= $leftBottomEdge ?></span>
                                                     <span class="parent-article-is-deleted">
                                                         <?= $parentArticleDeleted ?>
@@ -316,6 +248,7 @@ $GLOBALS['pageResources'] = [
                     </div>
 
                     <select name="element" class="custom-input" id="element">
+                        <option value="all" <?= ($element === 'all') ? 'selected' : ''; ?>>전체</option>
                         <option value="article-comment" <?= ($element === 'article-comment') ? 'selected' : ''; ?>>게시글 + 댓글</option>
                         <option value="title" <?= ($element === 'title') ? 'selected' : ''; ?>>제목</option>
                         <option value="author" <?= ($element === 'author') ? 'selected' : ''; ?>>글작성자</option>
@@ -333,4 +266,3 @@ $GLOBALS['pageResources'] = [
             </form>
         </div>
     </div>
-</section>

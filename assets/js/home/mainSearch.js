@@ -32,7 +32,7 @@ $(document).ready(function () {
     // AJAX 요청 함수
     function fetchArticles(data) {
         $.ajax({
-            url: '/article/ArticleListAllController/fetchArticles',
+            url: '/MainController/fetchArticles',
             type: 'GET',
             data: data,
             dataType: 'json',
@@ -98,7 +98,7 @@ $(document).ready(function () {
     function saveCurrentState() {
         var state = {
             page: $('#currentPage').val(),
-            boardId: 'all',
+            boardId: 'mainsearch',
             articlesPerPage: $('#articlesPerPage').val(),
             keyword: $('#keyword').val(),
             element: $('#element').val(),

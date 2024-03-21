@@ -60,7 +60,7 @@ class ArticleDetailModel extends MY_Model
 
         // treeOption이 활성화되어 있으면, 트리 구조로 재정렬
         if ($treeOption === 'enabled') {
-            $comments = $this->reorderCommentsAsTree($comments, $sortOption);
+            $comments = $this->reorderCommentsAsTree($comments);
         } else if ($treeOption === 'disabled') {
             $comments = $queryBuilder->getQuery()->getResult();
         }
@@ -68,7 +68,7 @@ class ArticleDetailModel extends MY_Model
         return $comments;
     }
 
-    private function reorderCommentsAsTree($comments, $sortOption)
+    private function reorderCommentsAsTree($comments)
     {
         // 댓글을 parentId를 키로 하는 배열로 재구성
         $commentsByParentId = [];

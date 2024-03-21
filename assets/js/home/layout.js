@@ -73,47 +73,4 @@ $(document).ready(function () {
         // 사용자에게 알림 표시
         alert('주소가 클립보드에 복사되었습니다: ' + textToCopy);
     });
-
-    // 게시판 버튼에 클릭 이벤트 바인딩
-    // $(document).on('click', '.board-url', function () {
-    //     // 클릭된 게시판의 data-board-id 속성 값 가져오기
-    //     var boardId = $(this).data("board-id");
-    //     fetchArticleBoard(1, boardId);
-    // });
-
-    // AJAX 요청 함수
-    function fetchArticles(data) {
-        $.ajax({
-            url: '/article/ArticleListAllController/fetchArticles',
-            type: 'GET',
-            data: data,
-            dataType: 'json',
-            success: function (response) {
-                $('#articleContent').html(response.html);
-                updateDateVisibility();
-            },
-            error: function (xhr, status, error) {
-                console.error("Error: ", error);
-            }
-        });
-    }
-
-    // 검색 조건 수집 함수
-    function collectSearchConditions(page) {
-        return {
-            page: page,
-            articlesPerPage: $('#articlesPerPage').val(),
-            keyword: $('#searchForm input[name="keyword"]').val(),
-            element: $('#searchForm select[name="element"]').val(),
-            period: $('#searchForm select[name="period"]').val(),
-            startDate: $('#start-date').val(),
-            endDate: $('#end-date').val()
-        };
-    }
-    // 검색 폼 제출 처리
-    $(document).on('submit', '.search-form-main', function (e) {
-        e.preventDefault();
-        fetchArticles(collectSearchConditions(1)); // 검색 실행 시 1페이지로 리셋
-    });
-
 });
