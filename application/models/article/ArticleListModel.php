@@ -15,13 +15,65 @@ class ArticleListModel extends MY_Model
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
             ->where('a.articleBoard = :boardId')
-            ->andWhere('a.isActive = 1')
+            ->andWhere('a.depth >= 0') // 모든 게시글을 선택
+            ->andWhere('a.isActive = 1') // 활성화된 게시글만
             ->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage)
+            ->addOrderBy('a.createDate', 'ASC') // createDate로 초기 정렬
             ->setParameter('boardId', $boardId);
 
-        return $queryBuilder->getQuery()->getResult();
+        $results = $queryBuilder->getQuery()->getResult();
+
+        // 게시글을 orderGroup별로 묶어 정렬
+        $groupedArticles = [];
+        foreach ($results as $article) {
+            $groupedArticles[$article->getOrderGroup()][] = $article;
+        }
+
+        // 각 orderGroup 내에서 게시글을 부모-자식 관계에 따라 정렬
+        foreach ($groupedArticles as $orderGroup => $articles) {
+            $tempArray = [];
+            foreach ($articles as $article) {
+                $parentId = $article->getParent() ? $article->getParent()->getId() : null;
+                $depth = $article->getDepth();
+                // 부모 ID를 기반으로 적절한 위치 찾기
+                if ($parentId !== NULL) {
+                    $positionFound = false;
+                    foreach ($tempArray as $index => $tempArticle) {
+                        if ($tempArticle->getId() == $parentId) {
+                            // 부모 바로 다음 위치에서 시작하여, 같은 부모를 가진 다음 자식까지의 범위에서 적절한 위치 찾기
+                            $insertPosition = $index + 1;
+                            while ($insertPosition < count($tempArray) && $tempArray[$insertPosition]->getParent() && $tempArray[$insertPosition]->getParent()->getId() == $parentId) {
+                                $insertPosition++;
+                            }
+                            array_splice($tempArray, $insertPosition, 0, [$article]);
+                            $positionFound = true;
+                            break;
+                        }
+                    }
+                    if (!$positionFound) {
+                        $tempArray[] = $article; // 부모가 없거나 아직 배열에 추가되지 않은 경우
+                    }
+                } else {
+                    $tempArray[] = $article; // 최상위 레벨 게시글
+                }
+            }
+            $orderGroupByArticles[$orderGroup] = $tempArray;
+        }
+        $flattenedArticles = [];
+        foreach ($orderGroupByArticles as $groupedArticles) {
+            foreach ($groupedArticles as $article) {
+                $flattenedArticles[] = $article;
+            }
+        }
+
+        // 여기서 페이징 적용
+        $pagedArticles = array_slice(
+            $flattenedArticles,
+            ($currentPage - 1) * $articlesPerPage,
+            $articlesPerPage
+        );
+
+        return $pagedArticles;
     }
 
     public function getAllArticlesByBoardId($boardId)

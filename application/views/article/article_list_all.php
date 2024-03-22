@@ -52,8 +52,6 @@ $GLOBALS['pageResources'] = [
                             $elementText = $element;
                     }
                     $conditions[] = "검색 범위: {$elementText}";
-                } else if (!empty($element) && $element === 'all') {
-                    $conditions[] = "검색 범위: {'전체'}";
                 }
 
                 if (!empty($period) && $period !== 'all') {
@@ -284,7 +282,6 @@ $GLOBALS['pageResources'] = [
                 </tbody>
             </table>
         </div>
-        <input type="hidden" id="currentPage" name="currentPage" value="<?= $currentPage ?? 1; ?>">
         <div class="pagination-box">
             <div class="pagination">
                 <?
@@ -315,7 +312,7 @@ $GLOBALS['pageResources'] = [
                         <input type="date" name="endDate" class="date-input" placeholder="종료 날짜" id="end-date" value="<?= htmlspecialchars($endDate); ?>">
                     </div>
 
-                    <select name="element" class="custom-input" id="element">
+                    <select name="element" class="custom-input">
                         <option value="article-comment" <?= ($element === 'article-comment') ? 'selected' : ''; ?>>게시글 + 댓글</option>
                         <option value="title" <?= ($element === 'title') ? 'selected' : ''; ?>>제목</option>
                         <option value="author" <?= ($element === 'author') ? 'selected' : ''; ?>>글작성자</option>
@@ -326,7 +323,7 @@ $GLOBALS['pageResources'] = [
                 </div>
 
                 <div class="search-keyword">
-                    <input type="text" name="keyword" id="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
+                    <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
                     <button type="submit" class="search-btn">검색</button>
                 </div>
 

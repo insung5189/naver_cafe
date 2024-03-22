@@ -164,6 +164,7 @@ $GLOBALS['pageResources'] = [
                     </colgroup>
                     <tbody>
                         <? foreach ($articles as $article) : ?>
+
                             <?
                             $styleAttributes = '';
                             if ($article->getDepth() > 0 && $parentArticlesExist[$article->getId()]) {
