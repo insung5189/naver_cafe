@@ -245,9 +245,32 @@
     <div class="pagination-box">
         <div class="pagination">
             <?
-            for ($page = 1; $page <= $totalPages; $page++) {
+            $startPage = max(1, $currentPage - 2);
+            $endPage = min($totalPages, $currentPage + 2);
+
+            // 첫 페이지로 가기 버튼
+            if ($currentPage > 1) {
+                echo '<a href="javascript:void(0);" class="article-board-list-page-btn page-btn page-start-btn" data-page="1"><i class="fa-solid fa-angles-left"></i></a>';
+            }
+
+            // 이전 페이지로 가는 버튼 (현재 페이지가 1페이지가 아닐 경우 항상 표시)
+            if ($currentPage > 1) {
+                echo '<a href="javascript:void(0);" class="article-board-list-page-btn page-btn page-prev-btn" data-page="' . ($currentPage - 1) . '"><i class="fa-solid fa-angle-left"></i></a>';
+            }
+
+            for ($page = $startPage; $page <= $endPage; $page++) {
                 $isActive = ($page == $currentPage) ? 'active' : '';
                 echo '<a href="javascript:void(0);" class="article-board-list-page-btn page-btn ' . $isActive . '" data-page="' . $page . '">' . $page . '</a>';
+            }
+
+            // 다음 페이지로 가는 버튼 (현재 페이지가 마지막 페이지가 아닐 경우 항상 표시)
+            if ($currentPage < $totalPages) {
+                echo '<a href="javascript:void(0);" class="article-board-list-page-btn page-btn page-next-btn" data-page="' . ($currentPage + 1) . '"><i class="fa-solid fa-angle-right"></i></a>';
+            }
+
+            // 마지막 페이지로 가기 버튼
+            if ($currentPage < $totalPages) {
+                echo '<a href="javascript:void(0);" class="article-board-list-page-btn page-btn page-end-btn" data-page="' . $totalPages . '"><i class="fa-solid fa-angles-right"></i></a>';
             }
             ?>
         </div>
