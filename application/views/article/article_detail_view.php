@@ -11,7 +11,7 @@ $GLOBALS['pageResources'] = [
                 이동
             </a> -->
             <? if (isset($user) && ($user['user_id'] == $article->getMember()->getId())) : ?>
-                <a href="javascript:void(0);" class="list-article-btn article-edit-btn" data-article-id="<?= $article->getId(); ?>">
+                <a href="/article/articleeditcontroller/editForm/<?= $viewedArticleId ?>" class="list-article-btn article-edit-btn">
                     수정
                 </a>
             <? endif; ?>
@@ -219,10 +219,10 @@ $GLOBALS['pageResources'] = [
                                 </div>
                             </a>
                             <label class="depth-option-checkbox">
-                                <input type="checkbox" id="depthOptionCheckbox" data-article-id="<?= $article->getId() ?>"> depth별 정렬
+                                <input type="radio" id="depthOptionCheckbox" data-article-id="<?= $article->getId() ?>"> depth별 정렬
                             </label>
                             <label class="tree-option-checkbox">
-                                <input type="checkbox" id="treeOptionCheckbox" data-article-id="<?= $article->getId() ?>"> 트리구조 정렬
+                                <input type="radio" id="treeOptionCheckbox" data-article-id="<?= $article->getId() ?>"> 트리구조 정렬
                             </label>
                         </div>
                     </div>
@@ -494,7 +494,7 @@ $GLOBALS['pageResources'] = [
                         </a>
                     <? endif; ?>
                     <? if (isset($user) && ($user['user_id'] == $article->getMember()->getId())) : ?>
-                        <a href="javascript:void(0);" class="article-base-btn article-edit-btn" data-article-id="<?= $article->getId(); ?>">
+                        <a href="/article/articleeditcontroller/editForm/<?= $viewedArticleId ?>" class="article-base-btn article-edit-btn">
                             수정
                         </a>
                     <? endif; ?>

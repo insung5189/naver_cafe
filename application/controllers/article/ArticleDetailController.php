@@ -26,6 +26,13 @@ class ArticleDetailController extends MY_Controller
             return;
         }
 
+        if ($this->session->userdata('viewedArticleId')) {
+            $this->session->unset_userdata('viewedArticleId');
+        }
+
+        $this->session->set_userdata('viewedArticleId', $articleId);
+        $viewedArticleId = $this->session->userdata('viewedArticleId');
+
         $parentArticlesExist = $this->ArticleDetailModel->checkParentArticlesExist($article);
 
         $comments = $this->ArticleDetailModel->getCommentsByArticleId($articleId);
@@ -47,11 +54,11 @@ class ArticleDetailController extends MY_Controller
         $userRole = $userData['role'] ?? null;
 
         if ($publicScope === 'public') {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist, $viewedArticleId);
         } else if ($publicScope === 'members' && $userData) {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist, $viewedArticleId);
         } else if ($publicScope === 'admins' && $userData && ($userRole === 'ROLE_ADMIN' || $userRole === 'ROLE_MASTER')) {
-            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist);
+            $this->loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist, $viewedArticleId);
         } else {
             if (!$userData) {
                 $this->setRedirectCookie(current_url());
@@ -62,7 +69,7 @@ class ArticleDetailController extends MY_Controller
         }
     }
 
-    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist)
+    private function loadArticleDetailView($article, $comments, $user, $articleFilesInfo, $likeCountByArticle, $userLikedArticle, $parentArticlesExist, $viewedArticleId)
     {
         $memberPrflFileUrl = "/assets/file/images/memberImgs/";
         $commentFileUrl = "/assets/file/commentFiles/img/";
@@ -72,6 +79,7 @@ class ArticleDetailController extends MY_Controller
             'article' => $article,
             'comments' => $comments,
             'user' => $user,
+            'viewedArticleId' => $viewedArticleId,
             'parentArticlesExist' => $parentArticlesExist,
             'articleFilesInfo' => $articleFilesInfo,
             'likeCountByArticle' => $likeCountByArticle,
@@ -217,7 +225,7 @@ class ArticleDetailController extends MY_Controller
     public function createComment()
     {
         $formData = [
-            'content' => $this->input->post('content', TRUE),
+            'content' => $this->input->post('content'),
             'articleId' => $this->input->post('articleId', TRUE),
             'memberId' => $this->input->post('memberId', TRUE),
             'parentId' => $this->input->post('parentId', TRUE),
@@ -245,7 +253,7 @@ class ArticleDetailController extends MY_Controller
     public function createReply()
     {
         $formData = [
-            'content' => $this->input->post('content', TRUE),
+            'content' => $this->input->post('content'),
             'articleId' => $this->input->post('articleId', TRUE),
             'memberId' => $this->input->post('memberId', TRUE),
             'parentId' => $this->input->post('parentId', TRUE),
@@ -284,7 +292,7 @@ class ArticleDetailController extends MY_Controller
     {
         if ($this->input->is_ajax_request()) {
             $formData = [
-                'content' => $this->input->post('commentEditContent', TRUE),
+                'content' => $this->input->post('commentEditContent'),
                 'articleId' => $this->input->post('articleId', TRUE),
                 'memberId' => $this->input->post('memberId', TRUE),
                 'existingImagePath' => $this->input->post('existingImagePath', TRUE),

@@ -41,7 +41,7 @@ $GLOBALS['pageResources'] = [
                         <dd class="article-list-all-title-box">
                             <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
                                 <span class="article-list-all-title-box-text">
-                                    <?= $articleListAllArticle->getTitle() ?>
+                                    <?= $articleListAllArticle->getTitle() ? htmlspecialchars($articleListAllArticle->getTitle(), ENT_QUOTES, 'UTF-8') : '';  ?>
                                 </span>
                                 <? $commentCount = $articleListAllcommentCounts[$articleListAllArticle->getId()] ?? 0; ?>
                                 <? if ($commentCount !== 0) : ?>
@@ -54,7 +54,7 @@ $GLOBALS['pageResources'] = [
                         <dd>
                             <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
                                 <span class="article-list-all-author-box-text">
-                                    <?= $articleListAllArticle->getMember()->getNickName() ?>
+                                    <?= $articleListAllArticle->getMember() ? htmlspecialchars($articleListAllArticle->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                 </span>
                             </a>
                         </dd>
@@ -97,13 +97,13 @@ $GLOBALS['pageResources'] = [
                             <div class="main-free-board-card-area">
                                 <div class="main-free-board-card-info">
                                     <div class="main-free-board-card-title">
-                                        <?= $freeBoardArticle->getTitle() ?>
+                                        <?= $freeBoardArticle->getTitle() ? htmlspecialchars($freeBoardArticle->getTitle(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                     </div>
                                     <div class="main-free-board-card-content">
-                                        <?= $freeBoardArticle->getContent() ?>
+                                        <?= $freeBoardArticle->getContent() ? htmlspecialchars($freeBoardArticle->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                     </div>
                                     <div class="main-free-board-card-author">
-                                        <?= $freeBoardArticle->getMember()->getNickName() ?>
+                                        <?= $freeBoardArticle->getMember() ? htmlspecialchars($freeBoardArticle->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                     </div>
                                     <div class="main-free-board-card-date-and-hit">
                                         <span class="main-free-board-card-date">
@@ -160,7 +160,7 @@ $GLOBALS['pageResources'] = [
                                     <? elseif ($qnaBoardArticle->getDepth() > 0) : ?>
                                         <span>┗</span>
                                     <? endif; ?>
-                                    <?= $qnaBoardArticle->getTitle() ?>
+                                    <?= $qnaBoardArticle->getTitle() ? htmlspecialchars($qnaBoardArticle->getTitle(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                     <? $commentCount = $commentCounts[$qnaBoardArticle->getId()] ?? 0; ?>
                                     <? if ($commentCount !== 0) : ?>
                                         <span class="article-list-all-comment-count">

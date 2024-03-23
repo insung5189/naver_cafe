@@ -225,8 +225,6 @@ $GLOBALS['pageResources'] = [
 
     <? elseif (!isset($comments)) : ?>
         <p>댓글 정보를 불러오는데 실패했습니다.</p>
-    <? elseif (!isset($user)) : ?>
-        <p>세션이 만료되었습니다.</p>
     <? endif; ?>
 <? else : ?>
     <p>존재하지 않는 게시물입니다.</p>

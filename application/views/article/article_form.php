@@ -31,6 +31,7 @@ $user = $_SESSION['user_data'];
             </div>
             <input type="hidden" name="memberId" value="<?= $user['user_id']; ?>">
             <input type="hidden" name="parentId" value="<?= isset($parentArticle) ? $parentArticle->getId() : ''; ?>">
+            <input type="hidden" name="parentBoardId" value="<?= isset($parentArticle) ? $parentArticle->getArticleBoard()->getId() : ''; ?>">
             <input type="hidden" name="depth" value="<?= isset($parentArticle) ? $parentArticle->getDepth() + 1 : 0; ?>">
             <input type="hidden" name="orderGroup" value="<?= isset($parentArticle) ? $parentArticle->getOrderGroup() : ''; ?>">
             <input type="hidden" name="parentBoardId" id="parentBoardId" value="<?= isset($parentArticle) ? $parentArticle->getArticleBoard()->getId() : ''; ?>">
@@ -81,16 +82,16 @@ $user = $_SESSION['user_data'];
                 <div class="public-scope-box">
                     <h3>공개 범위</h3>
                     <label>
-                        <input type="radio" name="publicScope" value="public"> 전체공개
+                        <input type="radio" name="publicScope" value="public" <?= $currentPublicScope == 'public' ? 'checked' : '' ?>> 전체공개
                     </label>
                     <label>
-                        <input type="radio" name="publicScope" value="members" checked> 멤버공개
+                        <input type="radio" name="publicScope" value="members" <?= $currentPublicScope == 'members' ? 'checked' : '' ?>> 멤버공개
                     </label>
-                    <?php if ($user['role'] == 'ROLE_ADMIN' || $user['role'] == 'ROLE_MASTER') : ?>
+                    <? if ($user['role'] == 'ROLE_ADMIN' || $user['role'] == 'ROLE_MASTER') : ?>
                         <label>
-                            <input type="radio" name="publicScope" value="admins"> 관리자공개
+                            <input type="radio" name="publicScope" value="admins" <?= $currentPublicScope == 'admins' ? 'checked' : '' ?>> 관리자공개
                         </label>
-                    <?php endif; ?>
+                    <? endif; ?>
                 </div>
 
             </div>

@@ -200,19 +200,23 @@ $(document).ready(function () {
 
     // Depth 옵션 체크박스 상태 변경 이벤트
     $(document).on('change', '#depthOptionCheckbox', function () {
-        // 현재 활성화된 정렬 옵션 확인
+        if ($(this).is(':checked')) {
+            $('#treeOptionCheckbox').prop('checked', false);
+        }
         var sortOption = $('#sort-asc-btn').hasClass('sort-btn-active') ? 'ASC' : 'DESC';
-        var depthOption = $('#depthOptionCheckbox').is(':checked') ? 'ASC' : '';
+        var depthOption = $(this).is(':checked') ? 'ASC' : '';
         var treeOption = $('#treeOptionCheckbox').is(':checked') ? 'enabled' : 'disabled';
         updateSortDepthAndTreeOptions(sortOption, depthOption, treeOption);
     });
 
     // Tree 옵션 체크박스 상태 변경 이벤트
     $(document).on('change', '#treeOptionCheckbox', function () {
-        // 현재 활성화된 정렬 옵션 확인 및 depthOption 상태 확인
+        if ($(this).is(':checked')) {
+            $('#depthOptionCheckbox').prop('checked', false);
+        }
         var sortOption = $('#sort-asc-btn').hasClass('sort-btn-active') ? 'ASC' : 'DESC';
         var depthOption = $('#depthOptionCheckbox').is(':checked') ? 'ASC' : '';
-        var treeOption = $('#treeOptionCheckbox').is(':checked') ? 'enabled' : 'disabled';
+        var treeOption = $(this).is(':checked') ? 'enabled' : 'disabled';
         updateSortDepthAndTreeOptions(sortOption, depthOption, treeOption);
     });
 
@@ -233,7 +237,6 @@ $(document).ready(function () {
                 if (response.success) {
                     $('.comment-foreach-box > ul').html(response.html);
 
-                    // 정렬 버튼 UI 업데이트
                     if (sortOption == 'ASC') {
                         $('#sort-asc-btn').removeClass('sort-btn-deactivate').addClass('sort-btn-active');
                         $('#sort-desc-btn').removeClass('sort-btn-active').addClass('sort-btn-deactivate');
@@ -557,13 +560,6 @@ $(document).ready(function () {
         $('html, body').animate({ scrollTop: 0 }, 0);
         return false;
     });
-
-    $(document).on('click', '.article-edit-btn', function () {
-        var articleId = $(this).data('article-id');
-        window.location.href = '/article/articleeditcontroller/editForm/' + articleId;
-    });
-
-
 
     console.log("현재 히스토리 상태 : ", history.state);
 

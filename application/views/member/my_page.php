@@ -115,7 +115,7 @@ $GLOBALS['pageResources'] = [
                                 </div>
 
                                 <div class="input-box">
-                                    <input class="custom-input" id="nickName" maxlength="50" placeholder="닉네임" required name="nickName" type="text" value="<?= $member->getNickName(); ?>" readonly>
+                                    <input class="custom-input" id="nickName" maxlength="50" placeholder="닉네임" required name="nickName" type="text" value="<?= $member->getNickName(); ?>">
                                     <div class="message-box">
                                         <input id="duplicateNickname" type="button" value="중복확인" class="btn" style="display:none;">
                                         <input type="hidden" name="isNickNameChecked" id="isNickNameChecked" value="true">

@@ -404,7 +404,7 @@ class ArticleDetailModel extends MY_Model
         try {
             $result = $query->execute();
 
-            return ['success' => true, 'updatedCount' => $result];
+            return ['success' => true, 'deletedCount' => $result];
         } catch (\Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }

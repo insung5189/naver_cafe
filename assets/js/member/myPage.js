@@ -162,10 +162,9 @@ $(document).ready(function () {
     $('#duplicateNickname').click(duplicateNickname);
     // $('#nickName').on('keyup, focus, input', validateNickname);
 
-    $('#nickName').on('keyup, focus, input', function () {
-        validateNickname();
+    $('#nickName').on('keyup focus input', function () {
         var currentNickName = $(this).val();
-
+        // 기존 닉네임과 현재 입력된 닉네임을 비교
         if (originalNickName === currentNickName) {
             $('#isNickNameChecked').val('true');
             $('#duplicateNickname').hide();
@@ -173,9 +172,13 @@ $(document).ready(function () {
         } else {
             $('#isNickNameChecked').val('false');
             $('#duplicateNickname').show();
+            $('#duplicateNickname').val('중복확인');
+            $('#nickname-duplication-check-message').text('❌ 닉네임 중복 확인이 필요합니다.').css('color', 'red');
         }
     });
-    $('#nickName').on('keyup click', resetNicknameValidation);
+    $('#nickName').on('keyup click', function () {
+        resetNicknameValidation();
+    });
     $('#phone').on('keyup input click', validatePhone);
     $('#firstName').on('keyup focus input click', validateFirstName);
     $('#lastName').on('keyup focus input click', validateLastName);
@@ -183,6 +186,37 @@ $(document).ready(function () {
     $('#gender').change(validateGenderSelect);
     $('#birth').on('keyup focus input click', validateBirthDate);
     $('#prfl-info-form').on('submit', submitPrflInfoFormValidation);
+
+    // 닉네임 입력란 변경 시 로직
+    // function resetNicknameValidation() {
+    //     if (originalNickName !== $('#nickName').val()) {
+    //         if ($('#isNickNameChecked').val() === 'true') {
+    //             $('#isNickNameChecked').val('false');
+    //             $('#duplicateNickname').val('중복확인');
+    //             $('#nickName').attr('readonly', false);
+    //             $('#duplicateNickname').attr('disabled', false);
+    //             alert('⚠ 입력값 수정을 시도하셨습니다.\n기존에 사용하던 닉네임이 아닐 경우\n입력 후 꼭 중복확인 시도해주세요.');
+    //         } else if ($('#nickName').attr('readonly', false)) {
+
+    //         }
+    //     } else if (originalNickName === $('#nickName').val()) {
+    //         $('#isNickNameChecked').val() === 'true'
+    //     }
+    // }
+
+    function resetNicknameValidation() {
+        var currentNickName = $('#nickName').val();
+        if (originalNickName === currentNickName) {
+            $('#isNickNameChecked').val('true');
+            $('#duplicateNickname').hide();
+            $('#nickname-duplication-check-message').text('✔️ 기존에 사용하던 닉네임입니다.').css('color', 'green');
+        } else {
+            $('#isNickNameChecked').val('false');
+            $('#duplicateNickname').show();
+            $('#duplicateNickname').val('중복확인');
+            $('#nickname-duplication-check-message').text('❌ 닉네임 중복 확인이 필요합니다.').css('color', 'red');
+        }
+    }
 
     // textarea 최대 허용길이 설정
     var textMaxLength = 500;
@@ -259,7 +293,6 @@ $(document).ready(function () {
             if (confirm('사용 가능한 닉네임입니다.\n확인 버튼을 누르시면 해당 닉네임을 사용하며 \n수정이 불가능합니다.')) {
                 $('#nickname-duplication-check-message').text('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
                 $('#duplicateNickname').val('중복확인 완료');
-                $('#nickName').attr('readonly', true);
                 $('#duplicateNickname').attr('disabled', true);
                 $('#isNickNameChecked').val('true');
                 return true;
@@ -296,52 +329,51 @@ $(document).ready(function () {
         }
     }
 
-    // 닉네임 입력란 변경 시 로직
-    function resetNicknameValidation() {
-        if ($('#isNickNameChecked').val() === 'true') {
-            $('#isNickNameChecked').val('false');
-            $('#duplicateNickname').val('중복확인');
-            $('#nickName').attr('readonly', false);
-            $('#duplicateNickname').attr('disabled', false);
-            alert('⚠ 입력값 수정을 시도하셨습니다.\n기존에 사용하던 닉네임이 아닐 경우\n입력 후 꼭 중복확인 시도해주세요.');
-        } else if ($('#nickName').attr('readonly', false)) {
-
-        }
-    }
-
     // 닉네임 유효성 검사 메서드
     function validateNickname() {
-        validationResults.fieldId = '#nickName';
-        validationResults.tabToShow = '#linkToProfileInfo';
-        const nicknameInput = $('#nickName').val().trim();
-        const nicknameValidationMessage = $('#nickname-duplication-check-message');
+        var currentNickName = $('#nickName').val();
+        if (originalNickName !== currentNickName) {
+            validationResults.fieldId = '#nickName';
+            validationResults.tabToShow = '#linkToProfileInfo';
+            const nicknameInput = $('#nickName').val().trim();
+            const nicknameValidationMessage = $('#nickname-duplication-check-message');
 
-        // 길이 검사
-        if (!(nicknameInput.length >= 2 && nicknameInput.length <= 10)) {
-            validationResults.isValid = false;
-            validationResults.validErrorMsg = '닉네임은 2~10글자 사이여야 합니다.';
-            nicknameValidationMessage.html('❌ 2~10글자 사이여야 합니다.').css('color', 'red');
-            return validationResults;
-        }
+            // 길이 검사
+            if (!(nicknameInput.length >= 2 && nicknameInput.length <= 10)) {
+                validationResults.isValid = false;
+                validationResults.validErrorMsg = '닉네임은 2~10글자 사이여야 합니다.';
+                nicknameValidationMessage.html('❌ 2~10글자 사이여야 합니다.').css('color', 'red');
+                return validationResults;
+            }
 
-        // 한글 또는 영문 대소문자 검사
-        if (!/[가-힣a-zA-Z]+/.test(nicknameInput)) {
-            validationResults.isValid = false;
-            validationResults.validErrorMsg = '닉네임에는 한글 또는 영문 대소문자가 포함되어야 합니다.';
-            nicknameValidationMessage.html('❌ 한글 또는 영문 대소문자가 포함되어야 합니다.').css('color', 'red');
-            return validationResults;
-        }
+            // 한글 또는 영문 대소문자 검사
+            if (!/[가-힣a-zA-Z]+/.test(nicknameInput)) {
+                validationResults.isValid = false;
+                validationResults.validErrorMsg = '닉네임에는 한글 또는 영문 대소문자가 포함되어야 합니다.';
+                nicknameValidationMessage.html('❌ 한글 또는 영문 대소문자가 포함되어야 합니다.').css('color', 'red');
+                return validationResults;
+            }
 
-        // 유효하지 않은 문자 포함 검사
-        if (/[^가-힣a-zA-Z0-9]/.test(nicknameInput)) {
-            validationResults.isValid = false;
-            validationResults.validErrorMsg = '닉네임에 유효하지 않은 문자가 포함되어 있습니다.';
-            nicknameValidationMessage.html('❌ 유효하지 않은 문자가 있습니다.').css('color', 'red');
-            return validationResults;
+            // 유효하지 않은 문자 포함 검사
+            if (/[^가-힣a-zA-Z0-9]/.test(nicknameInput)) {
+                validationResults.isValid = false;
+                validationResults.validErrorMsg = '닉네임에 유효하지 않은 문자가 포함되어 있습니다.';
+                nicknameValidationMessage.html('❌ 유효하지 않은 문자가 있습니다.').css('color', 'red');
+                return validationResults;
+            } else {
+                validationResults.isValid = true;
+                validationResults.validErrorMsg = '';
+                nicknameValidationMessage.html('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
+                return validationResults;
+            }
         } else {
+            validationResults.fieldId = '#nickName';
+            validationResults.tabToShow = '#linkToProfileInfo';
+            const nicknameValidationMessage = $('#nickname-duplication-check-message');
+
             validationResults.isValid = true;
             validationResults.validErrorMsg = '';
-            nicknameValidationMessage.html('✔️ 사용 가능한 닉네임입니다.').css('color', 'green');
+            nicknameValidationMessage.html('✔️ 기존에 사용하던 닉네임입니다.').css('color', 'green');
             return validationResults;
         }
     }
@@ -711,8 +743,6 @@ $(document).ready(function () {
             return validationResults;
         }
     }
-
-
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitPrflPasswordFormValidation(event) {

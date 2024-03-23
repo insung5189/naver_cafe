@@ -88,7 +88,7 @@
             }
 
             $searchSummary .= implode(', ', $conditions);
-            echo $searchSummary;
+            echo htmlspecialchars($searchSummary);
             ?>
         </div>
     <? endif; ?>

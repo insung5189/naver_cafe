@@ -3,6 +3,14 @@ $(document).ready(function () {
     // 사용자가 작성 중이던 form 페이지를 떠나려 할 때 표시되는 경고메시지
     var formModified = false;
 
+    $('body').on('keyup', '#board-select, #title, #fileInput, input[type="radio"]', function () {
+        formModified = true;
+    });
+
+    $('body').on('click', 'input[type="radio"]', function () {
+        formModified = true;
+    });
+
     $(window).on('beforeunload', function () {
         if (formModified) {
             return '변경사항이 저장되지 않을 수 있습니다.';
@@ -267,11 +275,62 @@ $(document).ready(function () {
         }
     }
 
+    $(document).on('input', '#title', function () {
+        var title = $(this).val();
+        if (title.length > 100) {
+            alert('제목은 100자 이하로 입력해주세요.');
+            $(this).val(title.substring(0, 100));
+        }
+    });
+
     $(document).on('submit', '#articleForm', function (e) {
         e.preventDefault();
 
+        var currentURL = window.location.href;
+        var urlSegments = currentURL.split('/');
         var formData = new FormData(this);
         formData.append('content', editor.getData());
+        formData.append('currentURL', currentURL);
+
+        var depth = parseInt(formData.get('depth'));
+        var memberId = parseInt(formData.get('memberId'), 10);
+        var parentId = formData.get('parentId');
+        var boardId = formData.get('parentBoardId');
+        var articleId = formData.get('articleId');
+        var articleIdFromURL = urlSegments[urlSegments.length - 1];
+
+        // memberId가 존재하지 않거나 음수인 경우
+        if (!memberId || memberId < 0 || !Number.isInteger(memberId) || isNaN(memberId)) {
+            alert('회원 정보가 올바르지 않습니다. 자동으로 로그아웃됩니다.');
+            location.href = '/member/logincontroller/processLogout';
+            return;
+        }
+
+        // 기본 게시글 작성인 경우.
+        if (currentURL.endsWith('/article/articleeditcontroller')) {
+            if (depth !== 0) {
+                alert('기본 게시글 작성 시 depth는 0이어야 합니다.');
+                return;
+            }
+        } else if (currentURL.includes('?parentId=')) { // 답글 작성인 경우
+            if (depth < 1) {
+                alert('답글 작성 시 depth는 1 이상이어야 합니다.');
+                return;
+            }
+            if (!parentId) {
+                alert('답글 작성 시 부모글의 정보는 반드시 존재해야 합니다.');
+                return;
+            } else if (!boardId) {
+                alert('답글 작성 시 게시판정보는 반드시 존재해야 합니다.');
+                return;
+            }
+        }
+
+        var title = $('#title').val();
+        if (title.length > 100) {
+            alert('제목은 100자 이하로 입력해주세요.');
+            return false;
+        }
 
         $.ajax({
             url: '/article/articleeditcontroller/createArticle',

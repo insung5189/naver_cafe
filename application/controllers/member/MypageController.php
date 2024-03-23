@@ -68,6 +68,8 @@ class MypageController extends MY_Controller
             'detailAddress' => trim($this->input->post('detailAddress', TRUE)),
             'extraAddress' => trim($this->input->post('extraAddress', TRUE)),
         ];
+        $member = $this->em->getRepository('Models\Entities\Member')->find($formData['memberId']);
+        $articleCount = count($this->MypageModel->getArticlesByMemberId($formData['memberId']));
 
         $result = $this->MypageModel->updateProfile($formData);
 
@@ -77,6 +79,12 @@ class MypageController extends MY_Controller
             echo json_encode(['success' => false, 'errors' => $result['errors']]);
             $page_view_data['title'] = '마이페이지';
             $page_view_data['errors'] = $result['errors'];
+            $page_view_data = [
+                'title' => '마이페이지',
+                'member' => $member,
+                'articleCount' => $articleCount,
+                'errors' => $result['errors'],
+            ];
             $this->layout->view('member/my_page', $page_view_data);
         }
     }

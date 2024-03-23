@@ -63,7 +63,7 @@ class MainController extends MY_Controller
         $childArticles = [];
         $currentPage = $this->input->get('page', TRUE) ?? 1;
         $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ? (int)$this->input->get('articlesPerPage') : 15;
-        $keyword = $this->input->get('keyword', TRUE) ?? '';
+        $keyword = $this->input->get('keyword') ?? '';
         $element = $this->input->get('element', TRUE) ?? '';
         $period = $this->input->get('period', TRUE) ?? '';
         $startDate = $this->input->get('startDate', TRUE) ?? '';

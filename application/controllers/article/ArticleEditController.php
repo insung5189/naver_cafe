@@ -51,21 +51,32 @@ class ArticleEditController extends MY_Controller
             redirect('/member/logincontroller');
             return;
         }
+        if ($this->session->userdata('editArticleId')) {
+            $this->session->unset_userdata('editArticleId');
+        }
+
+        $viewedArticleId = $this->session->userdata('viewedArticleId');
+
+        if (isset($viewedArticleId) && $articleId !== $viewedArticleId || !isset($viewedArticleId)) {
+            $this->loadErrorView();
+        } else if (isset($viewedArticleId) && $articleId === $viewedArticleId) {
+            $this->session->set_userdata('editArticleId', $articleId);
+        }
 
         $article = $this->ArticleEditModel->getArticleById($articleId);
 
         $parentArticle = $this->ArticleEditModel->getParentArticleById($articleId);
 
         if (!$article) {
-            show_404();
+            $this->loadErrorView();
             return;
         }
 
         $currentUserId = $this->session->userdata('user_data')['user_id'];
 
+        // 세션의 사용자가 작성자와 일치하지 않으면 오류페이지로 로드
         if ($article->getMember()->getId() != $currentUserId) {
-            $this->session->set_flashdata('error_message', '접근 권한이 없습니다.');
-            redirect('/');
+            $this->loadErrorView();
             return;
         }
 
@@ -78,6 +89,7 @@ class ArticleEditController extends MY_Controller
         // 게시글의 현재 게시판 ID
         $currentBoardId = $article->getArticleBoard()->getId();
         $currentPrefix = $article->getPrefix();
+        $currentPublicScope = $article->getPublicScope();
         $existingArticleContent = $article->getContent();
 
         $prefixesMap = [
@@ -96,6 +108,7 @@ class ArticleEditController extends MY_Controller
             'existingArticleContent' => $existingArticleContent,
             'currentBoardId' => $currentBoardId,
             'currentPrefix' => $currentPrefix,
+            'currentPublicScope' => $currentPublicScope,
             'prefixes' => $prefixes,
         ];
 
@@ -105,74 +118,121 @@ class ArticleEditController extends MY_Controller
     public function createArticle()
     {
         if (!$this->input->is_ajax_request()) {
-            redirect('/');
+            $this->loadErrorView();
             return;
         }
 
-        if (!$this->session->userdata('user_data')) {
+        $errors = [];
+
+        $userSession = $this->session->userdata('user_data');
+        if (!$userSession) {
             $this->setRedirectCookie('/article/articleeditcontroller');
             $loginUrl = site_url('/member/logincontroller');
             echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
             return;
         }
 
+        $isEdit = false;
+        $articleId = $this->session->userdata('editArticleId');
+        $currentURL = $this->input->post('currentURL', TRUE);
+        $prefix = $this->input->post('prefix', TRUE);
+        $boardId = $this->input->post('board', TRUE) ? $this->input->post('board', TRUE) : $this->input->post('parentBoardId', TRUE);
+        $title = $this->input->post('title');
+        $content = $this->purifyHtmlContent($this->input->post('content'));
+        $publicScope = $this->input->post('publicScope', TRUE);
+        $memberId = $userSession['user_id'];
+        $depth = $this->input->post('depth', TRUE);
+        $parentId = $this->input->post('parentId', TRUE);
+
+        if (mb_strlen($title) > 100) {
+            $errors[] = '제목은 100자를 초과할 수 없습니다.';
+        }
+        if (empty($boardId)) {
+            $errors[] = '게시판을 선택해주세요.';
+            echo json_encode(['success' => false, 'message' => $errors]);
+            return;
+        }
+        if ((int)$boardId < 1 || (int)$boardId > 5 || !ctype_digit($boardId)) {
+            $errors[] = '유효하지 않은 게시판입니다. 올바른 게시판을 선택해 주세요.';
+            echo json_encode(['success' => false, 'message' => $errors, 'invalidBoardSelection' => true]);
+            return;
+        }
+        $validPrefixes = [
+            '4' => ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타', ''],
+            '5' => ['질문', '답변', '']
+        ];
+        if (array_key_exists($boardId, $validPrefixes) && !in_array($prefix, $validPrefixes[$boardId])) {
+            echo json_encode([
+                'success' => false,
+                'message' => '유효하지 않은 말머리입니다. 올바른 말머리를 선택해 주세요.',
+                'invalidPrefixSelection' => true,
+                'boardId' => $boardId
+            ]);
+            return;
+        }
+        if (empty($title)) {
+            $errors[] = '제목을 입력해 주세요.';
+        }
+        if (empty($content)) {
+            $errors[] = '내용을 입력해 주세요.';
+        }
+        $validPublicScopes = ['public', 'members', 'admins'];
+        if (empty($publicScope) || !in_array($publicScope, $validPublicScopes)) {
+            $errors[] = '공개 범위가 잘못되었습니다. 올바른 값을 선택해 주세요.';
+        }
+        if (!isset($depth) || !is_numeric($depth)) {
+            $errors[] = 'Depth 값이 유효하지 않습니다.';
+        }
+        if (!isset($boardId) || !is_numeric($boardId) || !in_array($boardId, [1, 2, 3, 4, 5])) {
+            $errors[] = 'BoardId 값이 유효하지 않습니다.';
+        }
+
+        $parsedUrl = parse_url($currentURL);
+        $currentPath = $parsedUrl['path'];
+        if ($currentPath == "/article/articleeditcontroller") { // 신규 게시글 작성
+            if ($depth !== '0') {
+                $errors[] = '신규 게시글 작성 시 Depth 값이 0이어야 합니다.';
+            }
+            if (!empty($parentId)) {
+                $errors[] = '신규 게시글 작성 시 ParentId 값은 입력할 수 없습니다.';
+            }
+        } else if (strpos($currentURL, '?parentId=') !== false) { // 답글 게시글 작성
+            if (empty($parentId)) {
+                $errors[] = '답글 작성 시 ParentId 값은 필수입니다.';
+            }
+            if ($parentId && !is_numeric($parentId)) {
+                $errors[] = 'ParentId 값이 유효하지 않습니다.';
+            }
+        } else if (strpos($currentURL, 'editForm') !== false) { // 수정모드일 때
+
+            $article = $this->ArticleEditModel->getArticleById($articleId);
+
+            if (!$article) {
+                echo json_encode(['success' => false, 'message' => '요청한 게시글을 찾을 수 없습니다.']);
+                return;
+            }
+
+            $isEdit = true;
+            $urlSegments = explode('/', parse_url($currentURL, PHP_URL_PATH));
+            $lastSegment = end($urlSegments);
+            $lastSegmentId = is_numeric($lastSegment) ? (int)$lastSegment : null;
+
+            if ($article->getMember()->getId() != $userSession['user_id']) {
+                $errors[] = '해당 게시글을 수정할 권한이 없습니다.';
+            }
+            if ($lastSegmentId && ($lastSegmentId != $articleId)) {
+                $errors[] = '수정하려는 게시글이 일치하지 않습니다.';
+            }
+        } else {
+            $errors[] = '잘못된 접근입니다.';
+            $this->loadErrorView();
+        }
+        // 컨트롤러의 실패처리결과 표시
+        if (!empty($errors)) {
+            echo json_encode(['success' => false, 'message' => $errors]);
+            return;
+        }
         try {
-            $isEdit = $this->input->post('isEdit', TRUE) == true;
-            $articleId = $this->input->post('articleId', TRUE);
-
-            $validPrefixes = [
-                '4' => ['PHP', 'MYSQL', 'APACHE', 'JS', 'HTML', 'CSS', '기타', ''],
-                '5' => ['질문', '답변', '']
-            ];
-
-            $prefix = $this->input->post('prefix', TRUE);
-            $boardId = $this->input->post('board', TRUE) ? $this->input->post('board', TRUE) : $this->input->post('parentBoardId', TRUE);
-            $title = $this->input->post('title', TRUE);
-            $content = $this->purifyHtmlContent($this->input->post('content'));
-            $publicScope = $this->input->post('publicScope', TRUE);
-
-            $errors = [];
-            if (empty($boardId)) {
-                $errors[] = '게시판을 선택해주세요.';
-                echo json_encode(['success' => false, 'message' => $errors]);
-                return;
-            }
-
-            if ((int)$boardId < 1 || (int)$boardId > 5 || !ctype_digit($boardId)) {
-                $errors[] = '유효하지 않은 게시판입니다. 올바른 게시판을 선택해 주세요.';
-                echo json_encode(['success' => false, 'message' => $errors, 'invalidBoardSelection' => true]);
-                return;
-            }
-
-            if (array_key_exists($boardId, $validPrefixes) && !in_array($prefix, $validPrefixes[$boardId])) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => '유효하지 않은 말머리입니다. 올바른 말머리를 선택해 주세요.',
-                    'invalidPrefixSelection' => true,
-                    'boardId' => $boardId
-                ]);
-                return;
-            }
-
-            if (empty($title)) {
-                $errors[] = '제목을 입력해 주세요.';
-            }
-
-            if (empty($content)) {
-                $errors[] = '내용을 입력해 주세요.';
-            }
-
-            $validPublicScopes = ['public', 'members', 'admins'];
-            if (empty($publicScope) || !in_array($publicScope, $validPublicScopes)) {
-                $errors[] = '공개 범위가 잘못되었습니다. 올바른 값을 선택해 주세요.';
-            }
-
-            // 컨트롤러의 실패처리결과 표시
-            if (!empty($errors)) {
-                echo json_encode(['success' => false, 'message' => $errors]);
-                return;
-            }
-
             // 에디터 내부에 삽입한 이미지파일 임시폴더에서 정규폴더로 이동
             $editorImgfileValid = $this->updateImagePathsAndMoveFiles($content);
             // 에디터와 별도로 첨부한 파일 임시폴더에서 정규폴더로 이동
@@ -188,9 +248,9 @@ class ArticleEditController extends MY_Controller
                 'title' => $title,
                 'content' => $finalContent, // 게시글 상세보기에 표시하기 위한 모든 정보가 담겨있음.
                 'fileUrls' => $fileUrls, // 게시글과 연관된 파일정보만 추출해서담겨있음.(모델영역에서 게시글 등록 후 파일 처리예정)
-                'parentId' => $this->input->post('parentId', TRUE),
+                'parentId' => $parentId,
                 'publicScope' => $publicScope,
-                'memberId' => $this->session->userdata('user_data')['user_id'],
+                'memberId' => $memberId,
             ];
 
             if ($isEdit) {
@@ -585,5 +645,14 @@ class ArticleEditController extends MY_Controller
         }
 
         return $urls;
+    }
+
+    public function loadErrorView()
+    {
+        $page_view_data = [
+            'title' => '잘못된 접근입니다.',
+            'message' => '정상적인 경로로 접근해주세요.',
+        ];
+        $this->layout->view('errors/error_page', $page_view_data);
     }
 }

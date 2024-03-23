@@ -11,6 +11,9 @@ class MY_Controller extends CI_Controller
         // if (!$this->input->is_ajax_request()) {
         //     $this->output->enable_profiler(TRUE);
         // }
+
+        // 게시글 상세보기 페이지에서만 세션에 articleId값이 저장되도록 실시.
+        $this->removeArticleIdFromSession();
     }
 
     protected function setRedirectCookie($path)
@@ -35,5 +38,31 @@ class MY_Controller extends CI_Controller
     protected function deleteRedirectCookie()
     {
         delete_cookie('redirect_url');
+    }
+
+    private function removeArticleIdFromSession()
+    {
+        // AJAX 요청이면 세션에서 값을 제거하지 않고 반환
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            return;
+        }
+
+        $currentUrl = current_url();
+
+        // 게시글 상세보기 페이지의 URL 패턴
+        $articleDetailUrlPattern = '/article\/articledetailcontroller\/index\/\d+/';
+
+        // 게시글 수정 페이지의 URL 패턴
+        $articleEditUrlPattern = '/article\/articleeditcontroller\/editForm\/\d+/';
+
+        // 현재 URL이 게시글 상세보기, 수정, 관련 게시글 보기 페이지의 URL 패턴과 일치하지 않는 경우
+        // 해당 세션 값을 제거
+        if (
+            !preg_match($articleDetailUrlPattern, $currentUrl) &&
+            !preg_match($articleEditUrlPattern, $currentUrl)
+        ) {
+            $this->session->unset_userdata('viewedArticleId');
+            $this->session->unset_userdata('editArticleId');
+        }
     }
 }
