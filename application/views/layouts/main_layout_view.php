@@ -42,6 +42,9 @@
 </head>
 
 <body>
+    <?
+    header('Cache-Control: no-cache, no-store, must-revalidate');
+    ?>
     <div class="wrap-main">
         <header>
             <a href="/">
@@ -281,13 +284,13 @@
                                     </a>
                                 </div>
                                 <? if (!$favoriteBoards) : ?>
-                                    <ul class="board-instructions" style="display:none;">
+                                    <ul class="board-instructions" style="display:none;" id="favoriteBoardLayout">
                                         <li class="book-mark-board-none">
                                             <span>게시판 상단의 아이콘을 클릭하시면 추가됩니다.</span>
                                         </li>
                                     </ul>
                                 <? else : ?>
-                                    <ul class="board-instructions" style="display:none;">
+                                    <ul class="board-instructions" style="display:none;" id="favoriteBoardLayout">
                                         <? foreach ($favoriteBoards as $favoriteBoard) : ?>
                                             <?
                                             $boardName = '';

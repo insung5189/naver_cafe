@@ -36,9 +36,9 @@ $GLOBALS['pageResources'] = [
 
                     <div data-member-img-src="<?= $fileUrl . $profileImagePath; ?>"></div>
                     <form id="prfl-img-form" action="">
-                        <!-- <label class="prfl-img-edit" for="member-prfl-img-edit">
+                        <label class="prfl-img-edit" for="member-prfl-img-edit">
                             <input type="file" name="member-prfl-img" id="member-prfl-img-edit" accept="image/jpg, image/jpeg, image/png, image/bmp, image/webp, image/gif" hidden>
-                        </label> -->
+                        </label>
                     </form>
                 </span>
                 <span class="nick-and-info">

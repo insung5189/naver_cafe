@@ -80,12 +80,14 @@ class MainController extends MY_Controller
                 $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                 $totalArticleCount = $this->MainModel->getTotalArticleCount();
                 $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountForPagination();
+                $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, null, null);
             } else {
                 // 검색결과에 오류 없을 때
                 $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                 $totalArticleCount = $this->MainModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
                 $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                 $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate, $currentPage, $articlesPerPage);
+                $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, null, null);
             }
         } else {
             // 검색하지 않았을 때
@@ -93,6 +95,7 @@ class MainController extends MY_Controller
             $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
             $totalArticleCount = $this->MainModel->getTotalArticleCount();
             $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountForPagination();
+            $articleIndex = NULL;
         }
 
         $totalPages = ceil($totalArticleCountForPaginaion / $articlesPerPage);
@@ -104,12 +107,19 @@ class MainController extends MY_Controller
             return $article->getId();
         }, $articles);
 
+        if (isset($articleIndex)) {
+            $articleIndexIds = array_map(function ($article) {
+                return $article->getId();
+            }, $articleIndex);
+        }
+
         // 게시글별 댓글 개수 조회
         $commentCounts = $this->MainModel->getCommentCountForArticles($articleIds);
 
         $page_view_data = [
             'title' => '카페 통합검색 결과',
             'articles' => $articles,
+            'articleIndexIds' => $articleIndexIds,
             'commentCounts' => $commentCounts,
             'currentPage' => $currentPage,
             'totalPages' => $totalPages,
@@ -154,12 +164,14 @@ class MainController extends MY_Controller
                         $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCount = $this->MainModel->getTotalArticleCount();
                         $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountForPagination();
+                        $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, null, null);
                     } else {
                         // 검색결과에 오류 없을 때
                         $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                         $totalArticleCount = $this->MainModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
                         $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate, $currentPage, $articlesPerPage);
+                        $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, null, null);
                     }
                 } else {
                     // 검색하지 않았을 때
@@ -178,12 +190,19 @@ class MainController extends MY_Controller
                     return $article->getId();
                 }, $articles);
 
+                if (isset($articleIndex)) {
+                    $articleIndexIds = array_map(function ($article) {
+                        return $article->getId();
+                    }, $articleIndex);
+                }
+
                 // 게시글별 댓글 개수 조회
                 $commentCounts = $this->MainModel->getCommentCountForArticles($articleIds);
 
                 $page_view_data = [
                     'title' => '카페 통합검색 결과',
                     'articles' => $articles,
+                    'articleIndexIds' => $articleIndexIds,
                     'commentCounts' => $commentCounts,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,

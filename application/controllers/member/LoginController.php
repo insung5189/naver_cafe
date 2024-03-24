@@ -24,6 +24,13 @@ class LoginController extends MY_Controller
         $this->layout->view('member/login_form', $page_view_data);
     }
 
+    public function sessionDestroyAndLogin()
+    {
+        $this->session->sess_destroy();
+        $page_view_data['title'] = '로그인';
+        $this->layout->view('member/login_form', $page_view_data);
+    }
+
     public function processLogin()
     {
         if ($this->session->userdata('user_data')) {

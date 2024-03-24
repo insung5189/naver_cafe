@@ -58,10 +58,13 @@ class ArticleListController extends MY_Controller
             } else {
                 $articles = $searchResults['results'];
                 $totalArticleCount = $searchResults['total'];
+                $forArticleIndexResults = $this->ArticleListModel->searchArticles($boardId, $keyword, $element, $period, $startDate, $endDate, null, null);
+                $articleIndex =$forArticleIndexResults['results'];
             }
         } else {
             $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
             $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
+            $articleIndex = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, NULL, NULL);
         }
 
         $totalPages = ceil($totalArticleCount / $articlesPerPage);
@@ -72,6 +75,12 @@ class ArticleListController extends MY_Controller
             return $article->getId();
         }, $articles);
 
+        if (isset($articleIndex)) {
+            $articleIndexIds = array_map(function ($article) {
+                return $article->getId();
+            }, $articleIndex);
+        }
+
         // 게시글별 댓글 개수 조회
         $commentCounts = $this->ArticleListModel->getCommentCountForArticles($articleIds);
 
@@ -81,6 +90,7 @@ class ArticleListController extends MY_Controller
             'title' => !empty($keyword) ? '검색 결과' : $title,
             'boardGuide' => !empty($keyword) ? '검색조건을 이용한 검색결과입니다.' : $boardGuide,
             'articles' => $articles,
+            'articleIndexIds' => $articleIndexIds,
             'commentCounts' => $commentCounts,
             'totalArticleCountAll' => $totalArticleCount,
             'parentArticlesExist' => $parentArticlesExist,
@@ -152,13 +162,17 @@ class ArticleListController extends MY_Controller
                         $errors = $searchResults['errors'];
                         $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
                         $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
+                        $articleIndex = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, NULL, NULL);
                     } else {
                         $articles = $searchResults['results'];
                         $totalArticleCount = $searchResults['total'];
+                        $forArticleIndexResults = $this->ArticleListModel->searchArticles($boardId, $keyword, $element, $period, $startDate, $endDate, null, null);
+                        $articleIndex =$forArticleIndexResults['results'];
                     }
                 } else {
                     $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
                     $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
+                    $articleIndex = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, NULL, NULL);
                 }
 
                 $totalPages = ceil($totalArticleCount / $articlesPerPage);
@@ -169,6 +183,12 @@ class ArticleListController extends MY_Controller
                     return $article->getId();
                 }, $articles);
 
+                if (isset($articleIndex)) {
+                    $articleIndexIds = array_map(function ($article) {
+                        return $article->getId();
+                    }, $articleIndex);
+                }
+
                 // 게시글별 댓글 개수 조회
                 $commentCounts = $this->ArticleListModel->getCommentCountForArticles($articleIds);
 
@@ -177,6 +197,7 @@ class ArticleListController extends MY_Controller
                     'title' => !empty($keyword) ? '검색 결과' : $title,
                     'boardGuide' => !empty($keyword) ? '검색조건을 이용한 검색결과입니다.' : $boardGuide,
                     'articles' => $articles,
+                    'articleIndexIds' => $articleIndexIds,
                     'commentCounts' => $commentCounts,
                     'totalArticleCountAll' => $totalArticleCount,
                     'parentArticlesExist' => $parentArticlesExist,
@@ -212,6 +233,8 @@ class ArticleListController extends MY_Controller
             $memberId = $this->input->post('memberId');
             $isBookmarked = $this->input->post('isBookmarked');
 
+
+
             $board = $this->em->find('Models\Entities\ArticleBoard', $boardId);
             $member = $this->em->find('Models\Entities\Member', $memberId);
 
@@ -238,7 +261,12 @@ class ArticleListController extends MY_Controller
                 }
 
                 $this->em->flush();
-                echo json_encode(['success' => true, 'message' => $message, 'isBookmarked' => $isBookmarked]);
+
+                $favoriteBoards = $this->ArticleListModel->getFavoriteBoards($memberId);
+
+                $html = $this->load->view('layouts/book_mark_area', ['favoriteBoards' => $favoriteBoards], TRUE);
+
+                echo json_encode(['success' => true, 'message' => $message, 'isBookmarked' => $isBookmarked, 'html' => $html]);
             } else {
                 echo json_encode(['success' => false, 'message' => '게시판 또는 사용자를 찾을 수 없습니다.']);
             }

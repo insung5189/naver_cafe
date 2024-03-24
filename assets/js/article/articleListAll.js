@@ -1,6 +1,11 @@
 $(document).ready(function () {
 
-    console.log("현재 히스토리 상태 : ", history.state);
+    saveCurrentStateInitial()
+
+    var articleIdsStr = $('#articleIds').attr('data-articles');
+    var articleIds = JSON.parse(articleIdsStr);
+    localStorage.setItem('articles', JSON.stringify(articleIds));
+    console.log("초기 인덱스: ", localStorage.getItem('articles'));
 
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {
@@ -31,6 +36,8 @@ $(document).ready(function () {
 
     // AJAX 요청 함수
     function fetchArticles(data) {
+        var articleIdsStr = $('#articleIds').attr('data-articles');
+        var articleIds = JSON.parse(articleIdsStr);
         $.ajax({
             url: '/article/ArticleListAllController/fetchArticles',
             type: 'GET',
@@ -38,9 +45,15 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (response) {
                 $('#articleContent').html(response.html);
+                var articleIdsStr = $('#articleIds').attr('data-articles');
+                var articleIds = JSON.parse(articleIdsStr);
+                localStorage.setItem('articles', JSON.stringify(articleIds));
+                console.log("ajax업데이트 후: ", localStorage.getItem('articles'));
                 updateDateVisibility();
                 saveCurrentState();
                 window.history.pushState(data, '', window.location.pathname + '?' + $.param(data));
+
+
                 console.log("ajax요청 후 업데이트 된 히스토리 상태(전체글보기) : ", history.state);
             },
             error: function (xhr, status, error) {
@@ -97,7 +110,7 @@ $(document).ready(function () {
     // 게시글 목록으로 돌아가기 기능을 위해 로컬스토리지에 히스토리 상태를 저장 후 활용
     function saveCurrentState() {
         var state = {
-            page: $('#currentPage').val(),
+            page: $('#currentPage').val() ? $('#currentPage').val() : 1,
             boardId: 'all',
             articlesPerPage: $('#articlesPerPage').val(),
             keyword: $('#keyword').val(),
@@ -109,7 +122,23 @@ $(document).ready(function () {
         localStorage.setItem('articleListState', JSON.stringify(state));
     }
 
+    function saveCurrentStateInitial() {
+        var state = {
+            page: '1',
+            boardId: 'all',
+            articlesPerPage: '15',
+            keyword: '',
+            element: 'article-comment',
+            period: 'all',
+            startDate: '',
+            endDate: ''
+        };
+        localStorage.setItem('articleListState', JSON.stringify(state));
+    }
+
     $(document).on('click', '.article-title-link', function () {
         saveCurrentState();
     });
+
+    console.log("초기 페이지의 히스토리 상태 : ", localStorage.getItem('articleListState'));
 });

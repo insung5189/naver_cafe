@@ -13,7 +13,7 @@ $GLOBALS['pageResources'] = [
             </h1>
             <p class="page-guide">비밀번호 변경이 성공적으로 완료되었습니다! 새로운 비밀번호로 로그인해주세요.</p>
             <div class="btn-box flex-end">
-                <a href="/member/logincontroller" class="btn btn-primary">로그인 페이지로 이동</a>
+                <a href="/member/logincontroller/sessionDestroyAndLogin" class="btn btn-primary">로그인 페이지로 이동</a>
                 <a href="/" class="btn btn-secondary">메인 페이지로 이동</a>
             </div>
         <?php else : ?>

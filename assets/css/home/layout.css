@@ -415,6 +415,10 @@ button {
     border-bottom: 1px solid #e5e5e5;
 }
 
+#favoriteBoardLayout {
+    background: #e2ebda;
+}
+
 .board-container ul li:first-child {
     margin-top: 2px;
 }

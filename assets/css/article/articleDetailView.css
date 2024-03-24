@@ -99,6 +99,7 @@ h1 {
 
 .article-title-text {
     margin-left: -3px;
+    word-wrap: break-word;
 }
 
 .article-prefix {
@@ -687,14 +688,16 @@ h1 {
 }
 
 .related-article-title-area {
-    display: table-cell;
+    display: inline-block;
     width: 573px;
     line-height: 18px;
     font-size: 13px;
     vertical-align: middle;
-    word-break: break-all;
+    text-overflow: ellipsis;
+    overflow: hidden;
     word-wrap: break-word;
     word-break: break-word;
+    white-space: nowrap;
 }
 
 .prefix {

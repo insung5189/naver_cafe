@@ -1,3 +1,4 @@
+<!-- find_email_result.php -->
 <?
 $GLOBALS['pageResources'] = [
     'css' => ['/assets/css/member/findEmailResult.css'],
@@ -12,7 +13,7 @@ $GLOBALS['pageResources'] = [
             </h1>
             <? $number = count($emails); ?>
             <div class="account-count">
-                <span>총 </span><span class="count-num"><? echo $number; ?></span><span>개의 가입된 계정이 있습니다.</span>
+                <span>총 </span><span class="count-num"><?= $number; ?></span><span>개의 가입된 계정이 있습니다.</span>
             </div>
             <table class="email-result-table">
                 <thead>
@@ -43,7 +44,18 @@ $GLOBALS['pageResources'] = [
                 Email 찾기 결과
             </h1>
             <div class="form-box">
-                <div class="error-message center"><? echo $this->session->flashdata('findEmailError'); ?></div>
+                <div class="error-message center"><?= $this->session->flashdata('findEmailError'); ?></div>
+            </div>
+            <div class="btn-box">
+                <a href="/member/findaccountcontroller" class="btn btn-primary">다시 시도하기</a>
+            </div>
+        <? elseif ($error = $this->session->flashdata('findPasswordError')) : ?>
+            <h1 class="title">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                비밀번호 찾기 결과
+            </h1>
+            <div class="form-box">
+                <div class="error-message center"><?= $this->session->flashdata('findPasswordError'); ?></div>
             </div>
             <div class="btn-box">
                 <a href="/member/findaccountcontroller" class="btn btn-primary">다시 시도하기</a>

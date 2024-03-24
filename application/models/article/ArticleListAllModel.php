@@ -33,16 +33,19 @@ class ArticleListAllModel extends MY_Model
         return $query->getSingleScalarResult();
     }
 
-    public function getArticlesByPage($currentPage, $articlesPerPage)
+    public function getArticlesByPage($currentPage = null, $articlesPerPage = null)
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
             ->where('a.isActive = 1')
             ->andWhere('a.depth = 0')
-            ->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+            ->orderBy('a.orderGroup', 'DESC');
+
+        if ($currentPage !== null && $articlesPerPage !== null) {
+            $queryBuilder->setFirstResult(($currentPage - 1) * $articlesPerPage)
+                ->setMaxResults($articlesPerPage);
+        }
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -85,6 +88,10 @@ class ArticleListAllModel extends MY_Model
     public function checkChildArticlesParentExist($childArticles)
     {
         $result = [];
+        if (!is_array($childArticles)) {
+            return $result;
+        }
+
         foreach ($childArticles as $orderGroup => $articles) {
             foreach ($articles as $article) {
                 $articleId = $article->getId();
@@ -95,6 +102,22 @@ class ArticleListAllModel extends MY_Model
                 } else {
                     $result[$articleId] = false;
                 }
+            }
+        }
+        return $result;
+    }
+
+    public function checkChildArticlesParentExistForSearch($articles)
+    {
+        $result = [];
+        foreach ($articles as $article) {
+            $articleId = $article->getId();
+            if (!empty($article->getParent())) {
+                $articleParentId = $article->getParent()->getId();
+                $parentArticleExists = (bool)$this->getArticleById($articleParentId);
+                $result[$articleId] = $parentArticleExists;
+            } else {
+                $result[$articleId] = true;
             }
         }
         return $result;
@@ -154,7 +177,6 @@ class ArticleListAllModel extends MY_Model
         return $childArticles;
     }
 
-
     public function searchArticles($keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
     {
         $errors = $this->validateInputs($keyword, $element, $period, $startDate, $endDate);
@@ -164,8 +186,7 @@ class ArticleListAllModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
-            ->where('a.isActive = 1')
-            ->andWhere('a.depth = 0');
+            ->where('a.isActive = 1');
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {
             // 요소별 검색 (예: 제목, 작성자 등)
@@ -258,9 +279,13 @@ class ArticleListAllModel extends MY_Model
                 ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
         }
 
-        $queryBuilder->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+        if (isset($currentPage) || isset($currentPage)) {
+            $queryBuilder->orderBy('a.orderGroup', 'DESC')
+                ->setFirstResult(($currentPage - 1) * $articlesPerPage)
+                ->setMaxResults($articlesPerPage);
+        } else {
+            $queryBuilder->orderBy('a.orderGroup', 'DESC');
+        }
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -286,6 +311,117 @@ class ArticleListAllModel extends MY_Model
     }
 
     public function getTotalArticleCountWithSearch($keyword, $element, $period, $startDate = null, $endDate = null)
+    {
+        // 검색 결과는 게시글의 갯수만 카운트 함.
+
+        $errors = $this->validateInputs($keyword, $element, $period, $startDate, $endDate);
+        if (!empty($errors)) {
+            return ['errors' => $errors];
+        }
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('COUNT(DISTINCT a.id)') // 댓글 검색 조건이 포함된 경우에도, 그 결과가 속한 게시글의 개수만을 카운트함.
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1');
+
+        // 검색 조건 추가
+        if (!empty($keyword) && $element !== 'all') {
+            // 요소별 검색 (예: 제목, 작성자 등)
+            if ($element !== 'all') {
+                switch ($element) {
+                    case 'article-comment':
+                        $queryBuilder->andWhere(
+                            $queryBuilder->expr()->orX(
+                                $queryBuilder->expr()->like('a.title', ':keyword'),
+                                $queryBuilder->expr()->like('a.content', ':keyword')
+                            )
+                        );
+
+                        $subQuery = $this->em->createQueryBuilder()
+                            ->select('IDENTITY(c.article)')
+                            ->from('Models\Entities\Comment', 'c')
+                            ->leftJoin('c.member', 'm')
+                            ->where('c.content LIKE :keyword')
+                            ->andWhere('c.isActive = 1')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0')
+                            ->getDQL();
+
+                        $queryBuilder->orWhere($queryBuilder->expr()->in('a.id', $subQuery));
+
+                        // 게시글 작성자에 대한 조건 추가
+                        $queryBuilder->leftJoin('a.member', 'am')
+                            ->andWhere('am.isActive = 1')
+                            ->andWhere('am.blacklist = 0');
+
+                        $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
+                        break;
+                    case 'title':
+                        $queryBuilder->leftJoin('a.member', 'am')
+                            ->andWhere('a.title LIKE :keyword')
+                            ->andWhere('am.isActive = 1')
+                            ->andWhere('am.blacklist = 0');
+                        break;
+                    case 'author':
+                        $queryBuilder->join('a.member', 'm')
+                            ->andWhere('m.nickName LIKE :keyword')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0');
+                        break;
+                    case 'comment':
+                        $queryBuilder->join('Models\Entities\Comment', 'c', 'WITH', 'c.article = a.id')
+                            ->andWhere('c.content LIKE :keyword')
+                            ->andWhere('c.isActive = 1')
+                            ->join('c.member', 'm2')
+                            ->andWhere('m2.isActive = 1')
+                            ->andWhere('m2.blacklist = 0');
+                        break;
+                    case 'commentAuthor':
+                        $queryBuilder->join('Models\Entities\Comment', 'c', 'WITH', 'c.article = a.id')
+                            ->join('c.member', 'm', 'WITH', 'm.id = c.member')
+                            ->andWhere('m.nickName LIKE :keyword')
+                            ->andWhere('m.isActive = 1')
+                            ->andWhere('m.blacklist = 0');
+                        break;
+                }
+                $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
+            }
+        }
+
+        // 기간 필터링 로직
+        if ($period !== 'all') {
+            // custom 기간 로직
+            if ($period === 'custom') {
+                if (!empty($startDate) && is_string($startDate)) {
+                    $startDateObj = \DateTime::createFromFormat('Y-m-d', $startDate);
+                    if ($startDateObj) {
+                        $startDate = $startDateObj->setTime(0, 0, 0);
+                    }
+                } else {
+                    $startDate = new \DateTime();
+                }
+
+                if (!empty($endDate) && is_string($endDate)) {
+                    $endDateObj = \DateTime::createFromFormat('Y-m-d', $endDate);
+                    if ($endDateObj) {
+                        $endDate = $endDateObj->setTime(23, 59, 59);
+                    }
+                } else {
+                    $endDate = new \DateTime();
+                }
+            } else {
+                $endDate = new \DateTime();
+                $startDate = $this->calculateStartDateBasedOnPeriod($period);
+            }
+
+            $queryBuilder->andWhere('a.createDate BETWEEN :startDate AND :endDate')
+                ->setParameter('startDate', $startDate->format('Y-m-d H:i:s'))
+                ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
+        }
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    public function getTotalArticleCountWithSearchForPagination($keyword, $element, $period, $startDate = null, $endDate = null)
     {
         // 검색 결과는 게시글의 갯수만 카운트 함.
 

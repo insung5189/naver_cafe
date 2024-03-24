@@ -38,6 +38,7 @@ class ArticleEditController extends MY_Controller
             'boards' => $boards,
             'parentArticle' => $parentArticle,
             'isEdit' => false,
+            'currentPublicScope' => 'members',
             'existingArticleContent' => $existingArticleContent,
         ];
 
@@ -189,7 +190,7 @@ class ArticleEditController extends MY_Controller
 
         $parsedUrl = parse_url($currentURL);
         $currentPath = $parsedUrl['path'];
-        if ($currentPath == "/article/articleeditcontroller") { // 신규 게시글 작성
+        if ($currentPath == "/article/articleeditcontroller" && strpos($currentURL, '?parentId=') === false) { // 신규 게시글 작성
             if ($depth !== '0') {
                 $errors[] = '신규 게시글 작성 시 Depth 값이 0이어야 합니다.';
             }

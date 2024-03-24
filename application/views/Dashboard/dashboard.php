@@ -35,7 +35,12 @@ $GLOBALS['pageResources'] = [
                     <dl>
                         <dt class="article-list-all-photo-box">
                             <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
-                                <img src="<?= $articleListAllimgfileUrls[$articleListAllArticle->getId()] ?? '기본 이미지 경로' ?>" alt="" class="article-list-all-img">
+                                <?php
+                                $defaultImagePath = 'assets/file/images/memberImgs/defaultImg/default.png';
+                                $imagePath = $articleListAllimgfileUrls[$articleListAllArticle->getId()] ?? $defaultImagePath;
+                                $imageVersion = file_exists($imagePath) ? filemtime($imagePath) : time();
+                                ?>
+                                <img src="<?= $imagePath . '?v=' . $imageVersion; ?>" alt="" class="article-list-all-img">
                             </a>
                         </dt>
                         <dd class="article-list-all-title-box">
@@ -46,6 +51,7 @@ $GLOBALS['pageResources'] = [
                                 <? $commentCount = $articleListAllcommentCounts[$articleListAllArticle->getId()] ?? 0; ?>
                                 <? if ($commentCount !== 0) : ?>
                                     <span class="article-list-all-comment-count">
+
                                         <?= '[' . $commentCount . ']' ?>
                                     </span>
                                 <? endif; ?>
@@ -100,7 +106,7 @@ $GLOBALS['pageResources'] = [
                                         <?= $freeBoardArticle->getTitle() ? htmlspecialchars($freeBoardArticle->getTitle(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                     </div>
                                     <div class="main-free-board-card-content">
-                                        <?= $freeBoardArticle->getContent() ? htmlspecialchars($freeBoardArticle->getContent(), ENT_QUOTES, 'UTF-8') : ''; ?>
+                                        <?= $freeBoardArticle->getContent() ? $freeBoardArticle->getContent() : ''; ?>
                                     </div>
                                     <div class="main-free-board-card-author">
                                         <?= $freeBoardArticle->getMember() ? htmlspecialchars($freeBoardArticle->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : ''; ?>

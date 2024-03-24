@@ -9,6 +9,7 @@ $GLOBALS['pageResources'] = [
 <section class="section-container" id="articleContent">
     <!-- article_list_all_content.php -->
     <div class="container">
+        <div id="articleIds" data-articles='<?= json_encode($articleIndexIds); ?>' style="display:none;"></div>
         <h1 class="title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h1>
 
         <? if (!empty($errors)) : ?>
@@ -282,37 +283,38 @@ $GLOBALS['pageResources'] = [
                 </tbody>
             </table>
         </div>
+        <input type="hidden" id="currentPage" name="currentPage" value="<?= $currentPage ?? 1; ?>">
         <div class="pagination-box">
             <div class="pagination">
-            <?
-            $startPage = max(1, $currentPage - 2);
-            $endPage = min($totalPages, $currentPage + 2);
+                <?
+                $startPage = max(1, $currentPage - 2);
+                $endPage = min($totalPages, $currentPage + 2);
 
-            // 첫 페이지로 가기 버튼
-            if ($currentPage > 1) {
-                echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-start-btn" data-page="1"><i class="fa-solid fa-angles-left"></i></a>';
-            }
+                // 첫 페이지로 가기 버튼
+                if ($currentPage > 1) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-start-btn" data-page="1"><i class="fa-solid fa-angles-left"></i></a>';
+                }
 
-            // 이전 페이지로 가는 버튼 (현재 페이지가 1페이지가 아닐 경우 항상 표시)
-            if ($currentPage > 1) {
-                echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-prev-btn" data-page="' . ($currentPage - 1) . '"><i class="fa-solid fa-angle-left"></i></a>';
-            }
+                // 이전 페이지로 가는 버튼 (현재 페이지가 1페이지가 아닐 경우 항상 표시)
+                if ($currentPage > 1) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-prev-btn" data-page="' . ($currentPage - 1) . '"><i class="fa-solid fa-angle-left"></i></a>';
+                }
 
-            for ($page = $startPage; $page <= $endPage; $page++) {
-                $isActive = ($page == $currentPage) ? 'active' : '';
-                echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn ' . $isActive . '" data-page="' . $page . '">' . $page . '</a>';
-            }
+                for ($page = $startPage; $page <= $endPage; $page++) {
+                    $isActive = ($page == $currentPage) ? 'active' : '';
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn ' . $isActive . '" data-page="' . $page . '">' . $page . '</a>';
+                }
 
-            // 다음 페이지로 가는 버튼 (현재 페이지가 마지막 페이지가 아닐 경우 항상 표시)
-            if ($currentPage < $totalPages) {
-                echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-next-btn" data-page="' . ($currentPage + 1) . '"><i class="fa-solid fa-angle-right"></i></a>';
-            }
+                // 다음 페이지로 가는 버튼 (현재 페이지가 마지막 페이지가 아닐 경우 항상 표시)
+                if ($currentPage < $totalPages) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-next-btn" data-page="' . ($currentPage + 1) . '"><i class="fa-solid fa-angle-right"></i></a>';
+                }
 
-            // 마지막 페이지로 가기 버튼
-            if ($currentPage < $totalPages) {
-                echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-end-btn" data-page="' . $totalPages . '"><i class="fa-solid fa-angles-right"></i></a>';
-            }
-            ?>
+                // 마지막 페이지로 가기 버튼
+                if ($currentPage < $totalPages) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-end-btn" data-page="' . $totalPages . '"><i class="fa-solid fa-angles-right"></i></a>';
+                }
+                ?>
             </div>
         </div>
         <div class="search-box">
@@ -335,7 +337,7 @@ $GLOBALS['pageResources'] = [
                         <input type="date" name="endDate" class="date-input" placeholder="종료 날짜" id="end-date" value="<?= htmlspecialchars($endDate); ?>">
                     </div>
 
-                    <select name="element" class="custom-input">
+                    <select name="element" class="custom-input" id="element">
                         <option value="article-comment" <?= ($element === 'article-comment') ? 'selected' : ''; ?>>게시글 + 댓글</option>
                         <option value="title" <?= ($element === 'title') ? 'selected' : ''; ?>>제목</option>
                         <option value="author" <?= ($element === 'author') ? 'selected' : ''; ?>>글작성자</option>
@@ -346,7 +348,7 @@ $GLOBALS['pageResources'] = [
                 </div>
 
                 <div class="search-keyword">
-                    <input type="text" name="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
+                    <input type="text" name="keyword" id="keyword" placeholder="검색어를 입력하세요" class="custom-input" value="<?= htmlspecialchars($keyword); ?>" required>
                     <button type="submit" class="search-btn">검색</button>
                 </div>
 

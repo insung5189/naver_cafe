@@ -563,7 +563,6 @@ $(document).ready(function () {
 
     console.log("현재 히스토리 상태 : ", history.state);
 
-
     // 로컬스토리지에 저장된 게시글 목록 세팅을 articleListState 라는 key값으로 불러옴(페이징, 검색여부, 게시글 출력수 등)
     var savedState = localStorage.getItem('articleListState');
     var state = JSON.parse(savedState);
@@ -584,6 +583,47 @@ $(document).ready(function () {
             window.location.href = '/article/articlelistcontroller/index/' + boardId;
         }
 
+    });
+
+    var articleIds = JSON.parse(localStorage.getItem('articles') || "[]");
+
+    var currentArticleId = $('#article').data('article-id').toString();
+
+    var currentIndex = articleIds.indexOf(currentArticleId);
+
+    var $prevButton = $('.prev-article-btn');
+    var $nextButton = $('.next-article-btn');
+
+    // 이전글 버튼 상태 업데이트
+    if (currentIndex <= 0) {
+        $prevButton.hide();
+    } else {
+        $prevButton.show();
+    }
+
+    // 다음글 버튼 상태 업데이트
+    if (currentIndex === -1 || currentIndex >= articleIds.length - 1) {
+        $nextButton.hide();
+    } else {
+        $nextButton.show();
+    }
+
+    // 이전글 버튼 클릭 이벤트
+    $(document).on('click', '.prev-article-btn', function () {
+        if (currentIndex > 0) {
+            // 이전 게시글로 이동
+            var prevArticleId = articleIds[currentIndex - 1];
+            window.location.href = `/article/articledetailcontroller/index/${prevArticleId}`;
+        }
+    });
+
+    // 다음글 버튼 클릭 이벤트
+    $(document).on('click', '.next-article-btn', function () {
+        if (currentIndex >= 0 && currentIndex < articleIds.length - 1) {
+            // 다음 게시글로 이동
+            var nextArticleId = articleIds[currentIndex + 1];
+            window.location.href = `/article/articledetailcontroller/index/${nextArticleId}`;
+        }
     });
 
 });

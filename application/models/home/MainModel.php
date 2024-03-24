@@ -407,9 +407,13 @@ class MainModel extends MY_Model
                 ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
         }
 
-        $queryBuilder->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+        if (isset($currentPage) || isset($currentPage)) {
+            $queryBuilder->orderBy('a.orderGroup', 'DESC')
+                ->setFirstResult(($currentPage - 1) * $articlesPerPage)
+                ->setMaxResults($articlesPerPage);
+        } else {
+            $queryBuilder->orderBy('a.orderGroup', 'DESC');
+        }
 
         return $queryBuilder->getQuery()->getResult();
     }

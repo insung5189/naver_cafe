@@ -8,7 +8,7 @@ class ArticleListModel extends MY_Model
         parent::__construct();
     }
 
-    public function getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage)
+    public function getArticlesByBoardIdAndPage($boardId, $currentPage = null, $articlesPerPage = null)
     {
         $queryBuilder = $this->em->createQueryBuilder();
 
@@ -18,10 +18,16 @@ class ArticleListModel extends MY_Model
             ->andWhere('a.depth >= 0') // 모든 게시글을 선택
             ->andWhere('a.isActive = 1') // 활성화된 게시글만
             ->orderBy('a.orderGroup', 'DESC')
-            ->addOrderBy('a.createDate', 'ASC') // createDate로 초기 정렬
+            ->addOrderBy('a.createDate', 'ASC')
             ->setParameter('boardId', $boardId);
 
         $results = $queryBuilder->getQuery()->getResult();
+
+        // 결과집합이 비어 있는지 확인
+        if (empty($results)) {
+            // 결과가 없을 경우, 빈 배열 반환 또는 예외 처리
+            return [];
+        }
 
         // 게시글을 orderGroup별로 묶어 정렬
         $groupedArticles = [];
@@ -29,51 +35,55 @@ class ArticleListModel extends MY_Model
             $groupedArticles[$article->getOrderGroup()][] = $article;
         }
 
+        $orderGroupByArticles = [];
         // 각 orderGroup 내에서 게시글을 부모-자식 관계에 따라 정렬
         foreach ($groupedArticles as $orderGroup => $articles) {
-            $tempArray = [];
-            foreach ($articles as $article) {
-                $parentId = $article->getParent() ? $article->getParent()->getId() : null;
-                $depth = $article->getDepth();
-                // 부모 ID를 기반으로 적절한 위치 찾기
-                if ($parentId !== NULL) {
-                    $positionFound = false;
-                    foreach ($tempArray as $index => $tempArticle) {
-                        if ($tempArticle->getId() == $parentId) {
-                            // 부모 바로 다음 위치에서 시작하여, 같은 부모를 가진 다음 자식까지의 범위에서 적절한 위치 찾기
-                            $insertPosition = $index + 1;
-                            while ($insertPosition < count($tempArray) && $tempArray[$insertPosition]->getParent() && $tempArray[$insertPosition]->getParent()->getId() == $parentId) {
-                                $insertPosition++;
-                            }
-                            array_splice($tempArray, $insertPosition, 0, [$article]);
-                            $positionFound = true;
-                            break;
-                        }
-                    }
-                    if (!$positionFound) {
-                        $tempArray[] = $article; // 부모가 없거나 아직 배열에 추가되지 않은 경우
-                    }
-                } else {
-                    $tempArray[] = $article; // 최상위 레벨 게시글
-                }
-            }
-            $orderGroupByArticles[$orderGroup] = $tempArray;
-        }
-        $flattenedArticles = [];
-        foreach ($orderGroupByArticles as $groupedArticles) {
-            foreach ($groupedArticles as $article) {
-                $flattenedArticles[] = $article;
-            }
+            $orderGroupByArticles[$orderGroup] = $this->sortArticlesByParentChildRelationship($articles);
         }
 
-        // 여기서 페이징 적용
-        $pagedArticles = array_slice(
-            $flattenedArticles,
-            ($currentPage - 1) * $articlesPerPage,
-            $articlesPerPage
-        );
+        // 배열 평탄화
+        $flattenedArticles = array_merge(...array_values($orderGroupByArticles));
+
+        // 페이징 처리 조건 확인 및 적용
+        if ($currentPage !== null && $articlesPerPage !== null) {
+            $pagedArticles = array_slice(
+                $flattenedArticles,
+                ($currentPage - 1) * $articlesPerPage,
+                $articlesPerPage
+            );
+        } else {
+            $pagedArticles = $flattenedArticles;
+        }
 
         return $pagedArticles;
+    }
+
+    protected function sortArticlesByParentChildRelationship($articles)
+    {
+        $tempArray = [];
+        foreach ($articles as $article) {
+            $parentId = $article->getParent() ? $article->getParent()->getId() : null;
+            if ($parentId !== null) {
+                $positionFound = false;
+                foreach ($tempArray as $index => $tempArticle) {
+                    if ($tempArticle->getId() == $parentId) {
+                        $insertPosition = $index + 1;
+                        while ($insertPosition < count($tempArray) && $tempArray[$insertPosition]->getParent() && $tempArray[$insertPosition]->getParent()->getId() == $parentId) {
+                            $insertPosition++;
+                        }
+                        array_splice($tempArray, $insertPosition, 0, [$article]);
+                        $positionFound = true;
+                        break;
+                    }
+                }
+                if (!$positionFound) {
+                    $tempArray[] = $article; // 부모가 없거나 아직 배열에 추가되지 않은 경우
+                }
+            } else {
+                $tempArray[] = $article; // 최상위 레벨 게시글
+            }
+        }
+        return $tempArray;
     }
 
     public function getAllArticlesByBoardId($boardId)
@@ -251,10 +261,13 @@ class ArticleListModel extends MY_Model
         $totalQuery->select('COUNT(a.id)');
         $totalCount = $totalQuery->getQuery()->getSingleScalarResult();
 
-        // 페이징 처리된 게시글 조회
-        $queryBuilder->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+        if (isset($currentPage) || isset($currentPage)) {
+            $queryBuilder->orderBy('a.orderGroup', 'DESC')
+                ->setFirstResult(($currentPage - 1) * $articlesPerPage)
+                ->setMaxResults($articlesPerPage);
+        } else {
+            $queryBuilder->orderBy('a.orderGroup', 'DESC');
+        }
         $pagedResults = $queryBuilder->getQuery()->getResult();
 
         return [
@@ -338,5 +351,19 @@ class ArticleListModel extends MY_Model
 
         $count = $queryBuilder->getQuery()->getSingleScalarResult();
         return $count > 0;
+    }
+
+    public function getFavoriteBoards($memberId)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('ab', 'bb')
+            ->from('Models\Entities\BoardBookmark', 'bb')
+            ->innerJoin('bb.articleBoard', 'ab')
+            ->where('bb.member = :memberId')
+            ->setParameter('memberId', $memberId);
+
+        $favoriteBoards = $queryBuilder->getQuery()->getResult();
+
+        return $favoriteBoards;
     }
 }

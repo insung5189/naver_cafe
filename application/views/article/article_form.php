@@ -60,7 +60,7 @@ $user = $_SESSION['user_data'];
                     </div>
                 </div>
                 <div class="title-box">
-                    <input class="custom-input" id="title" placeholder="제목을 입력해 주세요" required name="title" type="text" value="<?= $isEdit ? $article->getTitle() : null ?>">
+                    <input class="custom-input" id="title" placeholder="제목을 입력해 주세요" required name="title" type="text" value="<?= $isEdit && $article->getTitle() ? htmlspecialchars($article->getTitle(), ENT_QUOTES, 'UTF-8') : '' ?>">
                 </div>
 
                 <div>

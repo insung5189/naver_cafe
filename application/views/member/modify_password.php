@@ -1,3 +1,4 @@
+<!-- modify_password.php -->
 <?
 if (isset($_SESSION['user_data'])) {
     echo "<script>

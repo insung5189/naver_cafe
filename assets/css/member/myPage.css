@@ -31,7 +31,6 @@ h1 {
     margin: 0 auto;
 }
 
-
 .prfl-box {
     display: flex;
 }
@@ -235,13 +234,13 @@ h1 {
 
 .absolute {
     position: absolute;
-    top: 40%;
+    top: 58%;
     left: 71%;
 }
 
 .absolute-match {
     position: absolute;
-    top: 49%;
+    top: 70%;
     left: 71%;
 }
 

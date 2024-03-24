@@ -1,5 +1,6 @@
 <!-- article_list_by_content.php -->
 <div class="container">
+    <div id="articleIds" data-articles='<?= json_encode($articleIndexIds); ?>' style="display:none;"></div>
     <div>
         <h1 class="title"><?= $articleBoard->getBoardName() ? htmlspecialchars($articleBoard->getBoardName(), ENT_QUOTES, 'UTF-8') : '⚠️ 게시판정보 불러오기 실패'; ?></h1>
         <? if (isset($articleBoard) && isset($_SESSION['user_data'])) : ?>

@@ -1,5 +1,10 @@
 $(document).ready(function () {
 
+    var articleIdsStr = $('#articleIds').attr('data-articles');
+    var articleIds = JSON.parse(articleIdsStr);
+    localStorage.setItem('articles', JSON.stringify(articleIds));
+    console.log("초기 인덱스: ", localStorage.getItem('articles'));
+
     $(document).on('click', '#boardBookMarkBtn', function () {
         var boardId = $(this).data('article-board');
         var memberId = $(this).data('member-id');
@@ -18,9 +23,13 @@ $(document).ready(function () {
                 if (response.success) {
                     if (response.isBookmarked) {
                         $('#boardBookMarkBtn').find('.fa-star').removeClass('fa-regular').addClass('fa-solid');
+                        $('#favoriteBoardLayout').html(response.html);
+                        $('#favoriteBoardLayout').show();
                         alert('게시판이 즐겨찾기에 추가되었습니다.');
                     } else {
                         $('#boardBookMarkBtn').find('.fa-star').removeClass('fa-solid').addClass('fa-regular');
+                        $('#favoriteBoardLayout').html(response.html);
+                        $('#favoriteBoardLayout').show();
                         alert('즐겨찾기가 해제되었습니다.');
                     }
                 } else {
@@ -34,6 +43,8 @@ $(document).ready(function () {
     });
 
     var boardId = $('#articleContent').data('article-board-id');
+
+    saveCurrentStateInitial()
 
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {
@@ -72,6 +83,10 @@ $(document).ready(function () {
             dataType: 'json',
             success: function (response) {
                 $('#articleContent').html(response.html);
+                var articleIdsStr = $('#articleIds').attr('data-articles');
+                var articleIds = JSON.parse(articleIdsStr);
+                localStorage.setItem('articles', JSON.stringify(articleIds));
+                console.log("ajax업데이트 후: ", localStorage.getItem('articles'));
                 updateDateVisibility();
                 saveCurrentState();
                 window.history.pushState(data, '', window.location.pathname + '?' + $.param(data));
@@ -115,7 +130,8 @@ $(document).ready(function () {
         }
     };
 
-    console.log("초기 페이지의 히스토리 상태 : ", history.state);
+    console.log("초기 페이지의 히스토리 상태 : ", localStorage.getItem('articleListState'));
+
 
     // 게시글 목록으로 돌아가기 기능을 위해 로컬스토리지에 히스토리 상태를 저장 후 활용
     function saveCurrentState() {
@@ -128,6 +144,20 @@ $(document).ready(function () {
             period: $('#select-period').val(),
             startDate: $('#start-date').val(),
             endDate: $('#end-date').val()
+        };
+        localStorage.setItem('articleListState', JSON.stringify(state));
+    }
+
+    function saveCurrentStateInitial() {
+        var state = {
+            page: '1',
+            boardId: boardId,
+            articlesPerPage: '15',
+            keyword: '',
+            element: 'article-comment',
+            period: 'all',
+            startDate: '',
+            endDate: ''
         };
         localStorage.setItem('articleListState', JSON.stringify(state));
     }

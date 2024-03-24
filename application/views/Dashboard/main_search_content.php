@@ -1,5 +1,6 @@
     <!-- main_search_content.php -->
     <div class="container">
+        <div id="articleIds" data-articles='<?= json_encode($articleIndexIds); ?>' style="display:none;"></div>
         <h1 class="title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h1>
 
         <? if (!empty($errors)) : ?>

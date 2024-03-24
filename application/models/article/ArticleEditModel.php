@@ -27,13 +27,13 @@ class ArticleEditModel extends MY_Model
         }
     }
 
-    // 직속 자식글이 여러 개 있는 글 수정시도시 오류발생. 조건을 다르게 해야함.
     public function getParentArticleById($articleId)
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
-            ->where('a.parent = :articleId')
+            ->join('Models\Entities\Article', 'parent', 'WITH', 'a.id = parent.parent')
+            ->where('parent.id = :articleId')
             ->andWhere('a.isActive = 1')
             ->setParameter('articleId', $articleId);
 
@@ -42,7 +42,6 @@ class ArticleEditModel extends MY_Model
         try {
             return $query->getOneOrNullResult();
         } catch (\Doctrine\ORM\NonUniqueResultException $e) {
-            // 쿼리 결과가 유니크하지 않은 경우의 예외 처리
             throw new \Exception("Expected a single result but got multiple.");
         }
     }

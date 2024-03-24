@@ -4,3 +4,6 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php/$1 [L]
 </IfModule>
+<FilesMatch "\.(png|gif|jpg|jpeg|apng)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+</FilesMatch>

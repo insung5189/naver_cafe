@@ -159,6 +159,14 @@ h1 {
     font-weight: bold;
 }
 
+#file-info {
+    word-wrap: break-word;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 310px;
+}
+
 .message-box {
     display: inline-flex;
     align-items: center;

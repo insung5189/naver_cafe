@@ -1,6 +1,9 @@
 $(document).ready(function () {
 
-    console.log("현재 히스토리 상태 : ", history.state);
+    var articleIdsStr = $('#articleIds').attr('data-articles');
+    var articleIds = JSON.parse(articleIdsStr);
+    localStorage.setItem('articles', JSON.stringify(articleIds));
+    console.log("초기 인덱스: ", localStorage.getItem('articles'));
 
     $(document).on('change', '#select-period', function () {
         if ($('#select-period').val() === "custom") {
@@ -40,6 +43,10 @@ $(document).ready(function () {
                 $('#articleContent').html(response.html);
                 updateDateVisibility();
                 saveCurrentState();
+                var articleIdsStr = $('#articleIds').attr('data-articles');
+                var articleIds = JSON.parse(articleIdsStr);
+                localStorage.setItem('articles', JSON.stringify(articleIds));
+                console.log("ajax업데이트 후: ", localStorage.getItem('articles'));
                 window.history.pushState(data, '', window.location.pathname + '?' + $.param(data));
                 console.log("ajax요청 후 업데이트 된 히스토리 상태(전체글보기) : ", history.state);
             },

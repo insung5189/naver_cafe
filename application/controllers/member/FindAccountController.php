@@ -55,18 +55,18 @@ class FindAccountController extends MY_Controller
             'phone' => $this->input->post('phone', TRUE),
         ];
 
-        $user = $this->FindAccountModel->validateMember($formData);
+        $result = $this->FindAccountModel->validateMember($formData);
 
-        if ($user) {
+        if ($result['success']) {
             $this->session->set_userdata([
-                'resetMemberId' => $user->getId(),
-                'resetMemberEmail' => $user->getUserName(),
-                'resetMemberCreateDate' => $user->getCreateDate()->format('Y-m-d')
+                'resetMemberId' => $result->getId(),
+                'resetMemberEmail' => $result->getUserName(),
+                'resetMemberCreateDate' => $result->getCreateDate()->format('Y-m-d')
             ]);
             redirect('/member/findaccountcontroller/modifypassword');
         } else {
-            $this->session->set_flashdata('error', '일치하는 회원이 없습니다.');
-            redirect('/member/findaccountcontroller');
+            $this->session->set_flashdata('findPasswordError', $result['errors']['message']);
+            redirect('/member/findaccountcontroller/findEmailResult');
         }
     }
 
