@@ -39,12 +39,13 @@
             alert('<?= htmlspecialchars($this->session->flashdata('welcome_message'), ENT_QUOTES, 'UTF-8'); ?>');
         </script>
     <? endif; ?>
-</head>
-
-<body>
     <?
     header('Cache-Control: no-cache, no-store, must-revalidate');
     ?>
+</head>
+
+<body>
+
     <div class="wrap-main">
         <header>
             <a href="/">

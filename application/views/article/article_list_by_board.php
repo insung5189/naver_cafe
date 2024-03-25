@@ -244,7 +244,7 @@ $GLOBALS['pageResources'] = [
                                     </td>
 
                                     <td scope="col" class="td-like">
-                                        <span class="article-hit-row"><?= $article->getHit() ? htmlspecialchars($article->getHit()) : '조회수 없음'; ?></span>
+                                        <span class="article-hit-row"><?= isset($likes[$article->getId()]) ? $likes[$article->getId()] : 0; ?></span>
                                     </td>
 
                                 </tr>

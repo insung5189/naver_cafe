@@ -39,7 +39,7 @@ class ArticleDetailModel extends MY_Model
         return $result;
     }
 
-    public function getCommentsByArticleId($articleId, $sortOption = '', $depthOption = '', $treeOption = '')
+    public function getCommentsByArticleId($articleId, $sortOption = '', $depthOption = '', $treeOption = 'enabled')
     {
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('c')

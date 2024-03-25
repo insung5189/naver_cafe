@@ -128,7 +128,7 @@ $(document).ready(function () {
 
         $('#member-prfl-file-remove').show();
         $('#updatePrflImgBtn').show();
-        fileInfo.html(`파일이름 : ${file.name},<br>파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
+        fileInfo.html(`파일이름 : ${file.name}<br>파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
 
         const reader = new FileReader();
         reader.onload = function (e) {
@@ -168,6 +168,10 @@ $(document).ready(function () {
                         alert(response.message);
                         $('.my-page-image-preview').attr('src', response.filePath);
                         $('.profile-thumb img').attr('src', response.filePath);
+                        initialImgSrc = $('.my-page-image-preview').attr('src');
+                        $('#member-prfl-file-remove').hide();
+                        $('#updatePrflImgBtn').hide();
+                        $('#member-prfl-file-info').hide();
                     } else {
                         alert(response.message);
                     }

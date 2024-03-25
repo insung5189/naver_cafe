@@ -444,8 +444,7 @@ class MainModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('COUNT(DISTINCT a.id)') // 댓글 검색 조건이 포함된 경우에도, 그 결과가 속한 게시글의 개수만을 카운트함.
             ->from('Models\Entities\Article', 'a')
-            ->where('a.depth = 0')
-            ->andWhere('a.isActive = 1');
+            ->where('a.isActive = 1');
 
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {

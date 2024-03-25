@@ -57,15 +57,16 @@ class FindAccountController extends MY_Controller
 
         $result = $this->FindAccountModel->validateMember($formData);
 
-        if (isset($result)) {
+        if ($result['success']) {
+            $member = $result['member'];
             $this->session->set_userdata([
-                'resetMemberId' => $result->getId(),
-                'resetMemberEmail' => $result->getUserName(),
-                'resetMemberCreateDate' => $result->getCreateDate()->format('Y-m-d')
+                'resetMemberId' => $member->getId(),
+                'resetMemberEmail' => $member->getUserName(),
+                'resetMemberCreateDate' => $member->getCreateDate()->format('Y-m-d')
             ]);
             redirect('/member/findaccountcontroller/modifypassword');
         } else {
-            $this->session->set_flashdata('findPasswordError', $result['errors']['message']);
+            $this->session->set_flashdata('findPasswordError', $result['message']);
             redirect('/member/findaccountcontroller/findEmailResult');
         }
     }

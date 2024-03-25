@@ -218,11 +218,11 @@ $GLOBALS['pageResources'] = [
                                     최신순
                                 </div>
                             </a>
+                            <label class="tree-option-checkbox">
+                                <input type="radio" id="treeOptionCheckbox" data-article-id="<?= $article->getId() ?>" checked> 트리구조 정렬
+                            </label>
                             <label class="depth-option-checkbox">
                                 <input type="radio" id="depthOptionCheckbox" data-article-id="<?= $article->getId() ?>"> depth별 정렬
-                            </label>
-                            <label class="tree-option-checkbox">
-                                <input type="radio" id="treeOptionCheckbox" data-article-id="<?= $article->getId() ?>"> 트리구조 정렬
                             </label>
                         </div>
                     </div>

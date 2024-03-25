@@ -59,7 +59,7 @@ class ArticleListController extends MY_Controller
                 $articles = $searchResults['results'];
                 $totalArticleCount = $searchResults['total'];
                 $forArticleIndexResults = $this->ArticleListModel->searchArticles($boardId, $keyword, $element, $period, $startDate, $endDate, null, null);
-                $articleIndex =$forArticleIndexResults['results'];
+                $articleIndex = $forArticleIndexResults['results'];
             }
         } else {
             $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
@@ -83,6 +83,8 @@ class ArticleListController extends MY_Controller
 
         // 게시글별 댓글 개수 조회
         $commentCounts = $this->ArticleListModel->getCommentCountForArticles($articleIds);
+        // 게시글별 좋아요 수 조회
+        $likes = $this->ArticleListModel->getLikesByArticleIds($articleIds);
 
         $page_view_data = [
             'articleBoard' => $articleBoard,
@@ -103,7 +105,7 @@ class ArticleListController extends MY_Controller
             'startDate' => $startDate,
             'endDate' => $endDate,
             'isBookmarked' => $isBookmarked,
-            // 'likes' => $likes, 각 게시글의 좋아요 수 확인 후 입력예정
+            'likes' => $likes,
             'errors' => $errors ?? []
         ];
 
@@ -167,7 +169,7 @@ class ArticleListController extends MY_Controller
                         $articles = $searchResults['results'];
                         $totalArticleCount = $searchResults['total'];
                         $forArticleIndexResults = $this->ArticleListModel->searchArticles($boardId, $keyword, $element, $period, $startDate, $endDate, null, null);
-                        $articleIndex =$forArticleIndexResults['results'];
+                        $articleIndex = $forArticleIndexResults['results'];
                     }
                 } else {
                     $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
@@ -192,7 +194,7 @@ class ArticleListController extends MY_Controller
                 // 게시글별 댓글 개수 조회
                 $commentCounts = $this->ArticleListModel->getCommentCountForArticles($articleIds);
                 // 게시글별 좋아요 수 조회
-                $likes = $this->ArticleListModel->getLikesForArticles($articleIds);
+                $likes = $this->ArticleListModel->getLikesByArticleIds($articleIds);
 
                 $boardListData = [
                     'articleBoard' => $articleBoard,
