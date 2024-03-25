@@ -57,7 +57,7 @@ class FindAccountController extends MY_Controller
 
         $result = $this->FindAccountModel->validateMember($formData);
 
-        if ($result['success']) {
+        if (isset($result)) {
             $this->session->set_userdata([
                 'resetMemberId' => $result->getId(),
                 'resetMemberEmail' => $result->getUserName(),

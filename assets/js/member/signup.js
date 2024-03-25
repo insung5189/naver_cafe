@@ -143,17 +143,19 @@ $(document).ready(function () {
             return;
         }
 
-        if (!file.type.match('image.*')) {
+        if (!(file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/jpg')) {
             alert('이미지 파일만 업로드 가능합니다.');
             $('#file').val("");
-            fileInfo.html(`50mb이하의 이미지 파일만 등록 가능합니다. <br>다시 등록해주세요.`);
+            $('.image-preview').attr('src', 'https://i.imgur.com/0Vhk4jx.png');
+            fileInfo.html(`이미지 파일만 등록 가능합니다. <br>다시 등록해주세요.`);
             return;
         }
 
-        if (file.size > 52428800) {
-            alert('파일 크기가 너무 큽니다. 50MB 이하의 파일을 선택해주세요.');
+        if (file.size > 3145728) {
+            alert('파일 크기가 너무 큽니다. 3MB 이하의 파일을 선택해주세요.');
             $('#file').val("");
-            fileInfo.html(`50mb이하의 이미지 파일만 등록 가능합니다. <br>다시 등록해주세요.`);
+            $('.image-preview').attr('src', 'https://i.imgur.com/0Vhk4jx.png');
+            fileInfo.html(`3mb이하의 파일만 등록 가능합니다. <br>다시 등록해주세요.`);
             return;
         }
 
@@ -530,12 +532,12 @@ $(document).ready(function () {
             if (!validateFirstName()) {
                 scrollError('firstName');
                 alert('이름(First name / Given name) 입력이 잘못되었습니다.');
-            isValid = false;
+                isValid = false;
             }
             if (!validateLastName()) {
                 scrollError('lastName');
                 alert('성(Last name / Family name) 입력이 잘못되었습니다.');
-            isValid = false;
+                isValid = false;
             }
             if (!validateGenderSelect()) {
                 scrollError('gender');

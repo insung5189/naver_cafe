@@ -57,7 +57,7 @@
                 <form action="/mainController/mainSearch" method="GET" class="search-form-main">
                     <div class="search-keyword-main">
                         <input type="hidden" name="period" value="all">
-                        <input type="hidden" name="element" value="all">
+                        <input type="hidden" name="element" value="article-comment">
                         <input type="hidden" name="page" value="1">
                         <input type="hidden" name="articlesPerPage" value="15">
                         <input type="hidden" name="startDate" value="">

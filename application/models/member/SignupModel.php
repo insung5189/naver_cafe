@@ -226,33 +226,41 @@ class SignupModel extends MY_Model
     {
         $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'memberImgs' . DIRECTORY_SEPARATOR;
         $config['allowed_types'] = 'jpg|jpeg|png|bmp';
-        $config['max_size'] = '51200';
+        $config['max_size'] = '3072'; // 3MB
 
         $this->load->library('upload', $config);
 
         if (isset($_FILES['file']) && $_FILES['file']['name'] != '') {
-            if ($this->upload->do_upload('file')) {
+            if (!$this->upload->do_upload('file')) {
+                // 상세한 에러 메시지 처리
+                $uploadError = strip_tags($this->upload->display_errors());
+                if (strpos($uploadError, 'The filetype you are attempting to upload is not allowed.') !== false) {
+                    $errorData['errors'][] = '허용되지 않는 파일 형식입니다. JPG, JPEG, PNG, BMP 형식만 가능합니다.';
+                } elseif (strpos($uploadError, 'The file you are attempting to upload is larger than the permitted size.') !== false) {
+                    $errorData['errors'][] = '파일 크기가 너무 큽니다. 최대 3MB까지 업로드 가능합니다.';
+                } else {
+                    // 기타 에러 메시지
+                    $errorData['errors'][] = '파일 업로드 중 오류가 발생했습니다. 다시 시도해주세요.';
+                }
+            } else {
                 $uploadData = $this->upload->data();
                 $originalName = trim(pathinfo($uploadData['client_name'], PATHINFO_FILENAME));
                 $fileExt = $uploadData['file_ext'];
                 $uploadDate = date('Ymd');
                 $uuid = uniqid();
-                $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}"; // 새 파일명 생성 => {원본파일명}-{파일등록일}-{uuid}.{확장자}
+                $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}";
 
                 rename($uploadData['full_path'], $uploadData['file_path'] . $newFileName);
 
                 $formData['memberFilePath'] = $config['upload_path'] . $newFileName;
                 $formData['memberFileName'] = $newFileName;
-            } else {
-                $errorData['errors']['file'] = $this->upload->display_errors('', '');
             }
-        } else if (!isset($_FILES['file']) || $_FILES['file']['name'] == '') {
+        } else {
+            // 파일이 선택되지 않았을 때의 기본 처리
             $defaultImagePath = $config['upload_path'] . 'defaultImg' . DIRECTORY_SEPARATOR . 'default.png';
             $defaultImageName = 'default.png';
             $formData['memberFilePath'] = $defaultImagePath;
             $formData['memberFileName'] = $defaultImageName;
-        } else {
-            $errorData['errors'] = $this->upload->display_errors('', '');
         }
     }
 }

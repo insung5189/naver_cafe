@@ -88,6 +88,14 @@ h1 {
     margin-left: 17px;
 }
 
+#member-prfl-file-info {
+    width: 256px;
+    overflow: hidden;
+    word-wrap: break-word;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 .list-style {
     padding: 29px 0 10px;
     height: 25px;

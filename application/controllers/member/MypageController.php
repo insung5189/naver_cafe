@@ -118,26 +118,43 @@ class MypageController extends MY_Controller
     public function processUpdateProfileImage()
     {
 
+        if (!$this->input->is_ajax_request()) {
+            $this->loadErrorView();
+            return;
+        }
+
+        $userData = $this->session->userdata('user_data');
+        $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
+
         $config['upload_path'] = FCPATH . 'assets' . DIRECTORY_SEPARATOR . 'file' . DIRECTORY_SEPARATOR . 'images' . DIRECTORY_SEPARATOR . 'memberImgs' . DIRECTORY_SEPARATOR;
         $config['allowed_types'] = 'jpg|jpeg|png|bmp';
-        $config['max_size'] = '51200';
-        $config['encrypt_name'] = TRUE; // 파일명 암호화
+        $config['max_size'] = '3072';
 
         $this->load->library('upload', $config);
 
-        if (!$this->upload->do_upload('member-prfl-img')) {
-            echo json_encode(['success' => false, 'errors' => [$this->upload->display_errors()]]);
+        if (!$this->upload->do_upload('profileImage')) {
+            echo json_encode(['success' => false, 'message' => '이미지파일 업로드에 실패했습니다.']);
         } else {
             $uploadData = $this->upload->data();
-            $filePath = $uploadData['file_name'];
+            $originalName = trim(pathinfo($uploadData['client_name'], PATHINFO_FILENAME));
+            $fileExt = $uploadData['file_ext'];
+            $uploadDate = date('Ymd');
+            $uuid = uniqid();
+            $newFileName = "{$originalName}-{$uploadDate}-{$uuid}{$fileExt}"; // 새 파일명 생성 => {원본파일명}-{파일등록일}-{uuid}.{확장자}
 
-            // DB에 파일 경로 저장 로직 (예: 회원 정보 업데이트)
-            $result = $this->MypageModel->updateProfileImage($this->input->post('memberId'), $filePath);
+            rename($uploadData['full_path'], $uploadData['file_path'] . $newFileName);
+
+            $fileData = [
+                'filePath' => $config['upload_path'] . $newFileName,
+                'fileName' => $newFileName
+            ];
+
+            $result = $this->MypageModel->updateProfileImage($memberId, $fileData);
 
             if ($result) {
-                echo json_encode(['success' => true]);
+                echo json_encode(['success' => true, 'message' => '프로필 이미지가 성공적으로 변경되었습니다.', 'filePath' => base_url('assets/file/images/memberImgs/' . $newFileName)]);
             } else {
-                echo json_encode(['success' => false, 'errors' => ['프로필 이미지 업데이트 실패']]);
+                echo json_encode(['success' => false, 'message' => '프로필 이미지 업데이트 실패']);
             }
         }
     }
@@ -176,5 +193,14 @@ class MypageController extends MY_Controller
         } else {
             $errorData['errors']['file'] = $this->upload->display_errors('', '');
         }
+    }
+
+    public function loadErrorView()
+    {
+        $page_view_data = [
+            'title' => '잘못된 접근입니다.',
+            'message' => '정상적인 경로로 접근해주세요.',
+        ];
+        $this->layout->view('errors/error_page', $page_view_data);
     }
 }

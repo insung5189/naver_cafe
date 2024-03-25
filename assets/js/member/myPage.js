@@ -87,6 +87,9 @@ $(document).ready(function () {
         resetImagePreview(initialImgSrc);
     });
     $('#prfl-img-form').on('submit', submitPrflImgFormValidation);
+    $(document).on('click', '#updatePrflImgBtn', function () {
+        $('#prfl-img-form').submit();
+    });
 
     // 이미지 미리보기 및 파일 정보 표시
     function updateImagePreview(event) {
@@ -96,14 +99,23 @@ $(document).ready(function () {
         if (!file) {
             $('.my-page-image-preview').attr('src', initialImgSrc);
             $('#member-prfl-img-edit').val("");
-            fileInfo.html(`등록된 파일이 없습니다. 기존 이미지가 적용됩니다.`);
+            fileInfo.html(`등록된 파일이 없습니다.<br>기존 이미지가 적용됩니다.`);
             return;
         }
 
-        if (!file.type.match('image.*') || file.size > 5242880) {
-            alert('이미지 파일만 업로드 가능합니다.');
+        // 파일 유형(확장자) 검사
+        if (!(file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/jpg')) {
+            alert('jpg, jpeg, png, bmp 형식의 이미지 파일만 업로드 가능합니다.');
             $('#member-prfl-img-edit').val("");
-            fileInfo.html(`5mb이하의 이미지 파일만 등록 가능합니다. 다시 등록해주세요.`);
+            fileInfo.html(`jpg, jpeg, png, bmp 형식의 이미지 파일만 등록 가능합니다.<br>다시 등록해주세요.`);
+            return;
+        }
+
+        // 파일 크기 검사
+        if (file.size > 3145728) { // 3MB 이상인 경우
+            alert('파일 크기가 너무 큽니다. 3MB 이하의 파일을 선택해주세요.');
+            $('#member-prfl-img-edit').val(""); // 입력 필드 초기화
+            fileInfo.html(`3MB 이하의 이미지 파일만 등록 가능합니다.<br>다시 등록해주세요.`);
             return;
         }
 
@@ -113,7 +125,10 @@ $(document).ready(function () {
             fileSize = fileSize / 1024; // MB 단위로 변환
             fileSizeUnit = 'MB';
         }
-        fileInfo.html(`파일이름 : ${file.name},파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
+
+        $('#member-prfl-file-remove').show();
+        $('#updatePrflImgBtn').show();
+        fileInfo.html(`파일이름 : ${file.name},<br>파일용량 : ${fileSize.toFixed(2)} ${fileSizeUnit}`);
 
         const reader = new FileReader();
         reader.onload = function (e) {
@@ -126,17 +141,43 @@ $(document).ready(function () {
     function resetImagePreview(initialImgSrc) {
         $('.my-page-image-preview').attr('src', initialImgSrc);
         $('#member-prfl-img-edit').val("");
-        $('#member-prfl-file-info').html(`등록된 파일이 없습니다. 기존 이미지가 적용됩니다.`);
+        $('#updatePrflImgBtn').hide();
+        $('#member-prfl-file-info').html(`등록된 파일이 없습니다.<br>기존 이미지가 적용됩니다.`);
     }
 
     // 폼 제출 시 모든 유효성 검사 확인하여 문제 발생 시 폼 제출 방지
     function submitPrflImgFormValidation(event) {
-        if (true/*이미지파일항목에 관련된 조건*/) {
-            event.preventDefault();
-            if (true/*이미지파일항목에 관련된 조건*/) {
-                scrollError('???');
-                alert('전화번호 형식에 맞추어서\n입력해주시기 바랍니다.');
-            }
+        event.preventDefault();
+
+        var formData = new FormData();
+        var fileInput = $('#member-prfl-img-edit')[0];
+        if (fileInput.files && fileInput.files[0]) {
+            var file = fileInput.files[0];
+            formData.append('profileImage', file);
+
+            // AJAX 요청 구성
+            $.ajax({
+                url: '/member/mypagecontroller/processUpdateProfileImage',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        $('.my-page-image-preview').attr('src', response.filePath);
+                        $('.profile-thumb img').attr('src', response.filePath);
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function () {
+                    alert('프로필 이미지 변경 중 오류가 발생했습니다. 다시 시도해주세요.');
+                }
+            });
+        } else {
+            alert('변경할 이미지 파일을 선택해주세요.');
         }
     }
 

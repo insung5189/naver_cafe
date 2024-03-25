@@ -245,30 +245,26 @@ class MypageModel extends MY_Model
         return true;
     }
 
-    public function updateProfileImage($formData)
+    public function updateProfileImage($memberId, $fileData)
     {
-        $errors = ['errors' => []];
-
-        if (!empty($errors['errors'])) {
-            return ['success' => false, 'errors' => $errors['errors']];
-        }
 
         try {
-            $member = $this->em->getRepository('Models\Entities\Member')->find($formData['memberId']);
+            $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
             if (!$member) {
-                return ['success' => false, 'errors' => ['UserNotFound' => '사용자를 찾을 수 없습니다.']];
+                return ['success' => false, 'message' => '사용자를 찾을 수 없습니다.'];
             }
 
-            // 회원 정보 업데이트
-            $member->setNickName($formData['nickName']);
+            // 회원 프로필 정보 업데이트
+            $member->setMemberFilePath($fileData['filePath']);
+            $member->setMemberFileName($fileData['fileName']);
 
             $this->em->persist($member);
             $this->em->flush();
 
-            return ['success' => true, 'errors' => []];
+            return ['success' => true];
         } catch (\Exception $e) {
-            log_message('error', '회원정보 변경 실패: ' . $e->getMessage());
-            return ['success' => false, 'errors' => ['Exception' => '회원정보 변경 중 오류가 발생했습니다.']];
+            log_message('error', '프로필사진 변경 실패: ' . $e->getMessage());
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 }

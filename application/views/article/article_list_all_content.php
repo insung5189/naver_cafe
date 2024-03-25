@@ -143,9 +143,9 @@
                     <?
                     if (!empty($keyword)) {
                         $parentArticleDeleted = '';
-                        if ($article->getDepth() > 0 && $parentArticlesExist[$article->getId()]) {
+                        if ($article->getDepth() > 0 && $parentArticlesExistAllArticles[$article->getId()]) {
                             $parentArticleDeleted = '';
-                        } else if (!$parentArticlesExist[$article->getId()]) {
+                        } else if (!$parentArticlesExistAllArticles[$article->getId()]) {
                             $parentArticleDeleted = '[원글이 삭제된 답글]';
                         } else {
                             $parentArticleDeleted = '';
@@ -180,7 +180,7 @@
                                             </span>
                                         <? endif; ?>
                                     </a>
-                                    <? if (isset($childArticles[$article->getOrderGroup()])) : ?>
+                                    <? if (isset($childArticles[$article->getOrderGroup()]) && $article->getDepth() === 0) : ?>
                                         <a href="javascript:void(0);" class="show-reply" data-article-id="<?= $article->getId(); ?>">
                                             답글 <?= count($childArticles[$article->getOrderGroup()]) ?> <i class="fa-reply-toggle-arrow-<?= $article->getId(); ?> fa fa-caret-down"></i>
                                         </a>

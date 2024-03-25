@@ -227,6 +227,22 @@ class MainModel extends MY_Model
         return $result;
     }
 
+    public function checkChildArticlesParentExistForSearch($articles)
+    {
+        $result = [];
+        foreach ($articles as $article) {
+            $articleId = $article->getId();
+            if (!empty($article->getParent())) {
+                $articleParentId = $article->getParent()->getId();
+                $parentArticleExists = (bool)$this->getArticleById($articleParentId);
+                $result[$articleId] = $parentArticleExists;
+            } else {
+                $result[$articleId] = true;
+            }
+        }
+        return $result;
+    }
+
     // 부모글의 orderGroup를 key로 하고 자식글들을 배열에 담는 메서드(전체글보기에서 자식글이 존재하면 접었다 폈다 하기 위함.)
     public function getChildArticles()
     {
@@ -290,11 +306,10 @@ class MainModel extends MY_Model
         $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
-            ->where('a.isActive = 1')
-            ->andWhere('a.depth = 0');
+            ->where('a.isActive = 1');
 
         // 검색 조건 추가
-        if (!empty($keyword) && $element !== 'all') {
+        if (!empty($keyword)) {
             // 요소별 검색 (예: 제목, 작성자 등)
             if ($element !== 'all') {
                 switch ($element) {
@@ -310,9 +325,11 @@ class MainModel extends MY_Model
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
                             ->leftJoin('c.member', 'm')
+                            ->leftJoin('c.article', 'ca')
                             ->where('c.content LIKE :keyword')
                             ->andWhere('c.isActive = 1')
                             ->andWhere('m.isActive = 1')
+                            ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
@@ -352,29 +369,7 @@ class MainModel extends MY_Model
                 }
                 $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
             }
-        } else if (!empty($keyword) && $element === 'all') {
-            $subQuery = $this->em->createQueryBuilder()
-                ->select('IDENTITY(c.article)')
-                ->from('Models\Entities\Comment', 'c')
-                ->where('c.content LIKE :keyword')
-                ->andWhere('c.isActive = 1')
-                ->getDQL();
-
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('a.title', ':keyword'),
-                    $queryBuilder->expr()->like('a.content', ':keyword'),
-                    $queryBuilder->expr()->like('a.prefix', ':keyword'),
-                    $queryBuilder->expr()->like('ab.boardName', ':keyword'),
-                    $queryBuilder->expr()->like('m.nickName', ':keyword'),
-                    $queryBuilder->expr()->in('a.id', $subQuery)
-                )
-            )
-                ->leftJoin('a.articleBoard', 'ab')
-                ->leftJoin('a.member', 'm', 'WITH', 'm.isActive = 1 AND m.blacklist = 0')
-                ->setParameter('keyword', '%' . $keyword . '%');
         }
-
 
         // 기간 필터링 로직
         if ($period !== 'all') {
@@ -407,7 +402,7 @@ class MainModel extends MY_Model
                 ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
         }
 
-        if (isset($currentPage) || isset($currentPage)) {
+        if (isset($currentPage) && isset($articlesPerPage)) {
             $queryBuilder->orderBy('a.orderGroup', 'DESC')
                 ->setFirstResult(($currentPage - 1) * $articlesPerPage)
                 ->setMaxResults($articlesPerPage);
@@ -469,9 +464,11 @@ class MainModel extends MY_Model
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
                             ->leftJoin('c.member', 'm')
+                            ->leftJoin('c.article', 'ca')
                             ->where('c.content LIKE :keyword')
                             ->andWhere('c.isActive = 1')
                             ->andWhere('m.isActive = 1')
+                            ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
@@ -514,27 +511,6 @@ class MainModel extends MY_Model
                 }
                 $queryBuilder->setParameter('keyword', '%' . $keyword . '%');
             }
-        } else if (!empty($keyword) && $element === 'all') {
-            $subQuery = $this->em->createQueryBuilder()
-                ->select('IDENTITY(c.article)')
-                ->from('Models\Entities\Comment', 'c')
-                ->where('c.content LIKE :keyword')
-                ->andWhere('c.isActive = 1')
-                ->getDQL();
-
-            $queryBuilder->andWhere(
-                $queryBuilder->expr()->orX(
-                    $queryBuilder->expr()->like('a.title', ':keyword'),
-                    $queryBuilder->expr()->like('a.content', ':keyword'),
-                    $queryBuilder->expr()->like('a.prefix', ':keyword'),
-                    $queryBuilder->expr()->like('ab.boardName', ':keyword'),
-                    $queryBuilder->expr()->like('m.nickName', ':keyword'),
-                    $queryBuilder->expr()->in('a.id', $subQuery)
-                )
-            )
-                ->leftJoin('a.articleBoard', 'ab')
-                ->leftJoin('a.member', 'm', 'WITH', 'm.isActive = 1 AND m.blacklist = 0')
-                ->setParameter('keyword', '%' . $keyword . '%');
         }
 
         // 기간 필터링 로직

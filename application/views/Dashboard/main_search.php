@@ -15,15 +15,72 @@ $GLOBALS['pageResources'] = [
         <!-- 검색 요약 메시지 표시 -->
         <? if (!empty($keyword) && !empty($period) || !empty($startDate) || !empty($endDate)) : ?>
             <div class="search-summary">
-                <?php
-                echo '검색 조건: <br>';
+                <?
+                $searchSummary = '검색 조건: ';
+                $conditions = [];
 
                 if (!empty($keyword)) {
-                    echo htmlspecialchars("'{$keyword}' 키워드로 ", ENT_QUOTES, 'UTF-8') . '<br>';
+                    $conditions[] = "'{$keyword}' 키워드로 ";
                 }
 
-                echo "검색 범위: 전체(게시글 제목, 내용, 게시판, 댓글내용, 작성자, 말머리)" . '<br>';
-                echo "기간: 전체";
+                if (!empty($element) && $element !== 'all') {
+                    switch ($element) {
+                        case 'title':
+                            $elementText = '제목';
+                            break;
+                        case 'author':
+                            $elementText = '글작성자';
+                            break;
+                        case 'comment':
+                            $elementText = '댓글내용';
+                            break;
+                        case 'commentAuthor':
+                            $elementText = '댓글작성자';
+                            break;
+                        case 'article-comment':
+                            $elementText = '게시글 + 댓글';
+                            break;
+                        default:
+                            $elementText = $element;
+                    }
+                    $conditions[] = "검색 범위: {$elementText}";
+                }
+
+                if (!empty($period) && $period !== 'all') {
+                    switch ($period) {
+                        case '1day':
+                            $periodText = '최근 1일';
+                            break;
+                        case '1week':
+                            $periodText = '최근 1주';
+                            break;
+                        case '1month':
+                            $periodText = '최근 1개월';
+                            break;
+                        case '6months':
+                            $periodText = '최근 6개월';
+                            break;
+                        case '1year':
+                            $periodText = '최근 1년';
+                            break;
+                        case 'custom':
+                            $today = new DateTime();
+                            if (empty($startDate) && empty($endDate)) {
+                                $periodText = "{$today->format('Y-m-d')}(사용자 지정 기간이 지정되지 않았습니다.)";
+                            } else {
+                                $startDateText = !empty($startDate) ? $startDate : '오늘';
+                                $endDateText = !empty($endDate) ? $endDate : '오늘';
+                                $periodText = "{$startDateText}부터 {$endDateText}까지";
+                            }
+                            break;
+                        default:
+                            $periodText = $period;
+                    }
+                    $conditions[] = "기간: {$periodText}";
+                }
+
+                $searchSummary .= implode(', ', $conditions);
+                echo htmlspecialchars($searchSummary);
                 ?>
             </div>
         <? endif; ?>
@@ -81,7 +138,20 @@ $GLOBALS['pageResources'] = [
                 </colgroup>
                 <tbody>
                     <? foreach ($articles as $article) : ?>
-
+                        <?
+                        if (!empty($keyword)) {
+                            $parentArticleDeleted = '';
+                            if ($article->getDepth() > 0 && $parentArticlesExistAllArticles[$article->getId()]) {
+                                $parentArticleDeleted = '';
+                            } else if (!$parentArticlesExistAllArticles[$article->getId()]) {
+                                $parentArticleDeleted = '[원글이 삭제된 답글]';
+                            } else {
+                                $parentArticleDeleted = '';
+                            }
+                        } else {
+                            $parentArticleDeleted = '';
+                        }
+                        ?>
                         <tr class="normalTableTitleRow">
                             <td colspan="2" class="td-article">
 
@@ -94,6 +164,9 @@ $GLOBALS['pageResources'] = [
                                 <div class="title-list">
                                     <div class="inner-title-name">
                                         <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
+                                            <span class="parent-article-is-deleted">
+                                                <?= $parentArticleDeleted ?>
+                                            </span>
                                             <? if (!empty($article->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>
@@ -105,7 +178,7 @@ $GLOBALS['pageResources'] = [
                                                 </span>
                                             <? endif; ?>
                                         </a>
-                                        <? if (isset($childArticles[$article->getOrderGroup()])) : ?>
+                                        <? if (isset($childArticles[$article->getOrderGroup()]) && $article->getDepth() === 0) : ?>
                                             <a href="javascript:void(0);" class="show-reply" data-article-id="<?= $article->getId(); ?>">
                                                 답글 <?= count($childArticles[$article->getOrderGroup()]) ?> <i class="fa-reply-toggle-arrow-<?= $article->getId(); ?> fa fa-caret-down"></i>
                                             </a>
@@ -221,9 +294,32 @@ $GLOBALS['pageResources'] = [
         <div class="pagination-box">
             <div class="pagination">
                 <?
-                for ($page = 1; $page <= $totalPages; $page++) {
+                $startPage = max(1, $currentPage - 2);
+                $endPage = min($totalPages, $currentPage + 2);
+
+                // 첫 페이지로 가기 버튼
+                if ($currentPage > 1) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-start-btn" data-page="1"><i class="fa-solid fa-angles-left"></i></a>';
+                }
+
+                // 이전 페이지로 가는 버튼 (현재 페이지가 1페이지가 아닐 경우 항상 표시)
+                if ($currentPage > 1) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-prev-btn" data-page="' . ($currentPage - 1) . '"><i class="fa-solid fa-angle-left"></i></a>';
+                }
+
+                for ($page = $startPage; $page <= $endPage; $page++) {
                     $isActive = ($page == $currentPage) ? 'active' : '';
                     echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn ' . $isActive . '" data-page="' . $page . '">' . $page . '</a>';
+                }
+
+                // 다음 페이지로 가는 버튼 (현재 페이지가 마지막 페이지가 아닐 경우 항상 표시)
+                if ($currentPage < $totalPages) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-next-btn" data-page="' . ($currentPage + 1) . '"><i class="fa-solid fa-angle-right"></i></a>';
+                }
+
+                // 마지막 페이지로 가기 버튼
+                if ($currentPage < $totalPages) {
+                    echo '<a href="javascript:void(0);" class="article-list-all-page-btn page-btn page-end-btn" data-page="' . $totalPages . '"><i class="fa-solid fa-angles-right"></i></a>';
                 }
                 ?>
             </div>
@@ -249,7 +345,6 @@ $GLOBALS['pageResources'] = [
                     </div>
 
                     <select name="element" class="custom-input" id="element">
-                        <option value="all" <?= ($element === 'all') ? 'selected' : ''; ?>>전체</option>
                         <option value="article-comment" <?= ($element === 'article-comment') ? 'selected' : ''; ?>>게시글 + 댓글</option>
                         <option value="title" <?= ($element === 'title') ? 'selected' : ''; ?>>제목</option>
                         <option value="author" <?= ($element === 'author') ? 'selected' : ''; ?>>글작성자</option>

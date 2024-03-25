@@ -62,7 +62,12 @@ $GLOBALS['pageResources'] = [
                         <span>방문</span> <em class="count-num"><?= $member->getVisit(); ?></em> <span class="ml-17">작성글</span> <em class="count-num"><?= $articleCount; ?></em>
                     </div>
                     <div id="member-prfl-file-info"></div>
-                    <!-- <a href="javascript:void(0);" id="member-prfl-file-remove">이미지 삭제</a> -->
+                    <span class="profile-img-update-btn">
+                        <a href="javascript:void(0);" id="member-prfl-file-remove" style="display:none;">기존이미지</a>
+                    </span>
+                    <span class="profile-img-update-btn">
+                        <button type="button" id="updatePrflImgBtn" style="display:none;">프로필 사진 저장</button>
+                    </span>
                 </span>
 
             </div>

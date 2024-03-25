@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    console.log("게시글 인덱스: ", localStorage.getItem('articles'));
+
     $('.comment-content-box').each(function () {
         var trimmedText = $(this).text().trimStart();
 

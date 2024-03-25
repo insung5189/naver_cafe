@@ -35,12 +35,13 @@ class ArticleListAllController extends MY_Controller
             } else {
                 // 검색결과에 오류 없을 때
                 $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
-                $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
-                // $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
-                $childArticles = NULL;
+                // $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
+                $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
+                // $childArticles = NULL; // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                 // $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
-                // 검색결과에 페이징을 표시하기 위해 총 표시되는 게시글 수 확인.
                 $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountWithSearchForPagination($keyword, $element, $period, $startDate, $endDate);
+                // $totalArticleCountForPaginaion = count($articles);
+                $totalArticleCount = $totalArticleCountForPaginaion;
                 $articleIndex = $this->ArticleListAllModel->searchArticles($keyword, $element, $period, $startDate, $endDate, NULL, NULL);
             }
         } else {
@@ -54,6 +55,7 @@ class ArticleListAllController extends MY_Controller
 
         $totalPages = ceil($totalArticleCountForPaginaion / $articlesPerPage);
 
+        $parentArticlesExistAllArticles = $this->ArticleListAllModel->checkChildArticlesParentExistForSearch($articles);
         $parentArticlesExist = $this->ArticleListAllModel->checkChildArticlesParentExist($childArticles);
 
         // 게시글 ID 배열 생성
@@ -67,12 +69,11 @@ class ArticleListAllController extends MY_Controller
             }, $articleIndex);
         }
 
-
         // 게시글별 댓글 개수 조회
         $commentCounts = $this->ArticleListAllModel->getCommentCountForArticles($articleIds);
 
         $page_view_data = [
-            'title' => !empty($keyword) ? '검색 결과' : '전체글보기',
+            'title' => !empty($keyword) ? '전체글보기 검색 결과' : '전체글보기',
             'articles' => $articles,
             'articleIndexIds' => $articleIndexIds,
             'commentCounts' => $commentCounts,
@@ -81,6 +82,7 @@ class ArticleListAllController extends MY_Controller
             'articlesPerPage' => $articlesPerPage,
             'totalArticleCountAll' => $totalArticleCount,
             'parentArticlesExist' => $parentArticlesExist,
+            'parentArticlesExistAllArticles' => $parentArticlesExistAllArticles,
             'childArticles' => $childArticles,
             'keyword' => $keyword,
             'element' => $element,
@@ -124,8 +126,8 @@ class ArticleListAllController extends MY_Controller
                         // 검색결과에 오류 없을 때
                         $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                         // $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
-                        // $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
-                        $childArticles = NULL; // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
+                        $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
+                        // $childArticles = NULL; // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         // $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
                         $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountWithSearchForPagination($keyword, $element, $period, $startDate, $endDate);
                         // $totalArticleCountForPaginaion = count($articles);
@@ -143,12 +145,9 @@ class ArticleListAllController extends MY_Controller
 
                 $totalPages = ceil($totalArticleCountForPaginaion / $articlesPerPage);
 
-                if (empty($keyword)) {
-                    $parentArticlesExist = $this->ArticleListAllModel->checkChildArticlesParentExist($childArticles);
-                } else if (!empty($keyword)) {
-                    $parentArticlesExist = $this->ArticleListAllModel->checkChildArticlesParentExistForSearch($articles);
-                }
-
+                $parentArticlesExistAllArticles = $this->ArticleListAllModel->checkChildArticlesParentExistForSearch($articles);
+                $parentArticlesExist = $this->ArticleListAllModel->checkChildArticlesParentExist($childArticles);
+                
                 // 게시글 ID 배열 생성
                 $articleIds = array_map(function ($article) {
                     return $article->getId();
@@ -164,7 +163,7 @@ class ArticleListAllController extends MY_Controller
                 $commentCounts = $this->ArticleListAllModel->getCommentCountForArticles($articleIds);
 
                 $page_view_data = [
-                    'title' => !empty($keyword) ? '검색 결과' : '전체글보기',
+                    'title' => !empty($keyword) ? '전체글보기 검색 결과' : '전체글보기',
                     'articles' => $articles,
                     'articleIndexIds' => $articleIndexIds,
                     'commentCounts' => $commentCounts,
@@ -173,6 +172,7 @@ class ArticleListAllController extends MY_Controller
                     'articlesPerPage' => $articlesPerPage,
                     'totalArticleCountAll' => $totalArticleCount,
                     'parentArticlesExist' => $parentArticlesExist,
+                    'parentArticlesExistAllArticles' => $parentArticlesExistAllArticles,
                     'childArticles' => $childArticles,
                     'keyword' => $keyword,
                     'element' => $element,

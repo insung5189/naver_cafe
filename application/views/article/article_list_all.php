@@ -24,7 +24,7 @@ $GLOBALS['pageResources'] = [
         <!-- 검색 요약 메시지 표시 -->
         <? if (!empty($keyword) && !empty($period) || !empty($startDate) || !empty($endDate)) : ?>
             <div class="search-summary">
-                <?php
+                <?
                 $searchSummary = '검색 조건: ';
                 $conditions = [];
 
@@ -147,7 +147,20 @@ $GLOBALS['pageResources'] = [
                 </colgroup>
                 <tbody>
                     <? foreach ($articles as $article) : ?>
-
+                        <?
+                        if (!empty($keyword)) {
+                            $parentArticleDeleted = '';
+                            if ($article->getDepth() > 0 && $parentArticlesExistAllArticles[$article->getId()]) {
+                                $parentArticleDeleted = '';
+                            } else if (!$parentArticlesExistAllArticles[$article->getId()]) {
+                                $parentArticleDeleted = '[원글이 삭제된 답글]';
+                            } else {
+                                $parentArticleDeleted = '';
+                            }
+                        } else {
+                            $parentArticleDeleted = '';
+                        }
+                        ?>
                         <tr class="normalTableTitleRow">
                             <td colspan="2" class="td-article">
 
@@ -160,6 +173,9 @@ $GLOBALS['pageResources'] = [
                                 <div class="title-list">
                                     <div class="inner-title-name">
                                         <a href="/article/articledetailcontroller/index/<?= $article->getId(); ?>" class="article-title-link">
+                                            <span class="parent-article-is-deleted">
+                                                <?= $parentArticleDeleted ?>
+                                            </span>
                                             <? if (!empty($article->getPrefix())) : ?>
                                                 <span class="prefix">[<?= htmlspecialchars($article->getPrefix(), ENT_QUOTES, 'UTF-8'); ?>]</span>
                                             <? endif; ?>
@@ -171,7 +187,7 @@ $GLOBALS['pageResources'] = [
                                                 </span>
                                             <? endif; ?>
                                         </a>
-                                        <? if (isset($childArticles[$article->getOrderGroup()])) : ?>
+                                        <? if (isset($childArticles[$article->getOrderGroup()]) && $article->getDepth() === 0) : ?>
                                             <a href="javascript:void(0);" class="show-reply" data-article-id="<?= $article->getId(); ?>">
                                                 답글 <?= count($childArticles[$article->getOrderGroup()]) ?> <i class="fa-reply-toggle-arrow-<?= $article->getId(); ?> fa fa-caret-down"></i>
                                             </a>

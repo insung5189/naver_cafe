@@ -187,6 +187,7 @@ class ArticleListAllModel extends MY_Model
         $queryBuilder->select('a')
             ->from('Models\Entities\Article', 'a')
             ->where('a.isActive = 1');
+
         // 검색 조건 추가
         if (!empty($keyword) && $element !== 'all') {
             // 요소별 검색 (예: 제목, 작성자 등)
@@ -204,9 +205,11 @@ class ArticleListAllModel extends MY_Model
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
                             ->leftJoin('c.member', 'm')
+                            ->leftJoin('c.article', 'ca')
                             ->where('c.content LIKE :keyword')
                             ->andWhere('c.isActive = 1')
                             ->andWhere('m.isActive = 1')
+                            ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
@@ -279,7 +282,7 @@ class ArticleListAllModel extends MY_Model
                 ->setParameter('endDate', $endDate->format('Y-m-d H:i:s'));
         }
 
-        if (isset($currentPage) || isset($currentPage)) {
+        if (isset($currentPage) && isset($articlesPerPage)) {
             $queryBuilder->orderBy('a.orderGroup', 'DESC')
                 ->setFirstResult(($currentPage - 1) * $articlesPerPage)
                 ->setMaxResults($articlesPerPage);
@@ -340,9 +343,11 @@ class ArticleListAllModel extends MY_Model
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
                             ->leftJoin('c.member', 'm')
+                            ->leftJoin('c.article', 'ca')
                             ->where('c.content LIKE :keyword')
                             ->andWhere('c.isActive = 1')
                             ->andWhere('m.isActive = 1')
+                            ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
@@ -451,9 +456,11 @@ class ArticleListAllModel extends MY_Model
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
                             ->leftJoin('c.member', 'm')
+                            ->leftJoin('c.article', 'ca')
                             ->where('c.content LIKE :keyword')
                             ->andWhere('c.isActive = 1')
                             ->andWhere('m.isActive = 1')
+                            ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
                             ->getDQL();
 

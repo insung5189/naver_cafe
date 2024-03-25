@@ -181,9 +181,11 @@ class ArticleListModel extends MY_Model
                             ->select('IDENTITY(c.article)')
                             ->from('Models\Entities\Comment', 'c')
                             ->leftJoin('c.member', 'm')
+                            ->leftJoin('c.article', 'ca')
                             ->where('c.content LIKE :keyword')
                             ->andWhere('c.isActive = 1')
                             ->andWhere('m.isActive = 1')
+                            ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
                             ->getDQL();
 
@@ -365,5 +367,24 @@ class ArticleListModel extends MY_Model
         $favoriteBoards = $queryBuilder->getQuery()->getResult();
 
         return $favoriteBoards;
+    }
+
+    public function getLikesByArticleIds($articleIds)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('IDENTITY(l.article) AS articleId, COUNT(l.id) AS likeCount')
+            ->from('Models\Entities\Likes', 'l')
+            ->where($queryBuilder->expr()->in('l.article', ':articleIds'))
+            ->groupBy('l.article')
+            ->setParameter('articleIds', $articleIds);
+
+        $results = $queryBuilder->getQuery()->getResult();
+
+        $likes = [];
+        foreach ($results as $result) {
+            $likes[$result['articleId']] = $result['likeCount'];
+        }
+
+        return $likes;
     }
 }

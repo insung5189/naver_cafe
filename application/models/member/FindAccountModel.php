@@ -59,10 +59,10 @@ class FindAccountModel extends MY_Model
                 ->setParameter('phone', $formData['phone'])
                 ->getQuery();
 
-            $user = $query->getOneOrNullResult();
+            $result = $query->getOneOrNullResult();
 
-            if ($user !== null) {
-                return $user;
+            if ($result !== null) {
+                return ['success' => true, 'member' => $result];
             } else {
                 return ['success' => false, 'errors' => ['message' => '사용자를 찾을 수 없습니다.']];
             }
