@@ -18,6 +18,7 @@ class MainController extends MY_Controller
             return $article->getId();
         }, $articleListAllArticles);
         $articleListAllcommentCounts = $this->MainModel->getCommentCountForArticles($articleListAllarticleIds);
+        $articleListAllIndex = $this->MainModel->getArticleListAllImgs(NULL, NULL);
 
         // 자유게시판 영역
         $freeBoardArticles = $this->MainModel->getFreeBoardArticles(1, 4);
@@ -26,6 +27,7 @@ class MainController extends MY_Controller
             return $article->getId();
         }, $freeBoardArticles);
         $freeBoardArticlesCommentCounts = $this->MainModel->getCommentCountForArticles($freeBoardarticleIds);
+        $freeBoardArticlesIndex = $this->MainModel->getFreeBoardArticles(NULL, NULL);
 
         // 질문/답변게시판 영역
         $qnaBoardArticles = $this->MainModel->getQnaArticles(1, 13);
@@ -33,6 +35,7 @@ class MainController extends MY_Controller
             return $article->getId();
         }, $qnaBoardArticles);
         $qnaBoardArticlesCommentCounts = $this->MainModel->getCommentCountForArticles($qnaBoardarticleIds);
+        $qnaBoardArticlesIndex = $this->MainModel->getQnaArticles(NULL, NULL);
 
 
         $page_view_data = [
@@ -40,13 +43,16 @@ class MainController extends MY_Controller
             'articleListAllArticles' => $articleListAllArticles,
             'articleListAllimgfileUrls' => $articleListAllimgfileUrls,
             'articleListAllcommentCounts' => $articleListAllcommentCounts,
+            'articleListAllIndex' => $articleListAllIndex,
 
             'freeBoardArticles' => $freeBoardArticles,
             'freeBoardArticlesimgfileUrls' => $freeBoardArticlesimgfileUrls,
             'freeBoardArticlesCommentCounts' => $freeBoardArticlesCommentCounts,
+            'freeBoardArticlesIndex' => $freeBoardArticlesIndex,
 
             'qnaBoardArticles' => $qnaBoardArticles,
             'qnaBoardArticlesCommentCounts' => $qnaBoardArticlesCommentCounts,
+            'qnaBoardArticlesIndex' => $qnaBoardArticlesIndex,
         ];
         $this->layout->view('dashboard/dashboard', $page_view_data);
     }

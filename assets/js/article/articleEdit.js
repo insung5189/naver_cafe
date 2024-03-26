@@ -17,6 +17,7 @@ class MyUploadAdapter {
     _initRequest() {
         const xhr = this.xhr = new XMLHttpRequest();
         xhr.open('POST', '/article/articleEditController/uploadImgFile', true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.responseType = 'json';
         xhr.withCredentials = true; // IMPORTANT
     }
@@ -95,7 +96,7 @@ $(document).ready(function () {
             // ckfinder: {
             //     uploadUrl: '/article/articleEditController/uploadImgFile'
             // },
-            extraPlugins: [ MyCustomUploadAdapterPlugin ],
+            extraPlugins: [MyCustomUploadAdapterPlugin],
             mediaEmbed: {
                 previewsInData: true,
             },

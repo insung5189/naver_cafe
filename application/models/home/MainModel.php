@@ -17,9 +17,12 @@ class MainModel extends MY_Model
             ->andWhere('a.depth = 0')
             ->andWhere('a.content LIKE :contentPattern')
             ->setParameter('contentPattern', '%<figure class="image"><img src="/assets/file/articleFiles/img/%')
-            ->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+            ->orderBy('a.orderGroup', 'DESC');
+
+        if ($currentPage !== null && $articlesPerPage !== null) {
+            $queryBuilder->setFirstResult(($currentPage - 1) * $articlesPerPage)
+                ->setMaxResults($articlesPerPage);
+        }
 
         $articles = $queryBuilder->getQuery()->getResult();
 
@@ -34,13 +37,30 @@ class MainModel extends MY_Model
             ->where('a.isActive = 1')
             ->andWhere('a.depth = 0')
             ->andWhere('a.articleBoard = 1')
-            ->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
+            ->orderBy('a.orderGroup', 'DESC');
+
+        if ($currentPage !== null && $articlesPerPage !== null) {
+            $queryBuilder->setFirstResult(($currentPage - 1) * $articlesPerPage)
+                ->setMaxResults($articlesPerPage);
+        }
 
         $articles = $queryBuilder->getQuery()->getResult();
 
         return $articles;
+    }
+
+    public function getArticlesByPage($currentPage, $articlesPerPage)
+    {
+        $queryBuilder = $this->em->createQueryBuilder();
+        $queryBuilder->select('a')
+            ->from('Models\Entities\Article', 'a')
+            ->where('a.isActive = 1')
+            ->andWhere('a.depth = 0')
+            ->orderBy('a.orderGroup', 'DESC')
+            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
+            ->setMaxResults($articlesPerPage);
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     public function getQnaArticles($currentPage, $articlesPerPage)
@@ -100,14 +120,18 @@ class MainModel extends MY_Model
             }
         }
 
-        // 여기서 페이징 적용
-        $pagedArticles = array_slice(
-            $flattenedArticles,
-            ($currentPage - 1) * $articlesPerPage,
-            $articlesPerPage
-        );
+        if ($currentPage === null || $articlesPerPage === null) {
+            return $flattenedArticles;
+        } else {
+            // 여기서 페이징 적용
+            $pagedArticles = array_slice(
+                $flattenedArticles,
+                ($currentPage - 1) * $articlesPerPage,
+                $articlesPerPage
+            );
 
-        return $pagedArticles;
+            return $pagedArticles;
+        }
     }
 
     public function extractFirstImagePathsFromArticles($articles)
@@ -158,20 +182,6 @@ class MainModel extends MY_Model
 
         $query = $queryBuilder->getQuery();
         return $query->getSingleScalarResult();
-    }
-
-    public function getArticlesByPage($currentPage, $articlesPerPage)
-    {
-        $queryBuilder = $this->em->createQueryBuilder();
-        $queryBuilder->select('a')
-            ->from('Models\Entities\Article', 'a')
-            ->where('a.isActive = 1')
-            ->andWhere('a.depth = 0')
-            ->orderBy('a.orderGroup', 'DESC')
-            ->setFirstResult(($currentPage - 1) * $articlesPerPage)
-            ->setMaxResults($articlesPerPage);
-
-        return $queryBuilder->getQuery()->getResult();
     }
 
     public function getCommentCountForArticles($articleIds)

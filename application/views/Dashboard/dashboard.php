@@ -13,7 +13,7 @@ $GLOBALS['pageResources'] = [
         <span class="toggle-daemoon"></span>
     </div>
 </div>
-
+<div id="articleIds" data-articles='<?= json_encode($articleIndexIds); ?>' style="display:none;"></div>
 <div class="main-contents-area">
     <div class="article-list-all-view">
         <div class="list-title">
@@ -34,7 +34,7 @@ $GLOBALS['pageResources'] = [
                 <li class="album-box-li">
                     <dl>
                         <dt class="article-list-all-photo-box">
-                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link all-article-link">
                                 <?php
                                 $defaultImagePath = 'assets/file/images/memberImgs/defaultImg/default.png';
                                 $imagePath = $articleListAllimgfileUrls[$articleListAllArticle->getId()] ?? $defaultImagePath;
@@ -44,7 +44,7 @@ $GLOBALS['pageResources'] = [
                             </a>
                         </dt>
                         <dd class="article-list-all-title-box">
-                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link all-article-link">
                                 <span class="article-list-all-title-box-text">
                                     <?= $articleListAllArticle->getTitle() ? htmlspecialchars($articleListAllArticle->getTitle(), ENT_QUOTES, 'UTF-8') : '';  ?>
                                 </span>
@@ -58,7 +58,7 @@ $GLOBALS['pageResources'] = [
                             </a>
                         </dd>
                         <dd>
-                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link">
+                            <a href="/article/articledetailcontroller/index/<?= $articleListAllArticle->getId() ?>" class="article-link all-article-link">
                                 <span class="article-list-all-author-box-text">
                                     <?= $articleListAllArticle->getMember() ? htmlspecialchars($articleListAllArticle->getMember()->getNickName(), ENT_QUOTES, 'UTF-8') : ''; ?>
                                 </span>
@@ -98,7 +98,7 @@ $GLOBALS['pageResources'] = [
             </div>
             <ul class="main-free-board-ul">
                 <? foreach ($freeBoardArticles as $freeBoardArticle) : ?>
-                    <a href="/article/articledetailcontroller/index/<?= $freeBoardArticle->getId() ?>" class="article-link">
+                    <a href="/article/articledetailcontroller/index/<?= $freeBoardArticle->getId() ?>" class="article-link freeboard-article-link">
                         <li class="main-free-board-li">
                             <div class="main-free-board-card-area">
                                 <div class="main-free-board-card-info">
@@ -160,7 +160,7 @@ $GLOBALS['pageResources'] = [
 
                         <div class="main-qna-board-row">
                             <div class="main-qna-board-title" <?= $styleAttributes ?>>
-                                <a href="/article/articledetailcontroller/index/<?= $qnaBoardArticle->getId() ?>" class="article-link">
+                                <a href="/article/articledetailcontroller/index/<?= $qnaBoardArticle->getId() ?>" class="article-link qna-article-link">
                                     <? if ($qnaBoardArticle->getDepth() == 0) : ?>
                                         <span>ㆍ</span>
                                     <? elseif ($qnaBoardArticle->getDepth() > 0) : ?>
@@ -176,7 +176,7 @@ $GLOBALS['pageResources'] = [
                                 </a>
                             </div>
                             <div class="main-qna-board-hit">
-                                <a href="/article/articledetailcontroller/index/<?= $qnaBoardArticle->getId() ?>" class="article-link">
+                                <a href="/article/articledetailcontroller/index/<?= $qnaBoardArticle->getId() ?>" class="article-link qna-article-link">
                                     <?= $qnaBoardArticle->getHit() ?>
                                 </a>
                             </div>
