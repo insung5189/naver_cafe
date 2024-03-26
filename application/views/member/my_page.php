@@ -381,10 +381,10 @@ $GLOBALS['pageResources'] = [
 
             </div>
         <? endif; ?>
+        <? if (isset($_SESSION['user_data'])) : ?>
+            <!-- 비밀번호 변경 탭 내용 -->
+            <div id="modifyPasswordSection" style="display:none;">
 
-        <!-- 비밀번호 변경 탭 내용 -->
-        <div id="modifyPasswordSection" style="display:none;">
-            <? if (isset($_SESSION['user_data'])) : ?>
                 <? $user = $_SESSION['user_data']; ?>
                 <? $createDate = $this->session->userdata('create_date'); ?>
                 <? if (!empty($this->session->flashdata('error'))) : ?>
@@ -405,6 +405,9 @@ $GLOBALS['pageResources'] = [
 
                                 <div class="input-box">
                                     <input autofocus class="custom-input" maxlength="50" name="oldpassword" id="oldpassword" placeholder="기존 비밀번호를 입력해주세요." type="password" autocomplete="off" required>
+                                    <span id="togglePassword" class="toggle-password">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </span>
                                 </div>
                             </div>
 
@@ -448,22 +451,22 @@ $GLOBALS['pageResources'] = [
                         <div class="center btn-box">
                             <input class="btn find-account-btn" type="submit" value="비밀번호 변경">
                         </div>
+                    </form>
                 </div>
-                </form>
-        </div>
-    <?php else : ?>
-        <div class="error-message">
-            <h1 class="title">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                잘못된 접근입니다.
-            </h1>
-            <p class="page-guide">비밀번호 변경을 위해서는 올바른 절차를 따라야 합니다.</p>
-            <div class="btn-box flex-end">
-                <a href="/member/logincontroller" class="btn btn-primary">로그인 페이지로 이동</a>
-                <a href="/" class="btn btn-secondary">메인 페이지로 이동</a>
             </div>
-        </div>
-    <?php endif; ?>
+        <?php else : ?>
+            <div class="error-message">
+                <h1 class="title">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    잘못된 접근입니다.
+                </h1>
+                <p class="page-guide">비밀번호 변경을 위해서는 올바른 절차를 따라야 합니다.</p>
+                <div class="btn-box flex-end">
+                    <a href="/member/logincontroller" class="btn btn-primary">로그인 페이지로 이동</a>
+                    <a href="/" class="btn btn-secondary">메인 페이지로 이동</a>
+                </div>
+            </div>
+        <?php endif; ?>
     </div>
     </div>
 </section>

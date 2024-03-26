@@ -13,6 +13,24 @@ $(document).ready(function () {
         }
     });
 
+    $('#togglePassword').click(function () {
+        // 모든 비밀번호 입력 필드 선택
+        var passwordFields = $('input[type=password], input[type=text]').filter('#oldpassword, #newpassword, #newpasswordcf');
+
+        // 첫 번째 필드의 현재 타입으로 모든 필드의 상태 결정
+        var isPassword = passwordFields.first().attr('type') === 'password';
+
+        // 모든 비밀번호 필드의 타입을 토글
+        passwordFields.attr('type', isPassword ? 'text' : 'password');
+
+        // 아이콘 토글
+        if (isPassword) {
+            $(this).children('i').addClass('fa-eye-slash').removeClass('fa-eye');
+        } else {
+            $(this).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
     $('form').submit(function () {
         $(window).off('beforeunload');
     });

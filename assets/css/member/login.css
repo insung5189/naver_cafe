@@ -79,6 +79,13 @@ h1 {
     width: 90%;
 }
 
+.toggle-password {
+    cursor: pointer;
+    position: relative;
+    right: 35px;
+    top: 2px;
+}
+
 .custom-input {
     width: 50%;
     height: 35px;

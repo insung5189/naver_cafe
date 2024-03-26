@@ -15,8 +15,23 @@ $(document).ready(function () {
     $('form').submit(function () {
         $(window).off('beforeunload');
     });
-    
+
     $('#newpassword, #newpasswordcf').on('keyup', validatePasswordAndMatch);
+
+    $('#togglePassword').click(function () {
+        var newpassword = $('#newpassword');
+        var newpasswordcf = $('#newpasswordcf');
+
+        var fieldType = newpassword.attr('type') === 'password' ? 'text' : 'password';
+        newpassword.attr('type', fieldType);
+        newpasswordcf.attr('type', fieldType);
+
+        if (fieldType === 'password') {
+            $(this).children('i').addClass('fa-eye').removeClass('fa-eye-slash');
+        } else {
+            $(this).children('i').removeClass('fa-eye').addClass('fa-eye-slash');
+        }
+    });
 
     // 비밀번호 유효성 검사 및 일치 확인
     function validatePasswordAndMatch() {

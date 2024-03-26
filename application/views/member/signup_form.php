@@ -91,7 +91,10 @@ $GLOBALS['pageResources'] = [
 
                     <div class="input-box">
                         <input class="custom-input" id="password1" maxlength="50" placeholder="비밀번호를 입력해주세요." required name="password1" type="password">
-                        <span class="description pl-5" id="password-validation-message"></span>
+                        <span id="togglePassword" class="toggle-password">
+                            <i class="fa-solid fa-eye"></i>
+                        </span>
+                        <span class="position description pl-5" id="password-validation-message"></span>
                     </div>
 
                 </div>

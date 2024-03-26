@@ -43,6 +43,19 @@ $(document).ready(function () {
     $('#birth').on('keyup', validateBirthDate);
     $('#birth').on('blur', validateBirthDate);
 
+    $('#togglePassword').click(function () {
+        var passwordField = $('#password1');
+        var passwordFieldType = passwordField.attr('type');
+
+        if (passwordFieldType == 'password') {
+            passwordField.attr('type', 'text');
+            $(this).children('i').addClass('fa-eye-slash').removeClass('fa-eye');
+        } else {
+            passwordField.attr('type', 'password');
+            $(this).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
     function duplicateEmail() {
         const userName = $('#userName').val();
         if (!userName) {

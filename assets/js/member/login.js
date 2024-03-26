@@ -26,6 +26,19 @@ $(document).ready(function () {
         }
     });
 
+    $('#togglePassword').click(function () {
+        var passwordField = $('#password');
+        var passwordFieldType = passwordField.attr('type');
+
+        if (passwordFieldType == 'password') {
+            passwordField.attr('type', 'text');
+            $(this).children('i').addClass('fa-eye-slash').removeClass('fa-eye');
+        } else {
+            passwordField.attr('type', 'password');
+            $(this).children('i').removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
     $('#userName').on('keyup', validateEmail);
 
     // 이메일 유효성 검사 keyup

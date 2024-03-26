@@ -262,6 +262,13 @@ h1 {
     margin-top: 4px;
 }
 
+.toggle-password {
+    cursor: pointer;
+    position: relative;
+    right: 35px;
+    top: 2px;
+}
+
 .custom-input {
     width: 300px;
     height: 35px;

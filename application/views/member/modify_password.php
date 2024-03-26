@@ -70,8 +70,11 @@ $GLOBALS['pageResources'] = [
                                 </label>
                             </div>
 
-                            <div class="input-box">
+                            <div class="input-box height">
                                 <input autofocus class="custom-input" maxlength="50" name="newpassword" id="newpassword" placeholder="신규 비밀번호를 입력해주세요." type="password" autocomplete="off" required>
+                                <span id="togglePassword" class="toggle-password">
+                                    <i class="fa-solid fa-eye toggle-password"></i>
+                                </span>
                             </div>
                         </div>
 
