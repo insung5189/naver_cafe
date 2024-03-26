@@ -53,7 +53,6 @@ class ArticleEditController extends MY_Controller
             return;
         }
         if ($this->session->userdata('editArticleId')) {
-            $this->session->unset_userdata('editArticleId');
         }
 
         $viewedArticleId = $this->session->userdata('viewedArticleId');
@@ -112,12 +111,13 @@ class ArticleEditController extends MY_Controller
             'currentPublicScope' => $currentPublicScope,
             'prefixes' => $prefixes,
         ];
-
+        log_message('debug', '수정 페이지 로드 후 Session editArticleId: ' . $this->session->userdata('editArticleId'));
         $this->layout->view('article/article_form', $data);
     }
 
     public function createArticle()
     {
+        log_message('debug', '수정 요청 보낸 후 Session editArticleId: ' . $this->session->userdata('editArticleId'));
         if (!$this->input->is_ajax_request()) {
             $this->loadErrorView();
             return;
@@ -132,7 +132,6 @@ class ArticleEditController extends MY_Controller
             echo json_encode(['success' => false, 'message' => '로그인이 필요합니다.', 'loginRequired' => true, 'loginUrl' => $loginUrl]);
             return;
         }
-
         $isEdit = false;
         $articleId = $this->session->userdata('editArticleId');
         $currentURL = $this->input->post('currentURL', TRUE);
@@ -502,6 +501,8 @@ class ArticleEditController extends MY_Controller
 
     public function uploadImgFile()
     {
+
+        log_message('debug', 'uploadImgFile()처리 시작 전 Session editArticleId: ' . $this->session->userdata('editArticleId'));
         $tempPath = 'assets/file/temporary/';
 
         $imgExtensions = ['gif', 'jpg', 'png', 'jpeg', 'webp', 'bmp'];
@@ -535,7 +536,7 @@ class ArticleEditController extends MY_Controller
         $config['file_name'] = $newName;
 
         $this->load->library('upload', $config);
-
+        log_message('debug', 'uploadImgFile()처리 끝난 후 Session editArticleId: ' . $this->session->userdata('editArticleId'));
         if (!$this->upload->do_upload('upload')) {
             $error = ['uploaded' => 0, 'error' => ['message' => strip_tags($this->upload->display_errors())]];
             echo json_encode($error);
