@@ -560,18 +560,18 @@ class MainModel extends MY_Model
     {
         $errors = [];
 
-        if (!empty($keyword) && strlen($keyword) > 20) {
-            $errors['keyword'] = '키워드는 20자를 초과할 수 없습니다.';
+        if (!empty($keyword) && mb_strlen($keyword, 'UTF-8') > 20) {
+            $errors[] = '키워드는 20자를 초과할 수 없습니다.';
         }
 
         $validElements = ['all', 'article-comment', 'title', 'author', 'comment', 'commentAuthor'];
         if (!empty($element) && !in_array($element, $validElements)) {
-            $errors['element'] = '지원되지 않는 검색 요소입니다.';
+            $errors[] = '지원되지 않는 검색 요소입니다.';
         }
 
         $validPeriods = ['all', '1day', '1week', '1month', '6months', '1year', 'custom'];
         if (!empty($period) && !in_array($period, $validPeriods)) {
-            $errors['period'] = '지원되지 않는 기간입니다.';
+            $errors[] = '지원되지 않는 기간입니다.';
         }
 
         $today = new DateTime();
@@ -581,19 +581,19 @@ class MainModel extends MY_Model
         $endDateObj = $endDate ? DateTime::createFromFormat('Y-m-d', $endDate) : null;
 
         if ($startDate && !$startDateObj) {
-            $errors['startDate'] = '시작 날짜 형식이 유효하지 않습니다. (예: YYYY-MM-DD)';
+            $errors[] = '시작 날짜 형식이 유효하지 않습니다. (예: YYYY-MM-DD)';
         } else if ($startDateObj && $startDateObj > $today) {
-            $errors['startDate'] = '시작 날짜는 오늘 날짜를 초과할 수 없습니다.';
+            $errors[] = '시작 날짜는 오늘 날짜를 초과할 수 없습니다.';
         }
 
         if ($endDate && !$endDateObj) {
-            $errors['endDate'] = '종료 날짜 형식이 유효하지 않습니다. (예: YYYY-MM-DD)';
+            $errors[] = '종료 날짜 형식이 유효하지 않습니다. (예: YYYY-MM-DD)';
         } else if ($endDateObj && $endDateObj > $today) {
-            $errors['endDate'] = '종료 날짜는 오늘 날짜를 초과할 수 없습니다.';
+            $errors[] = '종료 날짜는 오늘 날짜를 초과할 수 없습니다.';
         }
 
         if ($startDateObj && $endDateObj && $startDateObj > $endDateObj) {
-            $errors['dateRange'] = '시작 날짜는 종료 날짜보다 이후일 수 없습니다.';
+            $errors[] = '시작 날짜는 종료 날짜보다 이후일 수 없습니다.';
         }
 
         return $errors;

@@ -79,7 +79,7 @@
 
                             <td scope="col" class="td-create-date">
                                 <span class="article-create-date-row">
-                                    <?= $likedArticle->getModifyDate() ? $likedArticle->getModifyDate()->format('Y.m.d H:i') : $likedArticle->getCreateDate()->format('Y.m.d H:i'); ?>
+                                    <?= $likedArticle->getCreateDate() ? $likedArticle->getCreateDate()->format('Y.m.d H:i') : ''; ?>
                                 </span>
                             </td>
 

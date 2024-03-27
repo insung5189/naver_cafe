@@ -56,12 +56,14 @@ class ArticleListController extends MY_Controller
                 $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
                 $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
             } else {
+                $errors = NULL;
                 $articles = $searchResults['results'];
                 $totalArticleCount = $searchResults['total'];
                 $forArticleIndexResults = $this->ArticleListModel->searchArticles($boardId, $keyword, $element, $period, $startDate, $endDate, null, null);
                 $articleIndex = $forArticleIndexResults['results'];
             }
         } else {
+            $errors = NULL;
             $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
             $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
             $articleIndex = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, NULL, NULL);
@@ -166,12 +168,14 @@ class ArticleListController extends MY_Controller
                         $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
                         $articleIndex = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, NULL, NULL);
                     } else {
+                        $errors = NULL;
                         $articles = $searchResults['results'];
                         $totalArticleCount = $searchResults['total'];
                         $forArticleIndexResults = $this->ArticleListModel->searchArticles($boardId, $keyword, $element, $period, $startDate, $endDate, null, null);
                         $articleIndex = $forArticleIndexResults['results'];
                     }
                 } else {
+                    $errors = NULL;
                     $articles = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, $currentPage, $articlesPerPage);
                     $totalArticleCount = count($this->ArticleListModel->getAllArticlesByBoardId($boardId));
                     $articleIndex = $this->ArticleListModel->getArticlesByBoardIdAndPage($boardId, NULL, NULL);
@@ -201,7 +205,7 @@ class ArticleListController extends MY_Controller
                     'title' => !empty($keyword) ? '검색 결과' : $title,
                     'boardGuide' => !empty($keyword) ? '검색조건을 이용한 검색결과입니다.' : $boardGuide,
                     'articles' => $articles,
-                    'articleIndexIds' => $articleIndexIds,
+                    'articleIndexIds' => $articleIndexIds ?? NULL,
                     'commentCounts' => $commentCounts,
                     'totalArticleCountAll' => $totalArticleCount,
                     'parentArticlesExist' => $parentArticlesExist,
@@ -221,7 +225,7 @@ class ArticleListController extends MY_Controller
                 $html = $this->load->view('article/article_list_by_board_content', $boardListData, TRUE);
 
                 // 데이터를 JSON 형태로 반환
-                echo json_encode(['success' => true, 'html' => $html]);
+                echo json_encode(['success' => true, 'html' => $html, 'errors' => $errors]);
             } catch (\Exception $e) {
                 echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
             }

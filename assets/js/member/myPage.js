@@ -221,9 +221,10 @@ $(document).ready(function () {
     const nameRegex = /^[A-Za-z\u00C0-\u00FF\u0100-\u017F\u0180-\u024F\u0370-\u03FF\u0400-\u04FF\u1E00-\u1EFF\u2C00-\u2C7F\u2D00-\u2D2F\u3000-\u303F\u3400-\u4DBF\u4E00-\u9FFF\uA000-\uA48F\uA490-\uA4CF\uAC00-\uD7AF\uF900-\uFAFF\uFE30-\uFE4F-'\s]+$/;
 
     var originalNickName = $('#nickName').val();
-
-    $('#duplicateNickname').click(duplicateNickname);
-    // $('#nickName').on('keyup, focus, input', validateNickname);
+    $(document).on('click', '#duplicateNickname', function () {
+        duplicateNickname();
+    });
+    $('#nickName').on('keyup, focus, input', validateNickname);
 
     $('#nickName').on('keyup focus input', function () {
         var currentNickName = $(this).val();
@@ -236,12 +237,13 @@ $(document).ready(function () {
             $('#isNickNameChecked').val('false');
             $('#duplicateNickname').show();
             $('#duplicateNickname').val('중복확인');
+            $('#duplicateNickname').attr('disabled', false);
             $('#nickname-duplication-check-message').text('❌ 닉네임 중복 확인이 필요합니다.').css('color', 'red');
         }
     });
-    $('#nickName').on('keyup click', function () {
-        resetNicknameValidation();
-    });
+    // $('#nickName').on('keyup click', function () {
+    //     resetNicknameValidation();
+    // });
     $('#phone').on('keyup input click', validatePhone);
     $('#firstName').on('keyup focus input click', validateFirstName);
     $('#lastName').on('keyup focus input click', validateLastName);
@@ -267,19 +269,20 @@ $(document).ready(function () {
     //     }
     // }
 
-    function resetNicknameValidation() {
-        var currentNickName = $('#nickName').val();
-        if (originalNickName === currentNickName) {
-            $('#isNickNameChecked').val('true');
-            $('#duplicateNickname').hide();
-            $('#nickname-duplication-check-message').text('✔️ 기존에 사용하던 닉네임입니다.').css('color', 'green');
-        } else {
-            $('#isNickNameChecked').val('false');
-            $('#duplicateNickname').show();
-            $('#duplicateNickname').val('중복확인');
-            $('#nickname-duplication-check-message').text('❌ 닉네임 중복 확인이 필요합니다.').css('color', 'red');
-        }
-    }
+    // function resetNicknameValidation() {
+    //     var currentNickName = $('#nickName').val();
+    //     if (originalNickName === currentNickName) {
+    //         $('#isNickNameChecked').val('true');
+    //         $('#duplicateNickname').hide();
+    //         $('#nickname-duplication-check-message').text('✔️ 기존에 사용하던 닉네임입니다.').css('color', 'green');
+    //     } else {
+    //         $('#isNickNameChecked').val('false');
+    //         $('#duplicateNickname').show();
+    //         $('#duplicateNickname').val('중복확인');
+    //         $('#duplicateNickname').attr('disabled', false);
+    //         $('#nickname-duplication-check-message').text('❌ 닉네임 중복 확인이 필요합니다.').css('color', 'red');
+    //     }
+    // }
 
     // textarea 최대 허용길이 설정
     var textMaxLength = 500;
@@ -398,7 +401,7 @@ $(document).ready(function () {
         if (originalNickName !== currentNickName) {
             validationResults.fieldId = '#nickName';
             validationResults.tabToShow = '#linkToProfileInfo';
-            const nicknameInput = $('#nickName').val().trim();
+            const nicknameInput = $('#nickName').val();
             const nicknameValidationMessage = $('#nickname-duplication-check-message');
 
             // 길이 검사
@@ -418,7 +421,7 @@ $(document).ready(function () {
             }
 
             // 유효하지 않은 문자 포함 검사
-            if (/[^가-힣a-zA-Z0-9]/.test(nicknameInput)) {
+            if (/[^가-힣a-zA-Z0-9]/.test(nicknameInput) || /^\s|\s$/.test(nicknameInput)) {
                 validationResults.isValid = false;
                 validationResults.validErrorMsg = '닉네임에 유효하지 않은 문자가 포함되어 있습니다.';
                 nicknameValidationMessage.html('❌ 유효하지 않은 문자가 있습니다.').css('color', 'red');
@@ -446,7 +449,7 @@ $(document).ready(function () {
     function validateFirstName() {
         validationResults.fieldId = '#firstName';
         validationResults.tabToShow = '#linkToProfileInfo';
-        const firstName = $('#firstName').val().trim();
+        const firstName = $('#firstName').val();
         const firstNameMessage = $('#firstname-validation-message');
 
         if (firstName == null || firstName == '') {
@@ -455,7 +458,7 @@ $(document).ready(function () {
             firstNameMessage.text('❌ 이름을 입력해주세요.').css('color', 'red');
             return validationResults;
         }
-        if (!nameRegex.test(firstName)) {
+        if (!nameRegex.test(firstName) || /^\s|\s$/.test(firstName)) {
             validationResults.isValid = false;
             validationResults.validErrorMsg = '이름 : 잘못된 입력입니다.';
             firstNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
@@ -473,7 +476,7 @@ $(document).ready(function () {
     function validateLastName() {
         validationResults.fieldId = '#lastName';
         validationResults.tabToShow = '#linkToProfileInfo';
-        const lastName = $('#lastName').val().trim();
+        const lastName = $('#lastName').val();
         const lastNameMessage = $('#lastname-validation-message');
 
         if (lastName == null || lastName == '') {
@@ -482,7 +485,7 @@ $(document).ready(function () {
             lastNameMessage.text('❌ 성을 입력해주세요.').css('color', 'red');
             return validationResults;
         }
-        if (!nameRegex.test(lastName)) {
+        if (!nameRegex.test(lastName) || /^\s|\s$/.test(lastName)) {
             validationResults.isValid = false;
             validationResults.validErrorMsg = '성 : 잘못된 입력입니다.';
             lastNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
@@ -617,32 +620,32 @@ $(document).ready(function () {
             } else {
                 showErrorAndScrollToField(validationResults);
             }
-        }
+        } else {
+            // 폼 데이터 수집
+            var formData = new FormData(this);
 
-        // 폼 데이터 수집
-        var formData = new FormData(this);
-
-        // AJAX 요청
-        $.ajax({
-            url: '/member/MypageController/processUpdateProfile',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (response) {
-                if (response.success) {
-                    alert(response.message);
-                    window.location.reload();
-                } else {
-                    var errorMessages = Object.values(response.errors).join('\n');
-                    alert(errorMessages);
+            // AJAX 요청
+            $.ajax({
+                url: '/member/MypageController/processUpdateProfile',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function (response) {
+                    if (response.success) {
+                        alert(response.message);
+                        window.location.reload();
+                    } else {
+                        var errorMessages = Object.values(response.errors).join('\n');
+                        alert(errorMessages);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('회원정보 수정에 실패했습니다. 다시 시도해주세요.');
                 }
-            },
-            error: function (xhr, status, error) {
-                alert('회원정보 수정에 실패했습니다. 다시 시도해주세요.');
-            }
-        });
+            });
+        }
     }
 
 

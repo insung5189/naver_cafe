@@ -76,7 +76,7 @@
 
                             <td scope="col" class="td-create-date">
                                 <span class="article-create-date-row">
-                                    <?= $commentedArticle->getModifyDate() ? $commentedArticle->getModifyDate()->format('Y.m.d H:i') : $commentedArticle->getCreateDate()->format('Y.m.d H:i'); ?>
+                                    <?= $commentedArticle->getCreateDate() ? $commentedArticle->getCreateDate()->format('Y.m.d H:i') : ''; ?>
                                 </span>
                             </td>
 

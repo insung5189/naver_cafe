@@ -82,15 +82,19 @@ $(document).ready(function () {
             data: data,
             dataType: 'json',
             success: function (response) {
-                $('#articleContent').html(response.html);
-                var articleIdsStr = $('#articleIds').attr('data-articles');
-                var articleIds = JSON.parse(articleIdsStr);
-                localStorage.setItem('articles', JSON.stringify(articleIds));
-                console.log("ajax업데이트 후: ", localStorage.getItem('articles'));
-                updateDateVisibility();
-                saveCurrentState();
-                window.history.pushState(data, '', window.location.pathname + '?' + $.param(data));
-                console.log("ajax요청 후 업데이트 된 히스토리 상태(게시판별 보기) : ", history.state);
+                if (response.errors) {
+                    alert(response.errors);
+                } else if (response.success) {
+                    $('#articleContent').html(response.html);
+                    var articleIdsStr = $('#articleIds').attr('data-articles');
+                    var articleIds = JSON.parse(articleIdsStr);
+                    localStorage.setItem('articles', JSON.stringify(articleIds));
+                    console.log("ajax업데이트 후: ", localStorage.getItem('articles'));
+                    updateDateVisibility();
+                    saveCurrentState();
+                    window.history.pushState(data, '', window.location.pathname + '?' + $.param(data));
+                    console.log("ajax요청 후 업데이트 된 히스토리 상태(게시판별 보기) : ", history.state);
+                }
             },
             error: function (xhr, status, error) {
                 console.error("Error: ", error);

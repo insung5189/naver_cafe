@@ -106,7 +106,7 @@ $GLOBALS['pageResources'] = [
                             </a>
                             <div class="article-detail-info">
                                 <span class="article-date">
-                                    <?= $article->getModifyDate() ? $article->getModifyDate()->format('Y.m.d H:i') : $article->getCreateDate()->format('Y.m.d H:i'); ?>
+                                    <?= $article->getCreateDate() ? $article->getCreateDate()->format('Y.m.d H:i') : ''; ?>
                                 </span>
                                 <span class="article-hit">
                                     조회
@@ -286,18 +286,23 @@ $GLOBALS['pageResources'] = [
                                                 </div>
                                             </a>
                                         </div>
-                                        <? if (isset($user) && is_array($user) && isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()) : ?>
+
+                                        <? if (isset($user) && is_array($user) && ((isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()) || (isset($user['role']) && in_array($user['role'], ['ROLE_ADMIN', 'ROLE_MASTER'])))) : ?>
                                             <div class="comment-edit-delete-btn">
                                                 <a href="javascript:void(0);" class="comment-edit-delete-toggle" data-comment-id="<?= $comment->getId(); ?>">
                                                     <i class="fa-solid fa-xl fa-ellipsis-vertical"></i>
                                                 </a>
                                                 <div class="comment-edit-and-delete-btn-box" style="display:none;" id="comment-edit-delete-toggle-box">
-                                                    <a href="javascript:void(0);" class="comment-edit-btn" data-comment-image-url="<?= $commentFileUrl . $commentImageName; ?>" data-edited-comment-id="<?= $comment->getId(); ?>" data-comment-content="<?= htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8'); ?>">
-                                                        수정
-                                                    </a>
-                                                    <a href="javascript:void(0);" class="comment-delete-btn" data-delete-comment-id="<?= $comment->getId(); ?>">
-                                                        삭제
-                                                    </a>
+                                                    <? if (isset($user) && is_array($user) && ((isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()))) : ?>
+                                                        <a href="javascript:void(0);" class="comment-edit-btn" data-comment-image-url="<?= $commentFileUrl . $commentImageName; ?>" data-edited-comment-id="<?= $comment->getId(); ?>" data-comment-content="<?= htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8'); ?>">
+                                                            수정
+                                                        </a>
+                                                    <? endif; ?>
+                                                    <? if (isset($user) && is_array($user) && ((isset($user['user_id']) && $user['user_id'] === $comment->getMember()->getId()) || (isset($user['role']) && in_array($user['role'], ['ROLE_ADMIN', 'ROLE_MASTER'])))) : ?>
+                                                        <a href="javascript:void(0);" class="comment-delete-btn" data-delete-comment-id="<?= $comment->getId(); ?>">
+                                                            삭제
+                                                        </a>
+                                                    <? endif; ?>
                                                 </div>
                                             </div>
                                         <? else : ?>

@@ -69,7 +69,7 @@ $user = $_SESSION['user_data'];
                         <p><strong>파일 업로드 안내:</strong></p>
                         <ul>
                             <li>허용되는 파일 확장자: <em>gif, jpg, png, jpeg, webp, bmp, pdf, doc, docx, xls, xlsx, ppt, pptx, txt, hwp</em></li>
-                            <li>최대 파일 크기: <em>20MB</em></li>
+                            <li>최대 파일 크기: <em>3MB</em></li>
                             <li>파일을 선택하면, 자동으로 업로드됩니다.</li>
                         </ul>
                     </div>

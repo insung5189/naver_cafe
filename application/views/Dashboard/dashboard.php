@@ -69,7 +69,7 @@ $GLOBALS['pageResources'] = [
                         <dd>
                             <div class="article-list-all-date-and-hit">
                                 <span class="article-list-all-date">
-                                    <?= $articleListAllArticle->getModifyDate() ? $articleListAllArticle->getModifyDate()->format('Y.m.d') : $articleListAllArticle->getCreateDate()->format('Y.m.d'); ?>
+                                    <?= $articleListAllArticle->getCreateDate() ? $articleListAllArticle->getCreateDate()->format('Y.m.d') : ''; ?>
                                 </span>
                                 ㆍ
                                 <span class="article-list-all-hit">
@@ -115,7 +115,7 @@ $GLOBALS['pageResources'] = [
                                     </div>
                                     <div class="main-free-board-card-date-and-hit">
                                         <span class="main-free-board-card-date">
-                                            <?= $freeBoardArticle->getModifyDate() ? $freeBoardArticle->getModifyDate()->format('Y.m.d') : $freeBoardArticle->getCreateDate()->format('Y.m.d'); ?>
+                                            <?= $freeBoardArticle->getCreateDate() ? $freeBoardArticle->getCreateDate()->format('Y.m.d') : ''; ?>
                                         </span>
                                         <span class="main-free-board-card-hit">
                                             조회 <?= $freeBoardArticle ? $freeBoardArticle->getHit() : 0; ?>

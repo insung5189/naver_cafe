@@ -170,10 +170,10 @@ class ArticleEditController extends MY_Controller
             ]);
             return;
         }
-        if (empty($title)) {
+        if (empty($title) || trim($title) === '') {
             $errors[] = '제목을 입력해 주세요.';
         }
-        if (empty($content)) {
+        if (empty($content) || trim($content) === '') {
             $errors[] = '내용을 입력해 주세요.';
         }
         $validPublicScopes = ['public', 'members', 'admins'];
@@ -513,8 +513,14 @@ class ArticleEditController extends MY_Controller
         $filename = pathinfo($file['name'], PATHINFO_FILENAME);
         $mimeType = mime_content_type($file['tmp_name']);
 
-        if (!in_array($extension, $imgExtensions) || !in_array($mimeType, $allowedMimeTypes) || $file['size'] > 20000 * 1024) {
-            echo json_encode(['uploaded' => 0, 'error' => ['message' => '유효하지 않은 파일입니다.']]);
+        if (!in_array($extension, $imgExtensions)) {
+            echo json_encode(['uploaded' => 0, 'error' => ['message' => '파일 확장자가 허용되지 않습니다.']]);
+            return;
+        } elseif (!in_array($mimeType, $allowedMimeTypes)) {
+            echo json_encode(['uploaded' => 0, 'error' => ['message' => '파일 확장자(MIME) 타입이 허용되지 않습니다.']]);
+            return;
+        } elseif ($file['size'] > 3072 * 1024) {
+            echo json_encode(['uploaded' => 0, 'error' => ['message' => '파일 크기가 3MB를 초과합니다.']]);
             return;
         }
 
@@ -532,7 +538,7 @@ class ArticleEditController extends MY_Controller
         // 업로드 설정
         $config['upload_path'] = $uploadPath;
         $config['allowed_types'] = implode('|', $imgExtensions);
-        $config['max_size'] = 20000; // 20MB로 제한
+        $config['max_size'] = '3072'; // 3MB로 제한
         $config['file_name'] = $newName;
 
         $this->load->library('upload', $config);
@@ -574,12 +580,12 @@ class ArticleEditController extends MY_Controller
         $allowedExtensions = array_merge($imgExtensions, $docExtensions);
 
         if (!in_array($mimeType, $allowedMimeTypes)) {
-            echo json_encode(['uploaded' => 0, 'error' => ['message' => '유효하지 않은 파일입니다.']]);
+            echo json_encode(['uploaded' => 0, 'error' => ['message' => '파일 확장자(MIME) 타입이 허용되지 않습니다.']]);
             return;
         }
 
-        if ($file['size'] > 20000 * 1024) {
-            echo json_encode(['uploaded' => 0, 'error' => ['message' => '파일 크기가 너무 큽니다. 최대 허용 크기: 20MB']]);
+        if ($file['size'] > 3072 * 1024) {
+            echo json_encode(['uploaded' => 0, 'error' => ['message' => '파일 크기가 3MB를 초과합니다.']]);
             return;
         }
 
@@ -604,7 +610,7 @@ class ArticleEditController extends MY_Controller
 
         $config['upload_path'] = $uploadPath;
         $config['allowed_types'] = implode('|', $allowedExtensions);
-        $config['max_size'] = 20000; // 20MB로 제한
+        $config['max_size'] = '3072'; // 20MB로 제한
         $config['file_name'] = $newName;
 
         $this->load->library('upload', $config);

@@ -385,14 +385,14 @@ $(document).ready(function () {
 
     // 이름 유효성 검사
     function validateFirstName() {
-        const firstName = $('#firstName').val().trim();
+        const firstName = $('#firstName').val();
         const firstNameMessage = $('#firstname-validation-message');
 
         if (firstName == null || firstName == '') {
             firstNameMessage.text('❌ 이름을 입력해주세요.').css('color', 'red');
             return false;
         }
-        if (!nameRegex.test(firstName)) {
+        if (!nameRegex.test(firstName) || /^\s|\s$/.test(firstName)) {
             firstNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
             return false;
         } else {
@@ -404,14 +404,14 @@ $(document).ready(function () {
 
     // 성 유효성 검사
     function validateLastName() {
-        const lastName = $('#lastName').val().trim();
+        const lastName = $('#lastName').val();
         const lastNameMessage = $('#lastname-validation-message');
 
         if (lastName == null || lastName == '') {
             lastNameMessage.text('❌ 성을 입력해주세요.').css('color', 'red');
             return false;
         }
-        if (!nameRegex.test(lastName)) {
+        if (!nameRegex.test(lastName) || /^\s|\s$/.test(lastName)) {
             lastNameMessage.text('❌ 잘못된 입력입니다.').css('color', 'red');
             return false;
         } else {

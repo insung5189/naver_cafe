@@ -97,6 +97,7 @@ class MainController extends MY_Controller
                 $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountForPagination();
                 $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, null, null);
             } else {
+                $errors = NULL;
                 // 검색결과에 오류 없을 때
                 $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                 $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
@@ -112,6 +113,7 @@ class MainController extends MY_Controller
             // $totalArticleCount = $this->MainModel->getTotalArticleCount();
             // $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountForPagination();
             // $articleIndex = NULL;
+            $errors = NULL;
             redirect('/article/articlelistallcontroller');
         }
 
@@ -183,8 +185,9 @@ class MainController extends MY_Controller
                         $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCount = $this->MainModel->getTotalArticleCount();
                         $totalArticleCountForPaginaion = $this->MainModel->getTotalArticleCountForPagination();
-                        $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, null, null);
+                        $articleIndex = NULL;
                     } else {
+                        $errors = NULL;
                         // 검색결과에 오류 없을 때
                         $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                         $childArticles = $this->MainModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
@@ -194,6 +197,7 @@ class MainController extends MY_Controller
                         $articleIndex = $this->MainModel->searchArticles($keyword, $element, $period, $startDate, $endDate, NULL, NULL);
                     }
                 } else {
+                    $errors = NULL;
                     $this->loadErrorView();
                 }
 
@@ -219,7 +223,7 @@ class MainController extends MY_Controller
                 $page_view_data = [
                     'title' => '카페 통합검색 결과',
                     'articles' => $articles,
-                    'articleIndexIds' => $articleIndexIds,
+                    'articleIndexIds' => $articleIndexIds ?? NULL,
                     'commentCounts' => $commentCounts,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
@@ -239,7 +243,7 @@ class MainController extends MY_Controller
                 $html = $this->load->view('dashboard/main_search_content', $page_view_data, TRUE);
 
                 // 데이터를 JSON 형태로 반환
-                echo json_encode(['success' => true, 'html' => $html]);
+                echo json_encode(['success' => true, 'html' => $html, 'errors' => $errors]);
             } catch (\Exception $e) {
                 echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
             }

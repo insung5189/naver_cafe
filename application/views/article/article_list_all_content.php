@@ -3,15 +3,6 @@
     <div id="articleIds" data-articles='<?= json_encode($articleIndexIds); ?>' style="display:none;"></div>
     <h1 class="title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></h1>
 
-    <? if (!empty($errors)) : ?>
-        <div class="error-messages">
-            <p class="error-alert"><strong>⚠️ 문제가 발생했습니다!</strong></p>
-            <? foreach ($errors as $field => $error) : ?>
-                <p class="error-alert"><strong><?= htmlspecialchars($field) ?>:</strong> <?= htmlspecialchars($error) ?></p>
-            <? endforeach; ?>
-        </div>
-    <? endif; ?>
-
     <!-- 검색 요약 메시지 표시 -->
     <? if (!empty($keyword) && !empty($period) || !empty($startDate) || !empty($endDate)) : ?>
         <div class="search-summary">

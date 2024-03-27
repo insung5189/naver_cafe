@@ -69,7 +69,7 @@
 
                             <td scope="col" class="td-create-date">
                                 <span class="article-create-date-row">
-                                    <?= $article->getModifyDate() ? $article->getModifyDate()->format('Y.m.d H:i') : $article->getCreateDate()->format('Y.m.d H:i'); ?>
+                                    <?= $article->getCreateDate() ? $article->getCreateDate()->format('Y.m.d H:i') : ''; ?>
                                 </span>
                             </td>
 

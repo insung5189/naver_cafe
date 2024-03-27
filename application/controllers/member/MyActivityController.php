@@ -10,7 +10,6 @@ class MyActivityController extends MY_Controller
     public function index()
     {
         $userData = $this->session->userdata('user_data');
-
         $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
 
 
@@ -19,11 +18,34 @@ class MyActivityController extends MY_Controller
             $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
             $articleCount = count($this->MyActivityModel->getArticlesByMemberId($memberId));
 
+            $currentPage = $this->input->get('page', TRUE) ?? 1;
+            $articlesPerPage = $this->input->get('articlesPerPage', TRUE) ?? 10;
+            $totalArticleCount = count($this->MyActivityModel->getArticlesByMemberId($memberId));
+            $totalPages = ceil($totalArticleCount / $articlesPerPage);
+
+            // 필요한 데이터 로드
+            $articlesByPage = $this->MyActivityModel->getArticlesByMemberIdByPage($memberId, $currentPage, $articlesPerPage);
+
+            // 목록에 표시되는 게시물의 댓글 갯수 확인하기
+            $articlesByMemberId = $this->MyActivityModel->getArticlesByMemberId($memberId);
+            $articleIds = array_map(function ($article) {
+                return $article->getId();
+            }, $articlesByMemberId);
+            $commentCountByArticle = $this->MyActivityModel->getCommentCountForArticles($articleIds); // 해당 게시글의 댓글 갯수 데이터
+
+            $parentArticlesExist = $this->MyActivityModel->checkParentArticlesExist($articlesByPage);
+
             // 페이지 데이터 준비
             $page_view_data = [
                 'title' => '나의 활동',
                 'member' => $member,
                 'articleCount' => $articleCount,
+                'articlesByPage' => $articlesByPage,
+                'commentCountByArticle' => $commentCountByArticle,
+                'parentArticlesExist' => $parentArticlesExist,
+                'currentPage' => $currentPage,
+                'totalPages' => $totalPages,
+                'articlesPerPage' => $articlesPerPage
             ];
 
             // 뷰 로드

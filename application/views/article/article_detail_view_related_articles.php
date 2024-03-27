@@ -32,7 +32,7 @@
                     </a>
                     <a href="/article/articledetailcontroller/index/<?= $relatedArticle->getId(); ?>">
                         <div class="related-article-date-area">
-                            <?= $relatedArticle->getModifyDate() ? $relatedArticle->getModifyDate()->format('Y.m.d') : $relatedArticle->getCreateDate()->format('Y.m.d'); ?>
+                            <?= $relatedArticle->getCreateDate() ? $relatedArticle->getCreateDate()->format('Y.m.d') : ''; ?>
                         </div>
                     </a>
                 </li>

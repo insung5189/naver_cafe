@@ -8,8 +8,12 @@ class ArticleDetailController extends MY_Controller
         $this->load->model('article/ArticleDetailModel', 'ArticleDetailModel');
     }
 
-    public function index($articleId)
+    public function index($articleId = NULL)
     {
+        if ($articleId === null || !isset($articleId) || !is_numeric($articleId)) {
+            $this->loadErrorView();
+            return;
+        }
         // 로그인한 사용자가 있다면 좋아요 여부 확인
         $userLikedArticle = false;
 
@@ -233,7 +237,7 @@ class ArticleDetailController extends MY_Controller
             'file' => $_FILES['commentImage'] ?? null
         ];
 
-        if (empty($formData['content']) && empty($formData['file']['name'])) {
+        if (trim($formData['content']) === '' && empty($formData['file']['name']) ) {
             $errorMessages = ['content & file' => '댓글 내용이나 파일을 첨부해주세요.'];
             $this->session->set_flashdata('error_messages', $errorMessages);
             redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
@@ -262,7 +266,7 @@ class ArticleDetailController extends MY_Controller
             'file' => $_FILES['commentImage'] ?? null
         ];
 
-        if (empty($formData['content']) && empty($formData['file']['name'])) {
+        if (trim($formData['content']) === '' && empty($formData['file']['name']) ) {
             $errorMessages = [
                 'content & file' => '댓글 내용이나 파일을 첨부해주세요.'
             ];
@@ -307,7 +311,7 @@ class ArticleDetailController extends MY_Controller
                 return;
             }
 
-            if (empty($formData['content']) && empty($formData['file']['name'])) {
+            if (trim($formData['content']) === '' && empty($formData['file']['name']) ) {
                 echo json_encode(['success' => false, 'message' => '댓글 내용이나 파일을 첨부해주세요.']);
                 return;
             }

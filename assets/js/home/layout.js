@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    
+
     window.addEventListener('popstate', function (event) {
         console.log('현재 상태:', event.state);
         // event.state를 사용해 페이지 콘텐츠를 업데이트하는 로직을 구현합니다.
@@ -15,6 +15,14 @@ $(document).ready(function () {
     $(window).on('beforeunload', function () {
         if (formModified) {
             return '변경사항이 저장되지 않을 수 있습니다.';
+        }
+    });
+
+    $('.search-form-main').on('submit', function (e) {
+        var keyword = $('.custom-search-input-main').val();
+        if (keyword.length > 20) {
+            alert("검색어는 20자를 초과할 수 없습니다.");
+            e.preventDefault();
         }
     });
 

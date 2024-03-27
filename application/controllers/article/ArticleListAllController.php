@@ -33,6 +33,7 @@ class ArticleListAllController extends MY_Controller
                 $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
                 $articleIndex = NULL;
             } else {
+                $errors = NULL;
                 // 검색결과에 오류 없을 때
                 $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                 // $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
@@ -46,6 +47,7 @@ class ArticleListAllController extends MY_Controller
             }
         } else {
             // 검색하지 않았을 때
+            $errors = NULL;
             $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
             $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
             $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
@@ -121,8 +123,9 @@ class ArticleListAllController extends MY_Controller
                         $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
                         $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCount();
                         $totalArticleCountForPaginaion = $this->ArticleListAllModel->getTotalArticleCountForPagination();
-                        $articleIndex = NULL;
+                        $articleIndex = $this->ArticleListAllModel->getArticlesByPage(NULL, NULL);
                     } else {
+                        $errors = NULL;
                         // 검색결과에 오류 없을 때
                         $articles = $result; // 검색키워드가 있고, 오류가 없을 땐 검색결과 전부를 페이징 해서 불러옴.
                         // $totalArticleCount = $this->ArticleListAllModel->getTotalArticleCountWithSearch($keyword, $element, $period, $startDate, $endDate);
@@ -135,6 +138,7 @@ class ArticleListAllController extends MY_Controller
                         $articleIndex = $this->ArticleListAllModel->searchArticles($keyword, $element, $period, $startDate, $endDate, NULL, NULL);
                     }
                 } else {
+                    $errors = NULL;
                     // 검색하지 않았을 때
                     $articles = $this->ArticleListAllModel->getArticlesByPage($currentPage, $articlesPerPage); // 기존 게시글은 depth가 0인것, isActive가 1인것만 불러옴.
                     $childArticles = $this->ArticleListAllModel->getChildArticles(); // 자식글은 부모글의 id값을 key값으로 하여 배열에 저장하고 페이지에서 부모글 밑에 조건부로 foreach문으로 반복나열함.
@@ -165,7 +169,7 @@ class ArticleListAllController extends MY_Controller
                 $page_view_data = [
                     'title' => !empty($keyword) ? '전체글보기 검색 결과' : '전체글보기',
                     'articles' => $articles,
-                    'articleIndexIds' => $articleIndexIds,
+                    'articleIndexIds' => $articleIndexIds ?? NULL,
                     'commentCounts' => $commentCounts,
                     'currentPage' => $currentPage,
                     'totalPages' => $totalPages,
@@ -185,7 +189,7 @@ class ArticleListAllController extends MY_Controller
                 $html = $this->load->view('article/article_list_all_content', $page_view_data, TRUE);
 
                 // 데이터를 JSON 형태로 반환
-                echo json_encode(['success' => true, 'html' => $html]);
+                echo json_encode(['success' => true, 'html' => $html, 'errors' => $errors]);
             } catch (\Exception $e) {
                 echo json_encode(['success' => false, 'error' => '데이터를 불러오는 데 실패했습니다.']);
             }
