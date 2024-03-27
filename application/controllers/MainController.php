@@ -19,6 +19,9 @@ class MainController extends MY_Controller
         }, $articleListAllArticles);
         $articleListAllcommentCounts = $this->MainModel->getCommentCountForArticles($articleListAllarticleIds);
         $articleListAllIndex = $this->MainModel->getArticleListAllImgs(NULL, NULL);
+        $allArticleIndexIds = array_map(function ($article) {
+            return $article->getId();
+        }, $articleListAllIndex);
 
         // 자유게시판 영역
         $freeBoardArticles = $this->MainModel->getFreeBoardArticles(1, 4);
@@ -28,6 +31,9 @@ class MainController extends MY_Controller
         }, $freeBoardArticles);
         $freeBoardArticlesCommentCounts = $this->MainModel->getCommentCountForArticles($freeBoardarticleIds);
         $freeBoardArticlesIndex = $this->MainModel->getFreeBoardArticles(NULL, NULL);
+        $freeBoardarticleIndexIds = array_map(function ($article) {
+            return $article->getId();
+        }, $freeBoardArticlesIndex);
 
         // 질문/답변게시판 영역
         $qnaBoardArticles = $this->MainModel->getQnaArticles(1, 13);
@@ -36,24 +42,27 @@ class MainController extends MY_Controller
         }, $qnaBoardArticles);
         $qnaBoardArticlesCommentCounts = $this->MainModel->getCommentCountForArticles($qnaBoardarticleIds);
         $qnaBoardArticlesIndex = $this->MainModel->getQnaArticles(NULL, NULL);
-
+        $qnaBoardarticleIndexIds = array_map(function ($article) {
+            return $article->getId();
+        }, $qnaBoardArticlesIndex);
 
         $page_view_data = [
             'title' => '메인',
             'articleListAllArticles' => $articleListAllArticles,
             'articleListAllimgfileUrls' => $articleListAllimgfileUrls,
             'articleListAllcommentCounts' => $articleListAllcommentCounts,
-            'articleListAllIndex' => $articleListAllIndex,
+            'allArticleIndexIds' => $allArticleIndexIds,
 
             'freeBoardArticles' => $freeBoardArticles,
             'freeBoardArticlesimgfileUrls' => $freeBoardArticlesimgfileUrls,
             'freeBoardArticlesCommentCounts' => $freeBoardArticlesCommentCounts,
-            'freeBoardArticlesIndex' => $freeBoardArticlesIndex,
+            'freeBoardarticleIndexIds' => $freeBoardarticleIndexIds,
 
             'qnaBoardArticles' => $qnaBoardArticles,
             'qnaBoardArticlesCommentCounts' => $qnaBoardArticlesCommentCounts,
-            'qnaBoardArticlesIndex' => $qnaBoardArticlesIndex,
+            'qnaBoardarticleIndexIds' => $qnaBoardarticleIndexIds,
         ];
+
         $this->layout->view('dashboard/dashboard', $page_view_data);
     }
 

@@ -14,33 +14,33 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', '.freeboard-article-link', function () {
-        // var articleIdsStr = $('#articleIds').attr('data-articles');
-        var articleIds = JSON.parse(articleIdsStr);
-        localStorage.setItem('articles', JSON.stringify(articleIds));
-        console.log("초기 인덱스: ", localStorage.getItem('articles'));
-        
-        boardId = 'main';
-        saveCurrentState(boardId);
-    });
-
-    $(document).on('click', '.qna-article-link', function () {
-        // var articleIdsStr = $('#articleIds').attr('data-articles');
-        var articleIds = JSON.parse(articleIdsStr);
-        localStorage.setItem('articles', JSON.stringify(articleIds));
-        console.log("초기 인덱스: ", localStorage.getItem('articles'));
-        
-        boardId = 'main';
-        saveCurrentState(boardId);
-    });
-
     $(document).on('click', '.all-article-link', function () {
-        // var articleIdsStr = $('#articleIds').attr('data-articles');
+        var articleIdsStr = $('#allArticleIds').attr('data-all-articles');
         var articleIds = JSON.parse(articleIdsStr);
         localStorage.setItem('articles', JSON.stringify(articleIds));
         console.log("초기 인덱스: ", localStorage.getItem('articles'));
 
         boardId = 'all';
+        saveCurrentState(boardId);
+    });
+
+    $(document).on('click', '.freeboard-article-link', function () {
+        var articleIdsStr = $('#freeBoardArticleIds').attr('data-freeboard-articles');
+        var articleIds = JSON.parse(articleIdsStr);
+        localStorage.setItem('articles', JSON.stringify(articleIds));
+        console.log("초기 인덱스: ", localStorage.getItem('articles'));
+
+        boardId = 'main';
+        saveCurrentState(boardId);
+    });
+
+    $(document).on('click', '.qna-article-link', function () {
+        var articleIdsStr = $('#qnaArticleIds').attr('data-qna-articles');
+        var articleIds = JSON.parse(articleIdsStr);
+        localStorage.setItem('articles', JSON.stringify(articleIds));
+        console.log("초기 인덱스: ", localStorage.getItem('articles'));
+
+        boardId = 'main';
         saveCurrentState(boardId);
     });
 

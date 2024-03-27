@@ -13,7 +13,9 @@ $GLOBALS['pageResources'] = [
         <span class="toggle-daemoon"></span>
     </div>
 </div>
-<div id="articleIds" data-articles='<?= json_encode($articleIndexIds); ?>' style="display:none;"></div>
+<div id="allArticleIds" data-all-articles='<?= json_encode($allArticleIndexIds); ?>' style="display:none;"></div>
+<div id="freeBoardArticleIds" data-freeboard-articles='<?= json_encode($freeBoardarticleIndexIds); ?>' style="display:none;"></div>
+<div id="qnaArticleIds" data-qna-articles='<?= json_encode($qnaBoardarticleIndexIds); ?>' style="display:none;"></div>
 <div class="main-contents-area">
     <div class="article-list-all-view">
         <div class="list-title">
