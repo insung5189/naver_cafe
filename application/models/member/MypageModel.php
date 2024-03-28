@@ -56,7 +56,6 @@ class MypageModel extends MY_Model
             $member->setPhone($formattedPhone);
             $member->setFirstName($formData['firstName']);
             $member->setLastName($formData['lastName']);
-            $member->setGender($formData['gender'] === 'true' ? 1 : 0);
             $member->setBirth(new \DateTime($formData['birth']));
             $member->setPostalNum($formData['postalNum']);
             $member->setRoadAddress($formData['roadAddress']);
@@ -64,6 +63,11 @@ class MypageModel extends MY_Model
             $member->setDetailAddress($formData['detailAddress']);
             $member->setExtraAddress($formData['extraAddress']);
             $member->setModifyDate(new \DateTime(date('Y-m-d H:i')));
+            if (!isset($formData['gender']) || $formData['gender'] === '') {
+                $member->setGender(NULL);
+            } else {
+                $member->setGender($formData['gender'] === 'true' ? 1 : 0);
+            }
 
             $this->em->persist($member);
             $this->em->flush();

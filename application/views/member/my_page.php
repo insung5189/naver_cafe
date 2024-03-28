@@ -34,6 +34,7 @@ $GLOBALS['pageResources'] = [
                     ?>
                     <img class="my-page-image-preview" src="<?= $fileUrl . $profileImagePath; ?>" alt="프로필사진">
 
+
                     <div data-member-img-src="<?= $fileUrl . $profileImagePath; ?>"></div>
                     <form id="prfl-img-form" action="">
                         <label class="prfl-img-edit" for="member-prfl-img-edit">
@@ -248,8 +249,8 @@ $GLOBALS['pageResources'] = [
                                 <div class="input-box">
                                     <select id="gender" name="gender" class="custom-input">
                                         <option value="">성별 선택</option>
-                                        <option value="true" <?= $member->getGender() == '0' ? 'selected' : '' ?>>남성</option>
-                                        <option value="false" <?= $member->getGender() == '1' ? 'selected' : '' ?>>여성</option>
+                                        <option value="true" <?= $member->getGender() == '1' ? 'selected' : '' ?>>남성</option>
+                                        <option value="false" <?= $member->getGender() == '0' ? 'selected' : '' ?>>여성</option>
                                     </select>
                                     <div class="message-box">
                                         <span class="description pl-5" id="gender-validation-message"></span>

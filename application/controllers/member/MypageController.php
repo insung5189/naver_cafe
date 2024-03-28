@@ -29,27 +29,6 @@ class MypageController extends MY_Controller
         }
     }
 
-    public function index2()
-    {
-        $userData = $this->session->userdata('user_data');
-        $memberId = isset($userData['user_id']) ? $userData['user_id'] : null;
-
-        if ($memberId) {
-            $member = $this->em->getRepository('Models\Entities\Member')->find($memberId);
-            $articleCount = count($this->MypageModel->getArticlesByMemberId($memberId));
-
-            $page_view_data = [
-                'title' => '마이페이지',
-                'member' => $member,
-                'articleCount' => $articleCount,
-            ];
-            $this->layout->view('member/my_page_copy', $page_view_data);
-        } else {
-            $page_view_data['title'] = '오류 발생';
-            $this->layout->view('errors/error_page', $page_view_data);
-        }
-    }
-
     public function processUpdateProfile()
     {
         $formData = [
