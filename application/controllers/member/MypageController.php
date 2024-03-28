@@ -24,8 +24,7 @@ class MypageController extends MY_Controller
             ];
             $this->layout->view('member/my_page', $page_view_data);
         } else {
-            $page_view_data['title'] = '오류 발생';
-            $this->layout->view('errors/error_page', $page_view_data);
+            $this->loadErrorView();
         }
     }
 

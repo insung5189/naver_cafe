@@ -52,7 +52,7 @@ class MyActivityController extends MY_Controller
             $this->layout->view('member/my_activity', $page_view_data);
         } else {
             // 회원 정보 없을 경우 오류 페이지 로드
-            $this->layout->view('errors/error_page', ['title' => '오류 발생']);
+            $this->loadErrorView();
         }
     }
 
@@ -360,5 +360,14 @@ class MyActivityController extends MY_Controller
         } else {
             show_404();
         }
+    }
+
+    public function loadErrorView()
+    {
+        $page_view_data = [
+            'title' => '잘못된 접근입니다.',
+            'message' => '정상적인 경로로 접근해주세요.',
+        ];
+        $this->layout->view('errors/error_page', $page_view_data);
     }
 }

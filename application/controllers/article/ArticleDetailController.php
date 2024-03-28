@@ -237,7 +237,7 @@ class ArticleDetailController extends MY_Controller
             'file' => $_FILES['commentImage'] ?? null
         ];
 
-        if (trim($formData['content']) === '' && empty($formData['file']['name']) ) {
+        if (trim($formData['content']) === '' && empty($formData['file']['name'])) {
             $errorMessages = ['content & file' => '댓글 내용이나 파일을 첨부해주세요.'];
             $this->session->set_flashdata('error_messages', $errorMessages);
             redirect('/article/articledetailcontroller/index/' . $formData['articleId']);
@@ -266,7 +266,7 @@ class ArticleDetailController extends MY_Controller
             'file' => $_FILES['commentImage'] ?? null
         ];
 
-        if (trim($formData['content']) === '' && empty($formData['file']['name']) ) {
+        if (trim($formData['content']) === '' && empty($formData['file']['name'])) {
             $errorMessages = [
                 'content & file' => '댓글 내용이나 파일을 첨부해주세요.'
             ];
@@ -311,7 +311,7 @@ class ArticleDetailController extends MY_Controller
                 return;
             }
 
-            if (trim($formData['content']) === '' && empty($formData['file']['name']) ) {
+            if (trim($formData['content']) === '' && empty($formData['file']['name']) && empty($formData['existingImageName'])) {
                 echo json_encode(['success' => false, 'message' => '댓글 내용이나 파일을 첨부해주세요.']);
                 return;
             }

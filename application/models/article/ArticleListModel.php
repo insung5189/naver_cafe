@@ -18,14 +18,13 @@ class ArticleListModel extends MY_Model
             ->andWhere('a.depth >= 0') // 모든 게시글을 선택
             ->andWhere('a.isActive = 1') // 활성화된 게시글만
             ->orderBy('a.orderGroup', 'DESC')
-            ->addOrderBy('a.createDate', 'ASC')
+            ->addOrderBy('a.depth', 'ASC') // 깊이에 따라 정렬
+            ->addOrderBy('a.createDate', 'ASC') // 생성 날짜에 따라 추가 정렬
             ->setParameter('boardId', $boardId);
 
         $results = $queryBuilder->getQuery()->getResult();
 
-        // 결과집합이 비어 있는지 확인
         if (empty($results)) {
-            // 결과가 없을 경우, 빈 배열 반환 또는 예외 처리
             return [];
         }
 
@@ -35,55 +34,70 @@ class ArticleListModel extends MY_Model
             $groupedArticles[$article->getOrderGroup()][] = $article;
         }
 
-        $orderGroupByArticles = [];
-        // 각 orderGroup 내에서 게시글을 부모-자식 관계에 따라 정렬
+        $sortedArticles = [];
         foreach ($groupedArticles as $orderGroup => $articles) {
-            $orderGroupByArticles[$orderGroup] = $this->sortArticlesByParentChildRelationship($articles);
+            // 각 orderGroup 내에서 부모-자식 관계를 기준으로 정렬
+            $sortedGroupArticles = $this->sortArticlesByParentChildRelationshipImproved($articles);
+            foreach ($sortedGroupArticles as $article) {
+                $sortedArticles[] = $article;
+            }
         }
 
-        // 배열 평탄화
-        $flattenedArticles = array_merge(...array_values($orderGroupByArticles));
-
-        // 페이징 처리 조건 확인 및 적용
+        // 페이징 처리
         if ($currentPage !== null && $articlesPerPage !== null) {
             $pagedArticles = array_slice(
-                $flattenedArticles,
+                $sortedArticles,
                 ($currentPage - 1) * $articlesPerPage,
                 $articlesPerPage
             );
         } else {
-            $pagedArticles = $flattenedArticles;
+            $pagedArticles = $sortedArticles;
         }
 
         return $pagedArticles;
     }
 
-    protected function sortArticlesByParentChildRelationship($articles)
+    protected function sortArticlesByParentChildRelationshipImproved($articles)
     {
-        $tempArray = [];
+        $articlesById = [];
+        $sortedArticles = [];
+
+        // 게시글 ID를 키로 하는 배열 생성
         foreach ($articles as $article) {
-            $parentId = $article->getParent() ? $article->getParent()->getId() : null;
-            if ($parentId !== null) {
-                $positionFound = false;
-                foreach ($tempArray as $index => $tempArticle) {
-                    if ($tempArticle->getId() == $parentId) {
-                        $insertPosition = $index + 1;
-                        while ($insertPosition < count($tempArray) && $tempArray[$insertPosition]->getParent() && $tempArray[$insertPosition]->getParent()->getId() == $parentId) {
-                            $insertPosition++;
-                        }
-                        array_splice($tempArray, $insertPosition, 0, [$article]);
-                        $positionFound = true;
-                        break;
-                    }
-                }
-                if (!$positionFound) {
-                    $tempArray[] = $article; // 부모가 없거나 아직 배열에 추가되지 않은 경우
-                }
-            } else {
-                $tempArray[] = $article; // 최상위 레벨 게시글
+            $articlesById[$article->getId()] = $article;
+        }
+
+        // 모든 게시글 순회
+        foreach ($articles as $article) {
+            // 부모 게시글이 존재하지 않거나 결과 집합 내에 없는 경우
+            if (!$article->getParent() || !isset($articlesById[$article->getParent()->getId()])) {
+                $this->addArticleAndChildren($article, $sortedArticles, $articlesById, $articles);
             }
         }
-        return $tempArray;
+
+        // 정렬되지 않은 나머지 게시글 추가 (부모 ID가 있지만, 해당 부모가 결과 집합 내에 존재하지 않는 경우)
+        foreach ($articles as $article) {
+            if (!in_array($article, $sortedArticles, true)) {
+                $sortedArticles[] = $article;
+            }
+        }
+
+        return $sortedArticles;
+    }
+
+    protected function addArticleAndChildren($article, &$sortedArticles, $articlesById, $originalArticles)
+    {
+        // 현재 게시글 추가
+        if (!in_array($article, $sortedArticles, true)) {
+            $sortedArticles[] = $article;
+        }
+
+        // 자식 게시글 찾아 재귀적으로 추가
+        foreach ($originalArticles as $potentialChild) {
+            if ($potentialChild->getParent() && $potentialChild->getParent()->getId() === $article->getId()) {
+                $this->addArticleAndChildren($potentialChild, $sortedArticles, $articlesById, $originalArticles);
+            }
+        }
     }
 
     public function getAllArticlesByBoardId($boardId)

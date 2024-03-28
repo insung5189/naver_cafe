@@ -125,7 +125,7 @@ $(document).ready(function () {
         if (!(file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/bmp' || file.type === 'image/jpg')) {
             alert('jpg, jpeg, png, bmp 형식의 이미지 파일만 업로드 가능합니다.');
             $('#member-prfl-img-edit').val("");
-            fileInfo.html(`jpg, jpeg, png, bmp 형식의 이미지 파일만 등록 가능합니다.<br>다시 등록해주세요.`);
+            fileInfo.html(`jpg, jpeg, png, bmp 형식의<br>이미지 파일만 등록 가능합니다.<br>다시 등록해주세요.`);
             return;
         }
 

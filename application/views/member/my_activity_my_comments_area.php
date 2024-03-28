@@ -32,7 +32,7 @@
                                         </div>
                                         <a href="/article/articleDetailcontroller/index/<?= $comment->getArticle()->getId(); ?>#comment-<?= $comment->getId() ?>" target="_blank" class="link-to-commented-article-contents" data-comment-id="<?= $comment->getId(); ?>" data-comment-article-id="<?= $comment->getArticle()->getId(); ?>">
                                             <div class="comment-content-detail">
-                                                <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : '내용없음.'; ?>
+                                                <?= $comment->getContent() ? htmlspecialchars($comment->getContent(), ENT_QUOTES, 'UTF-8') : '(이미지)'; ?>
                                             </div>
                                             <div class="comment-create-date">
                                                 <?= $comment->getModifyDate() ? $comment->getModifyDate()->format('Y.m.d H:i') : $comment->getCreateDate()->format('Y.m.d H:i'); ?>

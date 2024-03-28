@@ -134,9 +134,20 @@ class ArticleListAllModel extends MY_Model
             ->from('Models\Entities\Article', 'article')
             ->where('article.depth > 0') // 자식 게시글인 것만 확보
             ->andWhere('article.isActive = 1') // 활성화된 게시글만
-            ->orderBy('article.createDate', 'ASC'); // createDate로 초기 정렬
+            ->orderBy('article.orderGroup', 'DESC')
+            ->addOrderBy('article.createDate', 'ASC'); // createDate로 초기 정렬
 
         $results = $queryBuilder->getQuery()->getResult();
+
+        if (empty($results)) {
+            return [];
+        }
+
+        // 게시글을 ID를 키로 하는 배열로 재구성
+        $articlesById = [];
+        foreach ($results as $article) {
+            $articlesById[$article->getId()] = $article;
+        }
 
         // 게시글을 orderGroup별로 묶어 정렬
         $groupedArticles = [];
@@ -146,35 +157,44 @@ class ArticleListAllModel extends MY_Model
 
         // 각 orderGroup 내에서 게시글을 부모-자식 관계에 따라 정렬
         foreach ($groupedArticles as $orderGroup => $articles) {
-            $tempArray = [];
-            foreach ($articles as $article) {
-                $parentId = $article->getParent() ? $article->getParent()->getId() : null;
-                $depth = $article->getDepth();
-                // 부모 ID를 기반으로 적절한 위치 찾기
-                if ($depth !== 1) {
-                    $positionFound = false;
-                    foreach ($tempArray as $index => $tempArticle) {
-                        if ($tempArticle->getId() == $parentId) {
-                            // 부모 바로 다음 위치에서 시작하여, 같은 부모를 가진 다음 자식까지의 범위에서 적절한 위치 찾기
-                            $insertPosition = $index + 1;
-                            while ($insertPosition < count($tempArray) && $tempArray[$insertPosition]->getParent() && $tempArray[$insertPosition]->getParent()->getId() == $parentId) {
-                                $insertPosition++;
-                            }
-                            array_splice($tempArray, $insertPosition, 0, [$article]);
-                            $positionFound = true;
-                            break;
-                        }
-                    }
-                    if (!$positionFound) {
-                        $tempArray[] = $article; // 부모가 없거나 아직 배열에 추가되지 않은 경우
-                    }
-                } else {
-                    $tempArray[] = $article; // 최상위 레벨 게시글
-                }
-            }
-            $childArticles[$orderGroup] = $tempArray;
+            // 부모 게시글이 없거나 부모 게시글이 존재하지 않는 경우에도 처리하는 정렬 로직
+            $sortedArticles = $this->sortArticlesByParentChildRelationshipImproved($articles, $articlesById);
+            $childArticles[$orderGroup] = $sortedArticles;
         }
+
         return $childArticles;
+    }
+
+    protected function sortArticlesByParentChildRelationshipImproved($articles, $articlesById)
+    {
+        $sortedArticles = [];
+        foreach ($articles as $article) {
+            // 부모 게시글이 없거나, 부모 게시글이 결과 집합 내에 존재하지 않는 경우에도 처리
+            if (!$article->getParent() || !isset($articlesById[$article->getParent()->getId()])) {
+                $this->addArticleAndChildren($article, $sortedArticles, $articlesById);
+            }
+        }
+
+        // 정렬되지 않은 나머지 게시글 추가
+        foreach ($articles as $article) {
+            if (!in_array($article, $sortedArticles, true)) {
+                $sortedArticles[] = $article;
+            }
+        }
+
+        return $sortedArticles;
+    }
+
+    protected function addArticleAndChildren($article, &$sortedArticles, $articlesById)
+    {
+        if (!in_array($article, $sortedArticles, true)) {
+            $sortedArticles[] = $article;
+        }
+        foreach ($articlesById as $childArticle) {
+            if ($childArticle->getParent() && $childArticle->getParent()->getId() === $article->getId()) {
+                $this->addArticleAndChildren($childArticle, $sortedArticles, $articlesById);
+            }
+        }
     }
 
     public function searchArticles($keyword, $element, $period, $startDate = null, $endDate = null, $currentPage, $articlesPerPage)
@@ -581,5 +601,4 @@ class ArticleListAllModel extends MY_Model
 
         return $errors;
     }
-
 }
