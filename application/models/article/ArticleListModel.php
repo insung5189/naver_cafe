@@ -201,6 +201,7 @@ class ArticleListModel extends MY_Model
                             ->andWhere('m.isActive = 1')
                             ->andWhere('ca.isActive = 1')
                             ->andWhere('m.blacklist = 0')
+                            ->andWhere('ca.articleBoard = :boardId')
                             ->getDQL();
 
                         $queryBuilder->orWhere($queryBuilder->expr()->in('a.id', $subQuery));
