@@ -59,7 +59,7 @@ $GLOBALS['pageResources'] = [
                     <div class="label-box">
                         <div class="label-section">
                             <span class="label-text">프로필 이미지</span>
-                            <span class="description">(최대50MB)</span>
+                            <span class="description">(최대3MB)</span>
                         </div>
                     </div>
 
