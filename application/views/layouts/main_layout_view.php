@@ -53,6 +53,9 @@
             </a>
         </header>
 
+        <h1>
+            루트디렉토리 변경 테스트
+        </h1>
         <main>
             <div class="search-box-main">
                 <form action="/mainController/mainSearch" method="GET" class="search-form-main">
