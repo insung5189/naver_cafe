@@ -8,7 +8,7 @@ class ArticleListController extends MY_Controller
         $this->load->model('article/ArticleListModel', 'ArticleListModel');
     }
 
-    public function index($boardId)
+    public function index($boardId = null)
     {
         $memberId = $this->session->userdata('user_data') ? $this->session->userdata('user_data')['user_id'] : NULL;
 
